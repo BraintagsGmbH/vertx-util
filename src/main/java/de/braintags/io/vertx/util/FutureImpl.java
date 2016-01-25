@@ -1,4 +1,4 @@
-package de.braintags.io.vertx;
+package de.braintags.io.vertx.util;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
