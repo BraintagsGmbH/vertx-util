@@ -18,9 +18,9 @@
 	<properties>
 		<sonar.language>java</sonar.language>
 		<sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
-		<testjar.skip>true</testjar.skip>
+		<testjar.skip>false</testjar.skip>
 		<doc.skip>true</doc.skip>
-		<maven.test.skip>true</maven.test.skip>
+		<maven.test.skip>false</maven.test.skip>
 		<source.skip>true</source.skip>
 	</properties>
 

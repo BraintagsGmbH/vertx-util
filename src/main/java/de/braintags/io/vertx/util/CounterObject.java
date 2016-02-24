@@ -17,8 +17,10 @@ import io.vertx.core.Handler;
 
 /**
  * A helper to count loops inside an asynchron call. It extends {@link ResultObject} to enable error and result handling
- * inside a
- * loop directly
+ * inside a loop directly
+ * 
+ * @param <E>
+ *          the underlaying class, which shall be delivered to the Handler as {@link AsyncResult}
  * 
  * @author Michael Remme
  * 
