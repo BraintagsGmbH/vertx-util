@@ -34,7 +34,7 @@ public class ResultObject<E> extends ErrorObject<E> {
    * method {@link #setResult(Object)} is called
    * 
    * @param handler
-   *          the handler to be informed
+   *          if a handler is set, it is automatically informed, if an error occured
    */
   public ResultObject(Handler<AsyncResult<E>> handler) {
     super(handler);
@@ -72,11 +72,9 @@ public class ResultObject<E> extends ErrorObject<E> {
   private boolean handleResult() {
     if (super.handleError()) {
       return true;
-    } else if (isResultDefined()) {
-      if (getHandler() != null) {
-        getHandler().handle(Future.succeededFuture(result));
-        return true;
-      }
+    } else if (isResultDefined() && getHandler() != null) {
+      getHandler().handle(Future.succeededFuture(result));
+      return true;
     }
     return false;
   }

@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.util;
 
+import java.util.Objects;
+
 /**
  * Helper class on objects
  * 
@@ -32,9 +34,8 @@ public class ObjectUtil {
    *          compare object 2
    * @return true, if one object is null and not the other or if they are not equal
    */
-  public static boolean equal(Object o1, Object o2) {
-    return (o1 == null && o2 != null) || (o2 == null && o1 != null) || !o1.equals(o2);
-
+  public static boolean isEqual(Object o1, Object o2) {
+    return Objects.equals(o1, o2);
   }
 
 }

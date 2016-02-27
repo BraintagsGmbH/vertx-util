@@ -30,9 +30,12 @@ public class CounterObject<E> extends ResultObject<E> {
   private int count;
 
   /**
+   * Craetes a new instance with the given count and a handler
    * 
    * @param count
    *          the count to be used for countdown
+   * @param handler
+   *          if a handler is set, it is automatically informed, if an error occured
    */
   public CounterObject(int count, Handler<AsyncResult<E>> handler) {
     super(handler);

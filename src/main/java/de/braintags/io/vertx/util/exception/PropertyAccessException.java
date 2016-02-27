@@ -13,7 +13,7 @@
 package de.braintags.io.vertx.util.exception;
 
 /**
- * 
+ * Exception which is thrown when an error occured with a property
  * 
  * @author Michael Remme
  * 
@@ -25,6 +25,7 @@ public class PropertyAccessException extends RuntimeException {
    * 
    */
   public PropertyAccessException() {
+    // empty
   }
 
   /**
@@ -55,7 +56,8 @@ public class PropertyAccessException extends RuntimeException {
    * @param enableSuppression
    * @param writableStackTrace
    */
-  public PropertyAccessException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+  public PropertyAccessException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 

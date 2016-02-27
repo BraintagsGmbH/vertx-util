@@ -44,6 +44,7 @@ public class ExceptionUtil {
    * 
    * @param exception
    *          the exception from which to retrieve the stacktrace
+   * @return the <code>StringBuilder</code> into which the content has been appended
    */
   public static StringBuilder getStackTrace(Throwable exception) {
     return appendStackTrace(exception, new StringBuilder());
@@ -56,6 +57,7 @@ public class ExceptionUtil {
    *          the exception from which to retrieve the stacktrace
    * @param stopString
    *          the String on which to stop adding new Exception trace
+   * @return the <code>StringBuilder</code> into which the content has been appended
    */
   public static StringBuilder getStackTrace(Throwable exception, String stopString) {
     return appendStackTrace(exception, new StringBuilder(), stopString, -1);
@@ -69,6 +71,7 @@ public class ExceptionUtil {
    *          the exception from which to retrieve the stacktrace
    * @param lineCount
    *          the number of lines to be written
+   * @return the <code>StringBuilder</code> into which the content has been appended
    */
   public static StringBuilder getStackTrace(Throwable exception, int lineCount) {
     return appendStackTrace(exception, new StringBuilder(), null, lineCount);
@@ -83,25 +86,24 @@ public class ExceptionUtil {
    *          the buffer into which to write the stacktrace
    * @param stopString
    *          the String on which to stop adding new Exception trace
-   * @return the <code>StringBuffer</code> into which the content has been appended
+   * @param lineCount
+   *          if lineCount is > 0, then this number of lines of the stacktrace is put out
+   * @return the <code>StringBuilder</code> into which the content has been appended
    */
   public static StringBuilder appendStackTrace(Throwable exception, StringBuilder buffer, String stopString,
       int lineCount) {
     if (exception == null) {
       return buffer;
     }
-
     StackTraceElement[] stacks = exception.getStackTrace();
-
     for (int i = 0; i < stacks.length; i++) {
-      if (lineCount > 0 && lineCount >= i)
-        break;
       String line = stacks[i].toString();
-      if (stopString != null && !stopString.isEmpty() && line.contains(stopString))
+      if ((lineCount > 0 && lineCount >= i)
+          || (stopString != null && !stopString.isEmpty() && line.contains(stopString))) {
         break;
+      }
       buffer.append(line).append("\n");
     }
-
     return buffer;
   }
 

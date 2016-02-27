@@ -46,7 +46,7 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 public class ClassUtil {
-  private static final Logger log = LoggerFactory.getLogger(ClassUtil.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
 
   private ClassUtil() {
 
@@ -101,9 +101,13 @@ public class ClassUtil {
   }
 
   /**
+   * Retrive the type arguments of the given class
+   * 
    * @param clazz
+   *          the class to be examined
    * @param tv
-   * @return
+   *          a generic type variable
+   * @return the type definition or null
    */
   public static <T> Class<?> getTypeArgument(final Class<? extends T> clazz,
       final TypeVariable<? extends GenericDeclaration> tv) {
@@ -170,13 +174,13 @@ public class ClassUtil {
       if (componentClass != null) {
         return Array.newInstance(componentClass, 0).getClass();
       } else {
-        log.debug("************ ClassUtil.getClass 1st else");
-        log.debug("************ type = " + type);
+        LOGGER.debug("************ ClassUtil.getClass 1st else");
+        LOGGER.debug("************ type = " + type);
         return null;
       }
     } else {
-      log.debug("************ ClassUtil.getClass final else");
-      log.debug("************ type = " + type);
+      LOGGER.debug("************ ClassUtil.getClass final else");
+      LOGGER.debug("************ type = " + type);
       return null;
     }
   }
@@ -299,6 +303,15 @@ public class ClassUtil {
     }
   }
 
+  /**
+   * Retrive the defined {@link Field} with the given name of the class
+   * 
+   * @param c
+   *          the class to be examined
+   * @param fieldName
+   *          the field name to check
+   * @return the Field, represented by the field name or null, if none found
+   */
   public static final Field getDeclaredField(final Class<?> c, final String fieldName) {
     Field[] df = c.getDeclaredFields();
     for (Field field : df) {

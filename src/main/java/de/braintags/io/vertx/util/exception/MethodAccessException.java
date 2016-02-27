@@ -25,6 +25,7 @@ public class MethodAccessException extends RuntimeException {
    * 
    */
   public MethodAccessException() {
+    // empty
   }
 
   /**

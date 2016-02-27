@@ -24,6 +24,7 @@ public class InitException extends RuntimeException {
    * 
    */
   public InitException() {
+    // empty
   }
 
   /**

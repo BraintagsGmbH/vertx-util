@@ -9,7 +9,9 @@ import io.vertx.core.impl.NoStackTraceThrowable;
  * 
  * Abstract implementation of {@link Future}
  * 
- * @author mremme
+ * @param T
+ *          the result, which the Future shall transport
+ * @author Michael Remme
  *
  */
 public class FutureImpl<T> implements Future<T> {
@@ -39,7 +41,7 @@ public class FutureImpl<T> implements Future<T> {
     }
   }
 
-  FutureImpl(String failureMessage, boolean failed) {
+  FutureImpl(String failureMessage) {
     this(new NoStackTraceThrowable(failureMessage));
   }
 

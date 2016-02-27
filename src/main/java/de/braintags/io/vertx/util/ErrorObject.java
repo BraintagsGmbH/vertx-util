@@ -27,7 +27,7 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 public class ErrorObject<E> {
-  private static final Logger logger = LoggerFactory.getLogger(ErrorObject.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
   private boolean errorHandled = false;
   private Handler<AsyncResult<E>> handler;
@@ -36,7 +36,8 @@ public class ErrorObject<E> {
    * Creates an instance with a handler, which will be informed, when an Exception is added
    * into the current instance
    * 
-   * @handler the handler to be informed about errors
+   * @handler
+   *          if a handler is set, it is automatically informed, if an error occured
    */
   public ErrorObject(Handler<AsyncResult<E>> handler) {
     this.handler = handler;
@@ -77,7 +78,7 @@ public class ErrorObject<E> {
    */
   public final void setThrowable(Throwable throwable) {
     this.throwable = throwable;
-    logger.info("", throwable);
+    LOGGER.info("", throwable);
     handleError();
   }
 
