@@ -16,6 +16,7 @@
 	</parent>
 
 	<properties>
+		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<sonar.language>java</sonar.language>
 		<sonar.host.url>http://sqube.bt-rz.net</sonar.host.url>
 		<testjar.skip>false</testjar.skip>

@@ -23,7 +23,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class })
+@SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class, ResultObjectTest.class,
+    ErrorObjectTest.class })
 public class TestAllUtil {
 
 }
