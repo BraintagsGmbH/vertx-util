@@ -98,8 +98,9 @@ public class ExceptionUtil {
     StackTraceElement[] stacks = exception.getStackTrace();
     for (int i = 0; i < stacks.length; i++) {
       String line = stacks[i].toString();
-      if ((lineCount > 0 && lineCount >= i)
-          || (stopString != null && !stopString.isEmpty() && line.contains(stopString))) {
+      boolean lcReached = (lineCount > 0 && lineCount <= i);
+      boolean stopReached = (stopString != null && !stopString.isEmpty() && line.contains(stopString));
+      if (lcReached || stopReached) {
         break;
       }
       buffer.append(line).append("\n");

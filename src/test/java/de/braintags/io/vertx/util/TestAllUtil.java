@@ -24,7 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class, ResultObjectTest.class,
-    ErrorObjectTest.class })
+    ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class })
 public class TestAllUtil {
 
 }
