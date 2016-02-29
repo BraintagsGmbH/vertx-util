@@ -9,9 +9,9 @@ import io.vertx.core.impl.NoStackTraceThrowable;
  * 
  * Abstract implementation of {@link Future}
  * 
+ * @author Michael Remme
  * @param T
  *          the result, which the Future shall transport
- * @author Michael Remme
  *
  */
 public class FutureImpl<T> implements Future<T> {

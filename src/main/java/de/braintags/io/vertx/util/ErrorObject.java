@@ -36,7 +36,7 @@ public class ErrorObject<E> {
    * Creates an instance with a handler, which will be informed, when an Exception is added
    * into the current instance
    * 
-   * @handler
+   * @param handler
    *          if a handler is set, it is automatically informed, if an error occured
    */
   public ErrorObject(Handler<AsyncResult<E>> handler) {
