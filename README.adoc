@@ -1,0 +1,4 @@
+= vertx-util
+
+*utility classes for use with vertx*
+
