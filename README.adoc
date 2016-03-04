@@ -2,21 +2,8 @@
 
 *utility classes for use with vertx*
 
- * * Maven (in your `pom.xml`):
- *
- * [source,xml,subs="+attributes"]
- * ----
- * <dependency>
- * <groupId>de.braintags</groupId>
- * <artifactId>{maven.artifactId}</artifactId>
- * <version>{maven.version}</version>
- * </dependency>
- * ----
- *
- * * Gradle (in your `build.gradle` file):
- *
- * [source,groovy,subs="+attributes"]
- * ----
- * compile "de.braintags:{maven.artifactId}:{maven.version}"
- * ----
- *
+README 
+
+See the documentation under
+
+* link:src/docs/asciidoc/java/index.adoc[ java ]
