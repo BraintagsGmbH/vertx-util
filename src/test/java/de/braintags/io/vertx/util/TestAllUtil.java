@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.braintags.io.vertx.util.file.FileSystemUtilTest;
+
 /**
  * 
  * 
@@ -24,7 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class, ResultObjectTest.class,
-    ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class })
+    ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class, FileSystemUtilTest.class })
 public class TestAllUtil {
 
 }
