@@ -6,13 +6,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>vertx-util</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0-ms1</version>
 	<name>Vert.x utilities from Braintags</name>
 
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>10-SNAPSHOT</version>
+		<version>10</version>
 	</parent>
 
 	<properties>
