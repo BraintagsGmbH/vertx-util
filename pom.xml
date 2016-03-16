@@ -17,9 +17,9 @@
 	<properties>
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<testjar.skip>false</testjar.skip>
-		<doc.skip>true</doc.skip>
+		<doc.skip>false</doc.skip>
 		<maven.test.skip>false</maven.test.skip>
-		<source.skip>true</source.skip>
+		<source.skip>false</source.skip>
 	</properties>
 
 	<scm>
