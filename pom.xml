@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>vertx-util</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.0.0_SNAPSHOT</version>
 	<name>Vert.x utilities from Braintags</name>
 
 	<parent>
@@ -26,7 +26,6 @@
 		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
 		<developerConnection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</developerConnection>
 		<url>git@github.com:BraintagsGmbH/vertx-util.git</url>
-    <tag>HEAD</tag>
   </scm>
 	
 	<url>https://github.com/BraintagsGmbH/vertx-util</url>
