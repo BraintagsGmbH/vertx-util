@@ -78,7 +78,6 @@ public class ErrorObject<E> {
    */
   public final void setThrowable(Throwable throwable) {
     this.throwable = throwable;
-    LOGGER.info("", throwable);
     handleError();
   }
 
