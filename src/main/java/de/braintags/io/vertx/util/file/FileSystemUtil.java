@@ -111,6 +111,13 @@ public class FileSystemUtil {
   @FunctionalInterface
   public interface Filter {
 
+    /**
+     * Decides wether a file shall be used or not
+     * 
+     * @param filename
+     *          the file to examine
+     * @return true if file shall be used
+     */
     public boolean accept(String filename);
   }
 

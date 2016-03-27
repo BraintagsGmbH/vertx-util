@@ -38,7 +38,10 @@ public class BufferInputStream extends InputStream {
   protected int count;
 
   /**
+   * Constructor creating a bridge
    * 
+   * @param buffer
+   *          the buffer to be filled
    */
   public BufferInputStream(Buffer buffer) {
     this.buffer = buffer;

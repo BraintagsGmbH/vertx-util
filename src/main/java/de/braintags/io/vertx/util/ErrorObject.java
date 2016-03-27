@@ -15,8 +15,6 @@ package de.braintags.io.vertx.util;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 /**
  * A simple instance to transfer error information in an event queue
@@ -27,7 +25,6 @@ import io.vertx.core.logging.LoggerFactory;
  * 
  */
 public class ErrorObject<E> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ErrorObject.class);
   private Throwable throwable;
   private boolean errorHandled = false;
   private Handler<AsyncResult<E>> handler;

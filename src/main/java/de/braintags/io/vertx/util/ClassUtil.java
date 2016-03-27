@@ -193,7 +193,7 @@ public class ClassUtil {
    * @return a class definition for the given {@link Type}
    */
   public static Class<?> toClass(final Type t) {
-    Class<?> returnClass = null;
+    Class<?> returnClass;
     if (t == null) {
       returnClass = null;
     } else if (t instanceof Class) {
