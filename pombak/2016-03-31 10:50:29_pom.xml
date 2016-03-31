@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>vertx-util</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+	<name>Vert.x utilities from Braintags</name>
+
+	<parent>
+		<groupId>de.braintags</groupId>
+		<artifactId>btVertxBasePOM</artifactId>
+		<version>13-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
+		<testjar.skip>false</testjar.skip>
+		<doc.skip>false</doc.skip>
+		<maven.test.skip>false</maven.test.skip>
+		<source.skip>false</source.skip>
+		<maven.compiler.plugin>false</maven.compiler.plugin>
+	</properties>
+
+	<scm>
+		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
+		<developerConnection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</developerConnection>
+		<url>git@github.com:BraintagsGmbH/vertx-util.git</url>
+	</scm>
+
+<build>
+
+<!-- <plugins>
+	      <plugin>
+	        <groupId>org.sonarsource.scanner.maven</groupId>
+	        <artifactId>sonar-maven-plugin</artifactId>
+	        <version>3.0.1</version>
+			<executions>
+				<execution>
+					<id>default-prepare-agent</id>
+					<goals>
+						<goal>sonar</goal>
+					</goals>
+				</execution>
+			</executions>
+	      </plugin>
+
+</plugins>
+ -->
+
+
+</build>
+
+	<url>https://github.com/BraintagsGmbH/vertx-util</url>
+	<description>utility classes for use with vertx</description>
+	
+<!--   <profiles>
+    <profile>
+      <id>coverage-per-test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            Minimal supported version is 2.4
+            <version>2.13</version>
+            <configuration>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>org.sonar.java.jacoco.JUnitListener</value>
+                </property>
+              </properties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.sonarsource.java</groupId>
+          <artifactId>sonar-jacoco-listeners</artifactId>
+          <version>3.8</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>	
+  --> 
+</project>
