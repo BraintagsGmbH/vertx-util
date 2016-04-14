@@ -27,7 +27,7 @@ import de.braintags.io.vertx.util.file.FileSystemUtilTest;
 @RunWith(Suite.class)
 @SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class, ResultObjectTest.class,
     ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class, CollectionAsyncTest.class,
-    FileSystemUtilTest.class })
+    FileSystemUtilTest.class, GeoLoationUtilTest.class })
 public class TestAllUtil {
 
 }
