@@ -53,6 +53,23 @@ public class ClassUtil {
   }
 
   /**
+   * Checks if a default contructor is available
+   * 
+   * @param cls
+   * @return
+   */
+  public static boolean hasDefaultConstructor(Class<?> cls) {
+    try {
+      cls.getDeclaredConstructor(new Class[0]);
+      return true;
+    } catch (NoSuchMethodException e) {
+      return false;
+    } catch (SecurityException e) {
+      throw new ClassAccessException(e);
+    }
+  }
+
+  /**
    * Get a defined {@link Constructor} of the given class with the arguments
    * 
    * @param cls
