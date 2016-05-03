@@ -286,7 +286,7 @@ public class ClassUtil {
   }
 
   /**
-   * Tries to get the class of a paramtrization like List<String>
+   * Tries to get the class of a parametrization like List<String>
    * 
    * @param c
    *          the class to be examined

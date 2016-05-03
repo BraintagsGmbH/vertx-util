@@ -12,6 +12,9 @@
  */
 package de.braintags.io.vertx.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Helper class dealing with longitude / latitude
  * 
@@ -35,6 +38,24 @@ public class GeoLocationUtil {
   public static final char MI = 'M';
 
   private GeoLocationUtil() {
+  }
+
+  /**
+   * Calculate the distance between two points with the defined scale
+   * 
+   * @param lat1
+   * @param lon1
+   * @param lat2
+   * @param lon2
+   * @param unit
+   *          the unit to be returned
+   * @param scale
+   *          the scale to be used
+   * @return the distance in km, nm or miles
+   */
+  public static String distance(double lat1, double lon1, double lat2, double lon2, char unit, int scale) {
+    double distance = distance(lat1, lon1, lat2, lon2, unit);
+    return new BigDecimal(distance).setScale(scale, RoundingMode.HALF_UP).toString();
   }
 
   /**
