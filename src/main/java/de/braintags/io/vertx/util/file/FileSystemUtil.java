@@ -12,11 +12,17 @@
  */
 package de.braintags.io.vertx.util.file;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.NoSuchFileException;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 
 /**
@@ -26,9 +32,93 @@ import io.vertx.core.file.FileSystem;
  * 
  */
 public class FileSystemUtil {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(FileSystemUtil.class);
 
   private FileSystemUtil() {
     // hidden
+  }
+
+  /**
+   * This method writes the content of the Buffer into a file inside the given directory. If a file with the same name
+   * already exists, then a unique filename is created and returned-
+   * 
+   * @param vertx
+   * @param directory
+   *          the directory, where the file shall be stored
+   * @param fileName
+   *          the name of the file
+   * @param data
+   *          the data to be stored
+   * @param handler
+   *          the handler will be informed about the new filename
+   */
+  public static final void storeFile(Vertx vertx, String directory, String fileName, Buffer data,
+      Handler<AsyncResult<String>> handler) {
+    try {
+      FileSystem fs = vertx.fileSystem();
+      checkDirectory(vertx, directory);
+      String newFileName = createUniqueName(fs, directory, fileName);
+      String destination = directory + (directory.endsWith("/") ? "" : "/") + newFileName;
+      fs.writeFile(destination, data, wr -> {
+        if (wr.failed()) {
+          handler.handle(Future.failedFuture(wr.cause()));
+        } else {
+          handler.handle(Future.succeededFuture(newFileName));
+        }
+      });
+    } catch (IOException e) {
+      handler.handle(Future.failedFuture(e));
+    }
+  }
+
+  private static String createUniqueName(FileSystem fs, String upDir, String fileInName) {
+    final String fileName = cleanFileName(fileInName);
+    String newFileName = fileName;
+    int counter = 0;
+    String path = createPath(upDir, fileName);
+    while (fs.existsBlocking(path)) {
+      LOGGER.info("file exists already: " + path);
+      if (fileName.indexOf('.') >= 0) {
+        newFileName = fileName.replaceFirst("\\.", "_" + counter++ + ".");
+      } else {
+        newFileName = fileName + "_" + counter++;
+      }
+      path = createPath(upDir, newFileName);
+    }
+    return newFileName;
+  }
+
+  private static String createPath(String upDir, String fileName) {
+    return upDir + (upDir.endsWith("/") ? "" : "/") + fileName;
+  }
+
+  private static String cleanFileName(String fileName) {
+    fileName = fileName.replaceAll(" ", "_");
+    if (fileName.lastIndexOf("\\") >= 0) {
+      fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+    }
+    return fileName;
+  }
+
+  /**
+   * Checks existence of the given path as directory. If it does not exist, it is created
+   * 
+   * @param fs
+   * @param directory
+   * @throws IOException
+   */
+  public static final void checkDirectory(Vertx vertx, String directory) throws IOException {
+    try {
+      FileSystem fs = vertx.fileSystem();
+      if (!fs.existsBlocking(directory)) {
+        fs.mkdirsBlocking(directory);
+      } else if (!isDirectory(vertx, directory)) {
+        throw new IOException("File exists and is no directory: " + directory);
+      }
+    } catch (NoSuchFileException e) {
+      throw ExceptionUtil.createRuntimeException(e);
+    }
   }
 
   /**
