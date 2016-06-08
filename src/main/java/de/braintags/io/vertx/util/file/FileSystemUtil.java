@@ -64,6 +64,7 @@ public class FileSystemUtil {
         if (wr.failed()) {
           handler.handle(Future.failedFuture(wr.cause()));
         } else {
+          LOGGER.info("stored file into " + destination);
           handler.handle(Future.succeededFuture(newFileName));
         }
       });
