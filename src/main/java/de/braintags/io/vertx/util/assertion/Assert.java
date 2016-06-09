@@ -44,22 +44,6 @@ public class Assert {
   }
 
   /**
-   * Throw IllegalStateException if the condition if false.
-   *
-   * @param name
-   *          the name of the state that is being checked
-   * @param condition
-   *          the condition about the parameter to check
-   * @throws java.lang.IllegalStateException
-   *           if the condition is false
-   */
-  public static void isTrue(final String name, final boolean condition) {
-    if (!condition) {
-      throw new IllegalStateException("state should be: " + name);
-    }
-  }
-
-  /**
    * Throw IllegalArgumentException if the condition if false.
    *
    * @param name

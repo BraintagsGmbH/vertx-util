@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.NoSuchFileException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -105,7 +104,7 @@ public class FileSystemUtil {
   /**
    * Checks existence of the given path as directory. If it does not exist, it is created
    * 
-   * @param fs
+   * @param vertx
    * @param directory
    * @throws IOException
    */
@@ -118,7 +117,7 @@ public class FileSystemUtil {
         throw new IOException("File exists and is no directory: " + directory);
       }
     } catch (NoSuchFileException e) {
-      throw ExceptionUtil.createRuntimeException(e);
+      // can not occur here
     }
   }
 

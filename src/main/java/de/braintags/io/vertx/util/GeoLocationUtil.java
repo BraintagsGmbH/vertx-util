@@ -55,7 +55,7 @@ public class GeoLocationUtil {
    */
   public static String distance(double lat1, double lon1, double lat2, double lon2, char unit, int scale) {
     double distance = distance(lat1, lon1, lat2, lon2, unit);
-    return new BigDecimal(distance).setScale(scale, RoundingMode.HALF_UP).toString();
+    return BigDecimal.valueOf(distance).setScale(scale, RoundingMode.HALF_UP).toString();
   }
 
   /**

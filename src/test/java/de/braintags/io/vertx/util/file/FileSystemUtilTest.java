@@ -12,6 +12,9 @@
  */
 package de.braintags.io.vertx.util.file;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.junit.Assert;
@@ -20,6 +23,10 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.BtVertxTestBase;
 import de.braintags.io.vertx.util.exception.NoSuchFileException;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.test.core.TestUtils;
 
 /**
  * 
@@ -34,6 +41,55 @@ public class FileSystemUtilTest extends BtVertxTestBase {
    */
   @Before
   public void setUp() throws Exception {
+  }
+
+  @Test
+  public void testStoreFile(TestContext context) throws Exception {
+    String directory = "tmpDir";
+    String fileName = "somefile.dat";
+    Buffer fileData = TestUtils.randomBuffer(50);
+    if (vertx.fileSystem().existsBlocking(directory)) {
+      vertx.fileSystem().deleteBlocking(directory);
+      assertFalse("Directory was not deleted", vertx.fileSystem().existsBlocking(directory));
+    }
+
+    Async async1 = context.async();
+    FileSystemUtil.storeFile(vertx, directory, fileName, fileData, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+        async1.complete();
+      } else {
+        context.assertEquals(fileName, result.result(), "filename should not be changed here");
+        async1.complete();
+      }
+    });
+    async1.await();
+
+    Async async = context.async();
+    FileSystemUtil.storeFile(vertx, directory, fileName, fileData, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+        async.complete();
+      } else {
+        context.assertNotEquals(fileName, result.result(), "filename should be changed here");
+        async.complete();
+      }
+    });
+    async.await();
+
+  }
+
+  @Test
+  public void testCheckDirectory(TestContext context) throws Exception {
+    String directory = "tmpDir";
+    if (vertx.fileSystem().existsBlocking(directory)) {
+      vertx.fileSystem().deleteRecursiveBlocking(directory, true);
+      assertFalse("Directory was not deleted", vertx.fileSystem().existsBlocking(directory));
+    }
+    FileSystemUtil.checkDirectory(vertx, directory);
+    assertTrue("Directory was not created", vertx.fileSystem().existsBlocking(directory));
+    assertTrue("Must return true for a directory", FileSystemUtil.isDirectory(vertx, directory));
+
   }
 
   /**
