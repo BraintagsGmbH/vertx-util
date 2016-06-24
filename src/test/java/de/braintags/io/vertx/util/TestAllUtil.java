@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.braintags.io.vertx.util.assertion.AssertTest;
 import de.braintags.io.vertx.util.codec.AbstractPojoCodecTest;
 import de.braintags.io.vertx.util.file.FileSystemUtilTest;
+import de.braintags.io.vertx.util.security.CRUDPermissionMapTest;
 
 /**
  * 
@@ -29,7 +30,8 @@ import de.braintags.io.vertx.util.file.FileSystemUtilTest;
 @RunWith(Suite.class)
 @SuiteClasses({ TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class, ResultObjectTest.class,
     ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class, CollectionAsyncTest.class,
-    FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class, AssertTest.class })
+    FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class, AssertTest.class,
+    CRUDPermissionMapTest.class })
 public class TestAllUtil {
 
 }
