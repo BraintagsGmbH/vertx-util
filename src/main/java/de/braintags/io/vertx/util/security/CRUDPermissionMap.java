@@ -28,7 +28,8 @@ public class CRUDPermissionMap {
   }
 
   /**
-   * Creates a new instance by parsing the
+   * Creates a new instance by parsing the input string, which must be in the format:
+   * admin{CRUD};users{R}
    * 
    * @param perms
    */
@@ -38,15 +39,28 @@ public class CRUDPermissionMap {
     }
     String[] ps = perms.split(";");
     for (String p : ps) {
-      int index = p.indexOf('{');
-      if (index > 0) {
-        String key = p.substring(0, index).trim();
-        String actions = p.substring(index + 1).replaceAll("}", "").trim();
-        addPermissions(key, actions);
-      } else {
-        String key = p.trim();
-        permissionMap.put(key, new BitSet());
-      }
+      addPermissionEntry(p);
+    }
+  }
+
+  /**
+   * Adds one permission sequence like "admin{CRUD}", which is parsed and added into the current map
+   * 
+   * @param permission
+   *          the permission sequence to be added
+   *          return the name of the key, which was added, in the example that would be "admin"
+   */
+  public String addPermissionEntry(String permission) {
+    int index = permission.indexOf('{');
+    if (index > 0) {
+      String key = permission.substring(0, index).trim();
+      String actions = permission.substring(index + 1).replaceAll("}", "").trim();
+      addPermissions(key, actions);
+      return key;
+    } else {
+      String key = permission.trim();
+      permissionMap.put(key, new BitSet());
+      return key;
     }
   }
 
