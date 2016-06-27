@@ -33,6 +33,9 @@ public class CRUDPermissionMap {
    * @param perms
    */
   public CRUDPermissionMap(String perms) {
+    if (perms == null) {
+      throw new NullPointerException("permission string is null");
+    }
     String[] ps = perms.split(";");
     for (String p : ps) {
       int index = p.indexOf('{');
