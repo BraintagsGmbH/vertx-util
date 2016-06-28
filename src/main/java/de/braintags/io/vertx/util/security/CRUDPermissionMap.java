@@ -49,6 +49,7 @@ public class CRUDPermissionMap {
    * @param permission
    *          the permission sequence to be added
    *          return the name of the key, which was added, in the example that would be "admin"
+   * @return the key, which was added
    */
   public String addPermissionEntry(String permission) {
     int index = permission.indexOf('{');
