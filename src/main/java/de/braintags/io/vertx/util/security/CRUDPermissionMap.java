@@ -140,7 +140,7 @@ public class CRUDPermissionMap {
     case 'D':
       return set.get(3);
     default:
-      throw new UnsupportedOperationException("action is not supported: " + action);
+      throw new UnsupportedOperationException("action is not supported: '" + action + "'");
     }
   }
 
