@@ -21,6 +21,8 @@ node {
         //sh "echo $MAVEN_SETTINGS"
          sh "pwd"
          sh "mvn -s settings.xml -Dsign.skip=true  clean deploy"
+    	step([$class: 'ArtifactArchiver', artifacts: '**/target/*.jar', fingerprint: true])
+    	step([$class: 'JUnitResultArchiver', testResults: '**/target/surefire-reports/TEST-*.xml'])
     }
 
 
