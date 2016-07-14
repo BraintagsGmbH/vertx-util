@@ -20,23 +20,33 @@ public class CertificateHelper {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(CertificateHelper.class);
 
+  private static final String ALGORYTM = "SHA1WithRSA"; // "MD5WithRSA"; //
+
   /**
    * 
    */
   private CertificateHelper() {
   }
 
+  /**
+   * Creates a self certificate, stores it into a keystore and adapts the server options to use that certificate
+   * 
+   * @param options
+   * @param hostName
+   * @param password
+   * @throws GeneralSecurityException
+   * @throws IOException
+   */
   @SuppressWarnings("restriction")
   public static void createSelfCertificate(HttpServerOptions options, String hostName, String password)
       throws GeneralSecurityException, IOException {
     LOGGER.info("creating self certificate");
     KeyStore store = KeyStore.getInstance("JKS");
     store.load(null, null);
-
-    sun.security.tools.keytool.CertAndKeyGen keypair = new sun.security.tools.keytool.CertAndKeyGen("RSA",
-        "SHA1WithRSA", null);
-    sun.security.x509.X500Name x500Name = new sun.security.x509.X500Name(hostName, "IT", "unknown", "unknown",
-        "unknown", "unknown");
+    sun.security.tools.keytool.CertAndKeyGen keypair = new sun.security.tools.keytool.CertAndKeyGen("RSA", ALGORYTM,
+        null);
+    sun.security.x509.X500Name x500Name = new sun.security.x509.X500Name(hostName, "IT", "firm", "city", "country",
+        "state");
     keypair.generate(1024);
     PrivateKey privKey = keypair.getPrivateKey();
     java.security.cert.X509Certificate[] chain = new java.security.cert.X509Certificate[1];
