@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>vertx-util</artifactId>
-	<version>1.3.1</version>
+	<version>1.3.2-SNAPSHOT</version>
 	<name>Vert.x utilities from Braintags</name>
 
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>17</version>
+		<version>19-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -24,14 +24,15 @@
 	</properties>
 
 	<dependencies>
-<dependency>
-  <groupId>sun.jdk</groupId>
-  <artifactId>rt.jar</artifactId>
-  <version>1.8</version>
-  <scope>system</scope>
-  <systemPath>${java.home}/lib/rt.jar</systemPath>
-</dependency>
+		<dependency>
+		  <groupId>sun.jdk</groupId>
+		  <artifactId>rt.jar</artifactId>
+		  <version>1.8</version>
+		  <scope>system</scope>
+		  <systemPath>${java.home}/lib/rt.jar</systemPath>
+		</dependency>
 	</dependencies>
+
 
 	<scm>
 		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
