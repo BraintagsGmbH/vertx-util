@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.util.security.crypt;
 
+import java.util.Properties;
+
 /**
  * Utility class to encode text like passwords and to check validity of values
  * 
@@ -39,5 +41,13 @@ public interface IEncoder {
    *         storage
    */
   boolean matches(CharSequence rawText, String encodedText);
+
+  /**
+   * This method can be used to init an encoder. The names of properties and there meaning should be found in the
+   * documentation of the appropriate implementation.
+   * 
+   * @param properties
+   */
+  void init(Properties properties);
 
 }

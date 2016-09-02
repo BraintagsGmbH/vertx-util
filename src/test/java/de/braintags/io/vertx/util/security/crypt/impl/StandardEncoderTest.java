@@ -59,4 +59,15 @@ public class StandardEncoderTest {
     assertTrue(encoder.matches("password", result));
   }
 
+  @Test
+  public void emptySalt() {
+    encoder = new StandardEncoder();
+    String result = encoder.encode("password");
+    LOGGER.info(result);
+    assertNotEquals(result, "password");
+    assertTrue(encoder.matches("password", result));
+    result = encoder.encode("password2");
+    LOGGER.info(result);
+  }
+
 }
