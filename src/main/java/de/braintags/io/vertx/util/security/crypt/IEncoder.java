@@ -23,10 +23,10 @@ import java.util.Properties;
 public interface IEncoder {
 
   /**
-   * Encode the raw password. Generally, a good encoding algorithm applies a SHA-1 or
+   * Encode the raw text. Generally, a good encoding algorithm applies a SHA-1 or
    * greater hash combined with an 8-byte or greater randomly generated salt.
    */
-  String encode(CharSequence rawPassword);
+  String encode(CharSequence rawText);
 
   /**
    * Verify the encoded test obtained from storage matches the submitted raw
