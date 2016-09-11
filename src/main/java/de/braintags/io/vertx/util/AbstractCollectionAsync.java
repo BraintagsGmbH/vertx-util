@@ -15,8 +15,10 @@ package de.braintags.io.vertx.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -29,6 +31,8 @@ import io.vertx.core.Handler;
  *          the underlaying class to be used
  */
 public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractCollectionAsync.class);
 
   /**
    * 
@@ -105,25 +109,47 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    */
   @Override
   public void toArray(Handler<AsyncResult<Object[]>> handler) {
-    List<Object> list = new ArrayList<Object>();
+    Object[] or = new Object[size()];
+
     if (isEmpty()) {
-      handler.handle(Future.succeededFuture(list.toArray()));
-      return;
-    }
-    CounterObject<Object[]> co = new CounterObject<Object[]>(size(), handler);
-    IteratorAsync<E> it = iterator();
-    while (it.hasNext() && !co.isError()) {
-      it.next(result -> {
+      handler.handle(Future.succeededFuture(or));
+    } else {
+      List<Future> fl = createFutureList(or);
+      CompositeFuture.all(fl).setHandler(result -> {
         if (result.failed()) {
-          co.setThrowable(result.cause());
+          LOGGER.error("", result.cause());
+          handler.handle(Future.failedFuture(result.cause()));
         } else {
-          list.add(result.result());
-          if (co.reduce()) {
-            co.setResult(list.toArray());
-          }
+          LOGGER.debug("futurelist finished");
+          handler.handle(Future.succeededFuture(or));
         }
       });
     }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private List<Future> createFutureList(Object[] or) {
+    List<Future> futures = new ArrayList<>();
+    IteratorAsync<E> it = iterator();
+    int counter = 0;
+    while (it.hasNext()) {
+      Future future = Future.future();
+      futures.add(future);
+      AtomicInteger ai = new AtomicInteger(counter++);
+      LOGGER.debug("preparing future for position " + counter);
+      it.next(nr -> {
+        if (nr.failed()) {
+          future.fail(nr.cause());
+        } else {
+          LOGGER.debug("executed position " + ai.get());
+          or[ai.get()] = nr.result();
+          future.complete();
+        }
+      });
+    }
+
+    LOGGER.debug("created futurelist with " + futures.size() + " entries ");
+    return futures;
   }
 
   /*
