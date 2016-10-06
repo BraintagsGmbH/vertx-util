@@ -12,8 +12,7 @@
  */
 package de.braintags.io.vertx.util.file;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 
 import io.vertx.core.buffer.Buffer;
 
@@ -23,19 +22,7 @@ import io.vertx.core.buffer.Buffer;
  * @author Michael Remme
  * 
  */
-public class BufferInputStream extends InputStream {
-  private Buffer buffer;
-  /**
-   * The index of the next character to read from the input stream buffer.
-   *
-   */
-  protected int pos;
-
-  /**
-   * The number of valid characters in the input stream buffer.
-   *
-   */
-  protected int count;
+public class BufferInputStream extends ByteArrayInputStream {
 
   /**
    * Constructor creating a bridge
@@ -44,17 +31,7 @@ public class BufferInputStream extends InputStream {
    *          the buffer to be filled
    */
   public BufferInputStream(Buffer buffer) {
-    this.buffer = buffer;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.InputStream#read()
-   */
-  @Override
-  public int read() throws IOException {
-    return (pos < count) ? (buffer.getByte(pos++) & 0xFF) : -1;
+    super(buffer.getBytes());
   }
 
 }

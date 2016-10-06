@@ -72,7 +72,15 @@ public class FileSystemUtil {
     }
   }
 
-  private static String createUniqueName(FileSystem fs, String upDir, String fileInName) {
+  /**
+   * Creates a unique file name based on a directory.
+   * 
+   * @param fs
+   * @param upDir
+   * @param fileInName
+   * @return
+   */
+  public static String createUniqueName(FileSystem fs, String upDir, String fileInName) {
     final String fileName = cleanFileName(fileInName);
     String newFileName = fileName;
     int counter = 0;
