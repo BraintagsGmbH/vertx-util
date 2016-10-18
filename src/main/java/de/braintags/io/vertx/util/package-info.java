@@ -11,7 +11,7 @@
  * = vertx-util
  * utilities and helper for vertx-based programming
  * 
- * === Using vertx-util
+ * == Using vertx-util
  * To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
  * 
  * * Maven (in your `pom.xml`):
