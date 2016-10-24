@@ -1,3 +1,9 @@
-plugins {
-    id 'java'
+apply from: 'gradle/vertx/vertxbase.gradle'
+
+// Workaround to compile with sun.security classes int the project
+// see: http://stackoverflow.com/a/38708594
+compileJava {
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+    options.compilerArgs << "-XDignore.symbol.file"
 }
