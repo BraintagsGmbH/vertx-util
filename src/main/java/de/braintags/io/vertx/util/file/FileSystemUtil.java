@@ -13,6 +13,7 @@
 package de.braintags.io.vertx.util.file;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,6 +117,17 @@ public class FileSystemUtil {
    * @param directory
    * @throws IOException
    */
+  public static final void checkDirectory(Vertx vertx, Path directory) throws IOException {
+    checkDirectory(vertx, directory.toAbsolutePath().toString());
+  }
+
+  /**
+   * Checks existence of the given path as directory. If it does not exist, it is created
+   * 
+   * @param vertx
+   * @param directory
+   * @throws IOException
+   */
   public static final void checkDirectory(Vertx vertx, String directory) throws IOException {
     try {
       FileSystem fs = vertx.fileSystem();
@@ -162,7 +174,7 @@ public class FileSystemUtil {
    */
   public static List<String> getChildren(Vertx vertx, String directory, boolean recursive, Filter filter)
       throws NoSuchFileException {
-    List<String> returnList = new ArrayList<String>();
+    List<String> returnList = new ArrayList<>();
     if (isDirectory(vertx, directory)) {
       List<String> children = vertx.fileSystem().readDirBlocking(directory);
       for (String child : children) {
