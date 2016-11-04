@@ -41,7 +41,7 @@ public class FileSystemUtil {
 
   /**
    * This method writes the content of the Buffer into a file inside the given directory. If a file with the same name
-   * already exists, then a unique filename is created and returned-
+   * already exists, then a unique filename is created and returned
    * 
    * @param vertx
    * @param directory
@@ -102,12 +102,19 @@ public class FileSystemUtil {
     return upDir + (upDir.endsWith("/") ? "" : "/") + fileName;
   }
 
-  private static String cleanFileName(String fileName) {
-    fileName = fileName.replaceAll(" ", "_");
-    if (fileName.lastIndexOf("\\") >= 0) {
-      fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-    }
-    return fileName;
+  /**
+   * Create a filename, where illegal characters are replaced against '_'
+   * 
+   * @param fileName
+   * @return
+   */
+  public static String cleanFileName(String fName) {
+    return fName.replaceAll("[\\\\/:*?\"<>|]", "_");
+    // fileName = fileName.replaceAll(" ", "_");
+    // if (fileName.lastIndexOf("\\") >= 0) {
+    // fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+    // }
+    // return fileName;
   }
 
   /**
