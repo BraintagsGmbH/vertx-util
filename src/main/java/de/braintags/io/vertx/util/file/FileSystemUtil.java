@@ -110,11 +110,6 @@ public class FileSystemUtil {
    */
   public static String cleanFileName(String fName) {
     return fName.replaceAll("[\\\\/:*?\"<>|]", "_");
-    // fileName = fileName.replaceAll(" ", "_");
-    // if (fileName.lastIndexOf("\\") >= 0) {
-    // fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-    // }
-    // return fileName;
   }
 
   /**
