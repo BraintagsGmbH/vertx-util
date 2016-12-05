@@ -1,4 +1,4 @@
-package de.braintags.io.vertx.util.asyncLock;
+package de.braintags.io.vertx.util.lock;
 
 @FunctionalInterface
 public interface LockedExecution {

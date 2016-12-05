@@ -1,4 +1,4 @@
-package de.braintags.io.vertx.util.asyncLock;
+package de.braintags.io.vertx.util.lock;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.braintags.io.vertx.util.asyncLock.AsyncReadWriteLock;
+import de.braintags.io.vertx.util.lock.AsyncReadWriteLock;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
