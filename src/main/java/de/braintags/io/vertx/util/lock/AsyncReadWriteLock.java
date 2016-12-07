@@ -1,3 +1,15 @@
+/*
+ * #%L
+ * vertx-pojo-mapper-common
+ * %%
+ * Copyright (C) 2015 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
 package de.braintags.io.vertx.util.lock;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,9 +20,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
 /**
- * An implementation for an asynchronous read / write lock. An {@link LockedExecution} can be called with a read or
- * write lock following the semantics of {@link ReadWriteLock}. The LockedExecution must not block (same as for tasks
- * executed on the event loop) and call the provided handler as soon as the lock can be released.
+ * An implementation for an asynchronous read / write lock. A {@link LockedExecution} can be called with a read or write
+ * lock following the semantics of {@link ReadWriteLock}. The LockedExecution must not block (same as for tasks executed
+ * on the event loop) and call the provided handler as soon as the lock can be released.
  * 
  * @author Martin Pluecker
  */
@@ -27,7 +39,7 @@ public class AsyncReadWriteLock {
   }
 
   /**
-   * Executed the execution using a read lock.
+   * Execute the {@link LockedExecution} using a read lock.
    * 
    * @param execution
    */
@@ -36,7 +48,7 @@ public class AsyncReadWriteLock {
   }
 
   /**
-   * Executed the execution using a write lock.
+   * Execute the {@link LockedExecution} using a write lock.
    * 
    * @param execution
    */
@@ -45,10 +57,12 @@ public class AsyncReadWriteLock {
   }
 
   /**
-   * Executed the execution using the given lock.
+   * Execute the {@link LockedExecution} using the given lock.
    * 
    * @param readLock
    *          true for a read lock, false for a write lock
+   * @param execution
+   *          the handler executed with the lock.
    */
   public void execute(boolean readLock, LockedExecution execution) {
     AsyncLock asyncLock = new AsyncLock(readLock, execution);
@@ -65,13 +79,7 @@ public class AsyncReadWriteLock {
   }
 
   private long obtainLock(boolean readLock) {
-    long lockStamp;
-    if (readLock) {
-      lockStamp = lock.tryReadLock();
-    } else {
-      lockStamp = lock.tryWriteLock();
-    }
-    return lockStamp;
+    return readLock ? lock.tryReadLock() : lock.tryWriteLock();
   }
 
   /**
@@ -115,10 +123,12 @@ public class AsyncReadWriteLock {
    */
   private void executeWorkerLocked(long lockStamp, AsyncLock asyncLock) {
     try {
-      asyncLock.lockStamp = lockStamp;
-      asyncLock.execution.perform(() -> {
-        executionDone(asyncLock);
-      });
+      long currentLock = asyncLock.lockStamp.getAndUpdate(currentValue -> currentValue == 0 ? lockStamp : currentValue);
+      if (currentLock != 0) {
+        throw new IllegalStateException(
+            "by construction it should not happen that there is a second execution of the same LockedExecution");
+      }
+      asyncLock.execution.perform(() -> executionDone(asyncLock));
     } catch (Exception e) {
       LOGGER.error("error executing execution", e);
       executionDone(asyncLock);
@@ -126,17 +136,13 @@ public class AsyncReadWriteLock {
   }
 
   /**
-   * A execution has finished its work and the next execution can be called.
+   * An execution has finished its work and the next execution can be called.
    * 
    * @param asyncLock
    */
   private void executionDone(AsyncLock asyncLock) {
-    long lockStamp;
     // this is done to make the lock robust against multiple calls to the handler
-    synchronized (asyncLock) {
-      lockStamp = asyncLock.lockStamp;
-      asyncLock.lockStamp = 0;
-    }
+    long lockStamp = asyncLock.lockStamp.getAndSet(0);
     if (lockStamp != 0) {
       lock.unlock(lockStamp);
       dequeue();
