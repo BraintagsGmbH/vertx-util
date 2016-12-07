@@ -1,3 +1,15 @@
+/*
+ * #%L
+ * vertx-pojo-mapper-common
+ * %%
+ * Copyright (C) 2015 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
 package de.braintags.io.vertx.util.lock;
 
 import java.util.ArrayList;
@@ -7,7 +19,6 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.braintags.io.vertx.util.lock.AsyncReadWriteLock;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
@@ -21,17 +32,17 @@ public class AsyncReadWriteLockTest {
 
     int threadCount = 0;
 
-    ExecutorService es = Executors.newFixedThreadPool(3);
-    threadCount += executeLockLevel(lock, 5, 0, true, result, es, false, false);
-    threadCount += executeLockLevel(lock, 1, 1, false, result, es, false, false);
-    threadCount += executeLockLevel(lock, 10, 2, true, result, es, false, false);
-    threadCount += executeLockLevel(lock, 1, 3, false, result, es, true, true);
-    threadCount += executeLockLevel(lock, 1, 4, false, result, es, false, true);
-    threadCount += executeLockLevel(lock, 1, 5, false, result, es, false, true);
-    threadCount += executeLockLevel(lock, 3, 6, true, result, es, true, false);
-    threadCount += executeLockLevel(lock, 3, 7, true, result, es, false, true);
+    ExecutorService es = Executors.newFixedThreadPool(30);
+    threadCount += executeLockLevel(lock, 500, 0, true, result, es, false, false);
+    threadCount += executeLockLevel(lock, 100, 1, false, result, es, false, false);
+    threadCount += executeLockLevel(lock, 100, 2, true, result, es, false, false);
+    threadCount += executeLockLevel(lock, 5, 3, false, result, es, true, true);
+    threadCount += executeLockLevel(lock, 10, 4, false, result, es, false, true);
+    threadCount += executeLockLevel(lock, 10, 5, false, result, es, false, true);
+    threadCount += executeLockLevel(lock, 30, 6, true, result, es, true, false);
+    threadCount += executeLockLevel(lock, 30, 7, true, result, es, false, true);
 
-    for (int tryCount = 0; tryCount < 100 && result.size() < threadCount; tryCount++) {
+    for (int tryCount = 0; tryCount < 1000 && result.size() < threadCount; tryCount++) {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
