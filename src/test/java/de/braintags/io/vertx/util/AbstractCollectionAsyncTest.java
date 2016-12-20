@@ -87,7 +87,7 @@ public class AbstractCollectionAsyncTest extends BtVertxTestBase {
     }
   }
 
-  class AC<String> extends AbstractCollectionAsync {
+  class AC extends AbstractCollectionAsync<String> {
 
     /*
      * (non-Javadoc)
@@ -105,7 +105,7 @@ public class AbstractCollectionAsyncTest extends BtVertxTestBase {
      * @see de.braintags.io.vertx.util.CollectionAsync#iterator()
      */
     @Override
-    public IteratorAsync iterator() {
+    public IteratorAsync<String> iterator() {
       return null;
     }
   }
