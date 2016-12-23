@@ -33,7 +33,7 @@ import de.braintags.io.vertx.util.security.crypt.impl.StandardEncoderTest;
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class,
-    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class })
+    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class })
 public class TestAllUtil {
 
 }
