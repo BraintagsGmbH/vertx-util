@@ -22,7 +22,11 @@ import org.junit.runners.MethodSorters;
 
 import de.braintags.io.vertx.BtVertxTestBase;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * Testing for vertx-async from https://github.com/gchauvet/vertx-async
@@ -37,6 +41,42 @@ public class VertxAsyncTest extends BtVertxTestBase {
 
   private int COUNT = 50000;
   private static final List<String> toRemove = Arrays.asList("1", "2", "3");
+
+  @Test
+  public void testComposite_WithError1(TestContext context) {
+    Async async = context.async();
+    ErrorObject err = new ErrorObject<>(null);
+    CompositeFuture cf = CompositeFuture.all(createFutureListWithError());
+    cf.setHandler(res -> {
+      if (res.failed()) {
+        // expected
+        async.complete();
+      } else {
+        err.setThrowable(new IllegalArgumentException("expected eception"));
+        async.complete();
+      }
+    });
+
+    async.await();
+    if (err.isError()) {
+      context.fail(err.getThrowable());
+    }
+  }
+
+  /**
+   * Create a list of duture, where one is a failedFuture
+   * 
+   * @return
+   */
+  List<Future> createFutureListWithError() {
+    List<Future> fl = new ArrayList<>();
+    fl.add(Future.succeededFuture());
+    fl.add(Future.succeededFuture());
+    fl.add(Future.succeededFuture());
+    fl.add(Future.failedFuture(new UnsupportedOperationException()));
+    fl.add(Future.succeededFuture());
+    return fl;
+  }
 
   /**
    * Test method for {@link de.braintags.io.vertx.util.CounterObject#CounterObject(int, io.vertx.core.Handler)}.
