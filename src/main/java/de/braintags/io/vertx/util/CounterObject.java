@@ -12,6 +12,8 @@
  */
 package de.braintags.io.vertx.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -27,7 +29,7 @@ import io.vertx.core.Handler;
  */
 
 public class CounterObject<E> extends ResultObject<E> {
-  private int count;
+  private final AtomicInteger count;
 
   /**
    * Craetes a new instance with the given count and a handler
@@ -39,9 +41,9 @@ public class CounterObject<E> extends ResultObject<E> {
    */
   public CounterObject(int count, Handler<AsyncResult<E>> handler) {
     super(handler);
-    this.count = count;
     if (count == 0)
       throw new UnsupportedOperationException("handle zero elements");
+    this.count = new AtomicInteger(count);
   }
 
   /**
@@ -50,8 +52,7 @@ public class CounterObject<E> extends ResultObject<E> {
    * @return true, if zero
    */
   public boolean reduce() {
-    --count;
-    return count == 0;
+    return count.decrementAndGet() == 0;
   }
 
   /**
@@ -60,7 +61,7 @@ public class CounterObject<E> extends ResultObject<E> {
    * @return wether the internal counter is zero
    */
   public boolean isZero() {
-    return count == 0;
+    return count.get() == 0;
   }
 
   /**
@@ -69,6 +70,6 @@ public class CounterObject<E> extends ResultObject<E> {
    * @return the counter
    */
   public int getCount() {
-    return count;
+    return count.get();
   }
 }
