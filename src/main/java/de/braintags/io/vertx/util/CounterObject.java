@@ -15,6 +15,7 @@ package de.braintags.io.vertx.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Handler;
 
 /**
@@ -25,9 +26,10 @@ import io.vertx.core.Handler;
  *          the underlaying class, which shall be delivered to the Handler as {@link AsyncResult}
  * 
  * @author Michael Remme
- * 
+ * @deprecated use {@link CompositeFuture} instead
  */
 
+@Deprecated
 public class CounterObject<E> extends ResultObject<E> {
   private final AtomicInteger count;
 
