@@ -15,6 +15,11 @@
 	</parent>
 
 	<properties>
+		<license.canUpdateDescription>false</license.canUpdateDescription>
+		<license.canUpdateCopyright>false</license.canUpdateCopyright>
+		<license.canUpdateLicense>false</license.canUpdateLicense>
+		<license.dryRun>false</license.dryRun>
+	
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<testjar.skip>false</testjar.skip>
 		<doc.skip>false</doc.skip>
@@ -32,7 +37,6 @@
 		  <systemPath>${java.home}/lib/rt.jar</systemPath>
 		</dependency>
 	</dependencies>
-
 
 	<scm>
 		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
