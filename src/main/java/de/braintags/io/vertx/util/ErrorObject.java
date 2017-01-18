@@ -1,4 +1,4 @@
-/*
+/*-
  * #%L
  * Vert.x utilities from Braintags
  * %%
