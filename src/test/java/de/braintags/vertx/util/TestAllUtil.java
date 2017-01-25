@@ -22,6 +22,7 @@ import de.braintags.vertx.util.file.FileSystemUtilTest;
 import de.braintags.vertx.util.lock.AsyncReadWriteLockTest;
 import de.braintags.vertx.util.security.CRUDPermissionMapTest;
 import de.braintags.vertx.util.security.crypt.impl.StandardEncoderTest;
+import de.braintags.vertx.util.tree.TreeTest;
 
 /**
  * 
@@ -33,7 +34,7 @@ import de.braintags.vertx.util.security.crypt.impl.StandardEncoderTest;
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class,
-    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class })
+    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class })
 public class TestAllUtil {
 
 }
