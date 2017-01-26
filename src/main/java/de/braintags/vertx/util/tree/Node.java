@@ -16,6 +16,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import de.braintags.vertx.util.exception.DuplicateObjectException;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
 /**
  * 
  * 
@@ -37,7 +41,7 @@ public class Node<T> {
    * @param name
    *          the name of the node
    */
-  Node(Tree<T> tree, Node<T> parentNode, String name) {
+  protected Node(Tree<T> tree, Node<T> parentNode, String name) {
     this.tree = tree;
     this.parentNode = parentNode;
     this.name = name;
@@ -51,7 +55,18 @@ public class Node<T> {
   public void addValue(T value) {
     if (!values.contains(value)) {
       values.add(value);
+    } else {
+      throw new DuplicateObjectException("value already inside node " + toString() + ": " + value);
     }
+  }
+
+  /**
+   * Get the child nodes of the current node
+   * 
+   * @return
+   */
+  protected List<Node<T>> getChildNodes() {
+    return childNodes;
   }
 
   /**
@@ -118,6 +133,21 @@ public class Node<T> {
       parent = parent.getParentNode();
     }
     return sb.toString();
+  }
+
+  public JsonObject toJson() {
+    JsonObject jo = new JsonObject();
+    jo.put("name", getName());
+    jo.put("path", toString());
+    JsonArray arr = new JsonArray();
+    for (Node<T> child : childNodes) {
+      arr.add(child.toJson());
+    }
+    for (T t : values) {
+      arr.add(t);
+    }
+    jo.put("children", arr);
+    return jo;
   }
 
 }

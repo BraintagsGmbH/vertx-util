@@ -45,8 +45,12 @@ public class PathTree<T> extends Tree<T> {
   }
 
   private String[] transform(String path) {
-    String tmpPath = path == null ? "/" : path.trim().startsWith("/") ? path : "/" + path;
-    return tmpPath.split("/");
+    if (path == null || path.trim().isEmpty() || path.trim().equals("/")) {
+      return new String[] {};
+    } else {
+      String tmpPath = path.startsWith("/") ? path.substring(1) : path;
+      return tmpPath.split("/");
+    }
   }
 
 }

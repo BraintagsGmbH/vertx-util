@@ -20,6 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import io.vertx.core.json.JsonObject;
+
 /**
  * 
  * 
@@ -62,6 +64,23 @@ public class TreeTest {
   }
 
   @Test
+  public void testTreeToJson() {
+    Tree<String> tree = new Tree<>();
+    String[] cats1 = { "L1-1", "L2-1", "L3-1" };
+    String[] cats2 = { "L1-1", "L2-2", "L3-2" };
+    tree.add(cats1, firstValue);
+    tree.add(cats2, secondValue);
+    JsonObject json = tree.toJson();
+    LOGGER.info(json.encodePrettily());
+
+    // Tree<String> tree2 = Json.decodeValue(j, Tree.class);
+    // Node<String> node = tree2.getNode(cats1);
+    // assertNotNull(node);
+    // LOGGER.info(node.toString());
+    // assertTrue("to String must display a path", node.toString().contains("/"));
+  }
+
+  @Test
   public void testNodeToString() {
     Tree<String> tree = new Tree<>();
     String[] cats1 = { "L1-1", "L2-1", "L3-1" };
@@ -82,6 +101,8 @@ public class TreeTest {
     String[] cats2 = { "L1-1", "L2-2", "L3-2" };
     tree.add(cats1, firstValue);
     tree.add(cats2, secondValue);
+
+    assertEquals(1, tree.getRootNode().getChildNodes().size());
 
     Node<String> node = tree.getNode(cats1);
     assertNotNull(node);

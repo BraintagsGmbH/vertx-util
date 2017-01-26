@@ -12,6 +12,8 @@
  */
 package de.braintags.vertx.util.tree;
 
+import io.vertx.core.json.JsonObject;
+
 /**
  * A tree implementation to store values in hirarchies
  * 
@@ -23,7 +25,11 @@ public class Tree<T> {
    * The name of the root node
    */
   public static final String ROOT_NODE_NAME = "root";
-  private Node<T> rootNode = new Node<>(this, null, ROOT_NODE_NAME);
+  private Node<T> rootNode;
+
+  public Tree() {
+    rootNode = createNode(ROOT_NODE_NAME, null);
+  }
 
   /**
    * Adds a new value into the given path entries. For each path entry new child nodes are created if not existing
@@ -35,7 +41,7 @@ public class Tree<T> {
    * @return the node, where the value was added
    */
   public Node<T> add(String[] pathElements, T value) {
-    Node<T> cn = rootNode;
+    Node<T> cn = getRootNode();
     if (pathElements != null) {
       for (String pe : pathElements) {
         cn = cn.getOrCreateChildNode(pe);
@@ -52,7 +58,7 @@ public class Tree<T> {
    * @return a fitting Node or null, if not existing
    */
   public Node<T> getNode(String[] pathElements) {
-    Node<T> cn = rootNode;
+    Node<T> cn = getRootNode();
     if (pathElements != null) {
       for (String pe : pathElements) {
         cn = cn.getChildNode(pe);
@@ -71,6 +77,16 @@ public class Tree<T> {
    */
   public Node<T> createNode(String nodeName, Node<T> parent) {
     return new Node<>(this, parent, nodeName);
+  }
+
+  protected Node<T> getRootNode() {
+    return rootNode;
+  }
+
+  public JsonObject toJson() {
+    JsonObject jo = new JsonObject();
+    jo.put("tree", getRootNode().toJson());
+    return jo;
   }
 
 }
