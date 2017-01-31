@@ -54,11 +54,12 @@ public class DebugVisitor implements ITreeVisitor<String, String> {
    * @see de.braintags.vertx.util.tree.ITreeVisitor#startLeaf(java.lang.Object)
    */
   @Override
-  public void startLeaf(String leaf) {
+  public void startLeaf(Leaf<String> leaf) {
     for (int i = 0; i <= index; i++) {
       buffer.appendString(" ");
     }
-    buffer.appendString(leaf + "\n");
+    buffer.appendString(leaf.getValue()).appendString("  ").appendString(String.valueOf(leaf.isLastChild()))
+        .appendString("\n");
   }
 
   /*

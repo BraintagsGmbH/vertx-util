@@ -26,11 +26,10 @@ import io.vertx.core.json.JsonObject;
  * @author Michael Remme
  * 
  */
-public class Node<T> {
+public class Node<T> extends Child<T> {
   private Tree<T> tree;
-  private Node<T> parentNode;
   private String name;
-  private List<T> values = new ArrayList<>();
+  private List<Leaf<T>> values = new ArrayList<>();
   private List<Node<T>> childNodes = new ArrayList<>();
 
   /**
@@ -42,8 +41,8 @@ public class Node<T> {
    *          the name of the node
    */
   protected Node(Tree<T> tree, Node<T> parentNode, String name) {
+    super(parentNode);
     this.tree = tree;
-    this.parentNode = parentNode;
     this.name = name;
   }
 
@@ -54,10 +53,13 @@ public class Node<T> {
    */
   public void visit(ITreeVisitor<?, T> visitor) {
     visitor.startNode(this);
+    int counter = 0;
     for (Node<T> child : childNodes) {
+      child.setCurrentIndex(counter++);
       child.visit(visitor);
     }
-    for (T leaf : values) {
+    for (Leaf<T> leaf : values) {
+      leaf.setCurrentIndex(counter++);
       visitor.startLeaf(leaf);
     }
     visitor.finishNode(this);
@@ -70,10 +72,20 @@ public class Node<T> {
    */
   public void addValue(T value) {
     if (!values.contains(value)) {
-      values.add(value);
+      values.add(createLeaf(value));
     } else {
       throw new DuplicateObjectException("value already inside node " + toString() + ": " + value);
     }
+  }
+
+  /**
+   * Creates an instance of {@link Leaf} with the given value
+   * 
+   * @param value
+   * @return
+   */
+  public Leaf<T> createLeaf(T value) {
+    return new Leaf<>(value, this);
   }
 
   /**
@@ -116,6 +128,15 @@ public class Node<T> {
    * @return the values
    */
   public Collection<T> getValues() {
+    List<T> list = new ArrayList<>();
+    values.stream().forEach(leaf -> list.add(leaf.getValue()));
+    return list;
+  }
+
+  /**
+   * @return the values
+   */
+  public Collection<Leaf<T>> getLeafs() {
     return values;
   }
 
@@ -126,13 +147,6 @@ public class Node<T> {
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * @return the parentNode
-   */
-  public Node<T> getParentNode() {
-    return parentNode;
   }
 
   /*
@@ -159,11 +173,19 @@ public class Node<T> {
     for (Node<T> child : childNodes) {
       arr.add(child.toJson());
     }
-    for (T t : values) {
-      arr.add(t);
+    for (Leaf<T> t : values) {
+      arr.add(t.getValue());
     }
     jo.put("children", arr);
     return jo;
   }
 
+  /**
+   * Get the number of alle children ( nodes and leafs )
+   * 
+   * @return
+   */
+  public int getCompleteSize() {
+    return childNodes.size() + values.size();
+  }
 }

@@ -28,6 +28,12 @@ public interface ITreeVisitor<F, T> {
    * A node is started
    * 
    * @param node
+   *          the node to be handled
+   * @param selectionSize
+   *          the count of all nodes and children in the selection on that level
+   * @param currentIndex
+   *          the index of the current element
+   * 
    */
   void startNode(Node<T> node);
 
@@ -35,6 +41,11 @@ public interface ITreeVisitor<F, T> {
    * A node is finished
    * 
    * @param node
+   *          the node to be handled
+   * @param selectionSize
+   *          the count of all nodes and children in the selection on that level
+   * @param currentIndex
+   *          the index of the current element
    */
   void finishNode(Node<T> node);
 
@@ -42,8 +53,13 @@ public interface ITreeVisitor<F, T> {
    * A leaf ( a child from a node ) is called
    * 
    * @param leaf
+   *          the leaf to be handled
+   * @param selectionSize
+   *          the count of all nodes and children in the selection on that level
+   * @param currentIndex
+   *          the index of the current element
    */
-  void startLeaf(T leaf);
+  void startLeaf(Leaf<T> leaf);
 
   /**
    * Get the result of the visit
