@@ -64,6 +64,21 @@ public class TreeTest {
   }
 
   @Test
+  public void testTreeVisitor() {
+    DebugVisitor visitor = new DebugVisitor();
+    Tree<String> tree = new Tree<>();
+    String[] cats1 = { "L1-1", "L2-1", "L3-1" };
+    String[] cats2 = { "L1-1", "L2-2", "L3-2" };
+    tree.add(cats1, firstValue);
+    tree.add(cats2, secondValue);
+
+    tree.visit(visitor);
+    assertNotNull(visitor.getResult());
+    assertFalse(visitor.getResult().isEmpty());
+    LOGGER.info(visitor.getResult());
+  }
+
+  @Test
   public void testTreeToJson() {
     Tree<String> tree = new Tree<>();
     String[] cats1 = { "L1-1", "L2-1", "L3-1" };

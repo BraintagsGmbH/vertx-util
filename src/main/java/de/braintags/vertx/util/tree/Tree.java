@@ -18,7 +18,8 @@ import io.vertx.core.json.JsonObject;
  * A tree implementation to store values in hirarchies
  * 
  * @author Michael Remme
- * 
+ * @param T
+ *          the type of a leaf
  */
 public class Tree<T> {
   /**
@@ -49,6 +50,15 @@ public class Tree<T> {
     }
     cn.addValue(value);
     return cn;
+  }
+
+  /**
+   * Let the visitor traverse the tree and collect or generate some data
+   * 
+   * @param visitor
+   */
+  public void visit(ITreeVisitor<?, T> visitor) {
+    getRootNode().visit(visitor);
   }
 
   /**

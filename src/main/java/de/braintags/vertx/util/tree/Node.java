@@ -48,6 +48,22 @@ public class Node<T> {
   }
 
   /**
+   * Let the visitor traverse the tree and collect or generate some data
+   * 
+   * @param visitor
+   */
+  public void visit(ITreeVisitor<?, T> visitor) {
+    visitor.startNode(this);
+    for (Node<T> child : childNodes) {
+      child.visit(visitor);
+    }
+    for (T leaf : values) {
+      visitor.startLeaf(leaf);
+    }
+    visitor.finishNode(this);
+  }
+
+  /**
    * Add a new entry as value of the node
    * 
    * @param value
