@@ -7,16 +7,3 @@ compileJava {
     options.forkOptions.executable = 'javac'
     options.compilerArgs << "-XDignore.symbol.file"
 }
-
-task buildTestFiles(type: Jar) { 
-	from sourceSets.test.output
-	classifier = 'tests'
-}
-
-configurations {
-  testArtifacts
-}
-
-artifacts {
-   testArtifacts buildTestFiles
-}
