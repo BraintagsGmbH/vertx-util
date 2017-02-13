@@ -17,8 +17,12 @@ package de.braintags.vertx.util.tree;
  * 
  * @author Michael Remme
  * 
+ * @param T
+ *          the value type of containig leafs
  */
 public class PathTree<T> extends Tree<T> {
+
+  private static final String SLASH = "/";
 
   /**
    * Add a value at the given path
@@ -45,11 +49,11 @@ public class PathTree<T> extends Tree<T> {
   }
 
   private String[] transform(String path) {
-    if (path == null || path.trim().isEmpty() || path.trim().equals("/")) {
+    if (path == null || path.trim().isEmpty() || SLASH.equals(path.trim())) {
       return new String[] {};
     } else {
-      String tmpPath = path.startsWith("/") ? path.substring(1) : path;
-      return tmpPath.split("/");
+      String tmpPath = path.startsWith(SLASH) ? path.substring(1) : path;
+      return tmpPath.split(SLASH);
     }
   }
 

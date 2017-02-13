@@ -16,6 +16,8 @@ package de.braintags.vertx.util.tree;
  * 
  * 
  * @author Michael Remme
+ * @param T
+ *          the value type of containig nodes
  * 
  */
 public class Child<T> {

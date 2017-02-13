@@ -34,7 +34,8 @@ import de.braintags.vertx.util.tree.TreeTest;
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class,
-    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class })
+    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class,
+    TestResourceUtil.class })
 public class TestAllUtil {
 
 }

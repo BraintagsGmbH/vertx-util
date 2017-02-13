@@ -63,6 +63,7 @@ public class ClassUtil {
       cls.getDeclaredConstructor(new Class[0]);
       return true;
     } catch (NoSuchMethodException e) {
+      LOGGER.warn(e);
       return false;
     } catch (SecurityException e) {
       throw new ClassAccessException(e);
@@ -128,7 +129,7 @@ public class ClassUtil {
    */
   public static <T> Class<?> getTypeArgument(final Class<? extends T> clazz,
       final TypeVariable<? extends GenericDeclaration> tv) {
-    final Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
+    final Map<Type, Type> resolvedTypes = new HashMap<>();
     Type type = clazz;
     // start walking up the inheritance hierarchy until we hit the end
     while (type != null && !getClass(type).equals(Object.class)) {

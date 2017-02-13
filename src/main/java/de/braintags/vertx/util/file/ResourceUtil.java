@@ -15,6 +15,7 @@ package de.braintags.vertx.util.file;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.braintags.vertx.util.ExceptionUtil;
 import io.vertx.core.buffer.Buffer;
 
 /**
@@ -56,7 +57,7 @@ public class ResourceUtil {
       }
       return buffer;
     } catch (IOException ioe) {
-      throw new RuntimeException(ioe);
+      throw ExceptionUtil.createRuntimeException(ioe);
     }
   }
 

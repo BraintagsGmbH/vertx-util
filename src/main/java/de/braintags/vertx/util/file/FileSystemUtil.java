@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.NoSuchFileException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -105,7 +106,7 @@ public class FileSystemUtil {
   /**
    * Create a filename, where illegal characters are replaced against '_'
    * 
-   * @param fileName
+   * @param fName
    * @return
    */
   public static String cleanFileName(String fName) {
@@ -140,6 +141,7 @@ public class FileSystemUtil {
       }
     } catch (NoSuchFileException e) {
       // can not occur here
+      throw ExceptionUtil.createRuntimeException(e);
     }
   }
 

@@ -24,7 +24,8 @@ import io.vertx.core.json.JsonObject;
  * 
  * 
  * @author Michael Remme
- * 
+ * @param T
+ *          the value type of containig leafs
  */
 public class Node<T> extends Child<T> {
   private Tree<T> tree;
@@ -71,8 +72,9 @@ public class Node<T> extends Child<T> {
    * @param value
    */
   public void addValue(T value) {
-    if (!values.contains(value)) {
-      values.add(createLeaf(value));
+    Leaf<T> leaf = createLeaf(value);
+    if (!values.contains(leaf)) {
+      values.add(leaf);
     } else {
       throw new DuplicateObjectException("value already inside node " + toString() + ": " + value);
     }
@@ -165,6 +167,11 @@ public class Node<T> extends Child<T> {
     return sb.toString();
   }
 
+  /**
+   * Export the given node into Json
+   * 
+   * @return
+   */
   public JsonObject toJson() {
     JsonObject jo = new JsonObject();
     jo.put("name", getName());
