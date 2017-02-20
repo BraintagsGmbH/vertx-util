@@ -11,27 +11,35 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.braintags.vertx.util.EqUtil;
+import io.vertx.core.json.Json;
 
 /**
- * Creates a diff for two JsonNodes. For Object and value nodes, the diff will be generated in the natural way, 
+ * Creates a diff for two JsonNodes. For Object and value nodes, the diff will be generated in the natural way,
  * i.e. only changed fields in data will be contained in the diff. For an array an ObjectNode is created:
  * { "size" : 2, "#0" : 4, "1" : { SOME DIFF }}
- * The field "size" determines the size for the data array. For each index of the data array there is a field in the object.
- * if the index is prefixed with a "#", the field value is the index of the element in the base array. 
- * Otherwise there is a diff between the base element and the data element at the corresponding index.  
+ * The field "size" determines the size for the data array. For each index of the data array there is a field in the
+ * object.
+ * if the index is prefixed with a "#", the field value is the index of the element in the base array.
+ * Otherwise there is a diff between the base element and the data element at the corresponding index.
+ * 
  * @author mpluecker
  *
  */
 public class JsonDiff {
 
+  public static JsonNode getDiff(JsonNode base, JsonNode data) {
+    return getDiff(base, data, Json.mapper.getNodeFactory());
+  }
+
   /**
-   * Creates a diff from base to data. 
+   * Creates a diff from base to data.
+   * 
    * @param base
-   *    is not modified
-   * @param data 
-   *    is not modified
+   *          is not modified
+   * @param data
+   *          is not modified
    * @param nodeFactory
-   *    a JsonNodeFactory
+   *          a JsonNodeFactory
    */
   public static JsonNode getDiff(JsonNode base, JsonNode data, JsonNodeFactory nodeFactory) {
     if (base.getNodeType() != data.getNodeType()) {
@@ -59,7 +67,7 @@ public class JsonDiff {
   }
 
   private static ObjectNode objectDiff(ObjectNode base, ObjectNode data, JsonNodeFactory nodeFactory) {
-    ObjectNode diff = nodeFactory.objectNode(); 
+    ObjectNode diff = nodeFactory.objectNode();
     Iterator<Entry<String, JsonNode>> dataFields = data.fields();
     while (dataFields.hasNext()) {
       Entry<String, JsonNode> dataField = dataFields.next();
@@ -128,12 +136,13 @@ public class JsonDiff {
 
   /**
    * Applies the diff to the base node. If the base is not a value node, the base node will be modified and returned.
+   * 
    * @param base
-   *    MAY BE MODIFIED!
+   *          MAY BE MODIFIED!
    * @param diff
-   *    is not modified
-   * @return 
-   *    the modified JsonNode
+   *          is not modified
+   * @return
+   *         the modified JsonNode
    */
   public static JsonNode applyDiff(JsonNode base, JsonNode diff) {
     if (base.isNull()) {
@@ -149,7 +158,7 @@ public class JsonDiff {
       }
     case OBJECT:
       if (diff.isObject()) {
-        applyObjectDiff((ObjectNode) base, (ObjectNode) diff);      
+        applyObjectDiff((ObjectNode) base, (ObjectNode) diff);
         return base;
       } else {
         return diff.deepCopy();
@@ -158,7 +167,7 @@ public class JsonDiff {
       throw new IllegalArgumentException("node type may not be " + JsonNodeType.MISSING);
     default:
       return diff.deepCopy();
-    }    
+    }
   }
 
   private static void applyObjectDiff(ObjectNode base, ObjectNode diff) {
@@ -175,7 +184,7 @@ public class JsonDiff {
       }
     }
   }
-  
+
   private static void applyArrayDiff(ArrayNode baseNode, ObjectNode diffNode) {
     JsonNode[] newValues = new JsonNode[diffNode.get("size").intValue()];
     for (int i = Math.min(newValues.length, baseNode.size()) - 1; i >= 0; i--) {
@@ -194,7 +203,7 @@ public class JsonDiff {
         if (value.isObject() && index < baseNode.size()) {
           JsonNode arrayValue = baseNode.get(index).deepCopy();
           if (arrayValue.isObject()) {
-            applyDiff((ObjectNode) arrayValue, (ObjectNode) value);
+            applyDiff(arrayValue, value);
             newValues[index] = arrayValue;
           } else {
             newValues[index] = value.deepCopy();
