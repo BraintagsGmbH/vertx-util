@@ -35,7 +35,7 @@ import de.braintags.vertx.util.tree.TreeTest;
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class,
     AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class,
-    TestResourceUtil.class })
+    TestResourceUtil.class, EqUtilTest.class })
 public class TestAllUtil {
 
 }

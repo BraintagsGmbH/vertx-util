@@ -1,15 +1,15 @@
 package de.braintags.vertx.util;
 
+import java.util.Objects;
+
 public class EqUtil {
 
   /**
-   * Tests two null pointers or objects for equality.
-   * 
-   * @return
-   *    true if both objects are <code>null</code> or equal. 
+   * @deprecated use Objects.equals() instead
    */
-	public static boolean eq(Object o1, Object o2) {
-		return o1 == null ? o2 == null : o1.equals(o2);
-	}
+  @Deprecated
+  public static boolean eq(Object o1, Object o2) {
+    return Objects.equals(o1, o2);
+  }
 
 }
