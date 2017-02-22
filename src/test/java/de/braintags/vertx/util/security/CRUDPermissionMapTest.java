@@ -17,13 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
 import org.junit.Test;
 
 /**
@@ -104,22 +97,6 @@ public class CRUDPermissionMapTest {
     } catch (UnsupportedOperationException e) {
       // expected result
     }
-  }
-
-  @Test
-  public void certificateTest() throws Exception {
-    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
-    KeyPair pair = generateRSAKeyPair();
-    X509Certificate cert = CertificateHelper.generateV3Certificate(pair);
-    cert.checkValidity(new Date());
-    cert.verify(cert.getPublicKey());
-  }
-
-  public static KeyPair generateRSAKeyPair() throws Exception {
-    KeyPairGenerator kpGen = (KeyPairGenerator) KeyPairGenerator.getInstance("RSA", "BC");
-    kpGen.initialize(1024, new SecureRandom());
-    return kpGen.generateKeyPair();
   }
 
 }
