@@ -23,6 +23,7 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -42,9 +43,10 @@ import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
-
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.DERInteger;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -60,12 +62,17 @@ import org.bouncycastle.asn1.x509.V3TBSCertificateGenerator;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import io.vertx.core.http.HttpServerOptions;
@@ -120,7 +127,6 @@ public class CertificateHelper {
   }
 
   /**
-   * 
    * generate a certificate with the boncycastle libary
    * 
    * @param dnsName
@@ -129,10 +135,10 @@ public class CertificateHelper {
    * @param caAlias
    * @param caPassword
    * @throws GeneralSecurityException
-   * @throws IOException 
+   * @throws IOException
    */
-  public static void newCertificateHelper(String caName, int validityDays, String caFile, String caAlias, String caPassword)
-      throws GeneralSecurityException, IOException {
+  public static void newCertificateHelper(String caName, int validityDays, String caFile, String caAlias,
+      String caPassword) throws GeneralSecurityException, IOException {
 
     PublicKey pubKey;
     X509Certificate caCert = null;
@@ -168,8 +174,7 @@ public class CertificateHelper {
     //DERObjectIdentifier sigOID = X509Util.getAlgorithmOID("SHA1WithRSAEncryption");
     AlgorithmIdentifier sigAlgId = new AlgorithmIdentifier(X509ObjectIdentifiers.id_SHA1);
     certGen.setSignature(sigAlgId);
-    
-    
+
     certGen.setSubjectPublicKeyInfo(new SubjectPublicKeyInfo(
         (ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(pubKey.getEncoded())).readObject()));
     certGen.setStartDate(new Time(new Date(System.currentTimeMillis())));
@@ -221,6 +226,55 @@ public class CertificateHelper {
         new GeneralNames(new GeneralName(GeneralName.rfc822Name, "test@test.test")));
 
     return certGen.generate(pair.getPrivate(), "BC");
+  }
+
+  private static final String BC = org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
+
+  public static void generateSelfSignedCertificate(String hostname, File keystore, String keystorePassword) {
+    try {
+      Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+
+      KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
+      kpGen.initialize(1024, new SecureRandom());
+      KeyPair pair = kpGen.generateKeyPair();
+
+      // Generate self-signed certificate
+      X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+      builder.addRDN(BCStyle.CN, hostname);
+
+      Date notBefore = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+      Date notAfter = new Date(System.currentTimeMillis() + 10 * 365 * 24 * 60 * 60 * 1000);
+      BigInteger serial = BigInteger.valueOf(System.currentTimeMillis());
+
+      X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(builder.build(), serial, notBefore, notAfter,
+          builder.build(), pair.getPublic());
+      ContentSigner sigGen = new JcaContentSignerBuilder("SHA256WithRSAEncryption").setProvider(BC)
+          .build(pair.getPrivate());
+
+      X509Certificate cert = new JcaX509CertificateConverter().setProvider(BC).getCertificate(certGen.build(sigGen));
+      cert.checkValidity(new Date());
+      cert.verify(cert.getPublicKey());
+
+      // Save to keystore
+      KeyStore store = KeyStore.getInstance("BKS");
+      if (keystore.exists()) {
+        FileInputStream caFile = new FileInputStream(keystore);
+        store.load(caFile, keystorePassword.toCharArray());
+        caFile.close();
+      } else {
+        store.load(null);
+        throw new RuntimeException("Got null cert from keystore!");
+      }
+      store.setKeyEntry(hostname, pair.getPrivate(), keystorePassword.toCharArray(),
+          new java.security.cert.Certificate[] { cert });
+      FileOutputStream fos = new FileOutputStream(keystore);
+      store.store(fos, keystorePassword.toCharArray());
+      fos.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new RuntimeException("Failed to generate self-signed certificate!", t);
+    }
+
   }
 
 }

@@ -8,5 +8,6 @@ compileJava {
     options.compilerArgs << "-XDignore.symbol.file"
 }
 dependencies{
-	compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.45'
+	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.56'	
+	compile group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.56'
 }
