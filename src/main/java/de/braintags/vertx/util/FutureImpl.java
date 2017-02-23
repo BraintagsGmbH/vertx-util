@@ -119,34 +119,40 @@ public class FutureImpl<T> implements Future<T> {
 
   /**
    * Set the result. Any handler will be called, if there is one
+   * 
+   * @return
    */
   @Override
-  public void complete(T result) {
-    checkComplete();
+  public boolean complete(T result) {
+    if (isComplete())
+      return false;
     this.result = result;
     succeeded = true;
     checkCallHandler();
+    return true;
   }
 
   @Override
-  public void complete() {
-    complete(null);
+  public boolean complete() {
+    return complete(null);
   }
 
   /**
    * Set the failure. Any handler will be called, if there is one
    */
   @Override
-  public void fail(Throwable throwable) {
-    checkComplete();
+  public boolean fail(Throwable throwable) {
+    if (isComplete())
+      return false;
     this.throwable = throwable;
     failed = true;
     checkCallHandler();
+    return true;
   }
 
   @Override
-  public void fail(String failureMessage) {
-    fail(new NoStackTraceThrowable(failureMessage));
+  public boolean fail(String failureMessage) {
+    return fail(new NoStackTraceThrowable(failureMessage));
   }
 
   private void checkCallHandler() {
@@ -155,9 +161,17 @@ public class FutureImpl<T> implements Future<T> {
     }
   }
 
-  private void checkComplete() {
-    if (succeeded || failed) {
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.Future#handle(io.vertx.core.AsyncResult)
+   */
+  @Override
+  public void handle(AsyncResult<T> asyncResult) {
+    if (asyncResult.succeeded()) {
+      complete(asyncResult.result());
+    } else {
+      fail(asyncResult.cause());
     }
   }
 
