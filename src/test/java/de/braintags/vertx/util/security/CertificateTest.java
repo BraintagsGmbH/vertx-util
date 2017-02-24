@@ -12,13 +12,7 @@
  */
 package de.braintags.vertx.util.security;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.Date;
-
+import java.io.File;
 import org.junit.Test;
 
 /**
@@ -29,19 +23,9 @@ public class CertificateTest {
       .getLogger(CertificateTest.class);
 
   @Test
-  public void certificateTest() throws Exception {
-    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
-    KeyPair pair = generateRSAKeyPair();
-    X509Certificate cert = CertificateHelper.generateV3Certificate(pair);
-    cert.checkValidity(new Date());
-    cert.verify(cert.getPublicKey());
-  }
-
-  public static KeyPair generateRSAKeyPair() throws Exception {
-    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
-    kpGen.initialize(1024, new SecureRandom());
-    return kpGen.generateKeyPair();
+  public void certificateTest() {
+    File file = new File("src/test/resources/de/braintags/vertx/util/security/certificate.jks");
+    CertificateHelper.generateSelfSignedCertificate("localhost", file, "bouncyCastle");
   }
 
 }
