@@ -119,40 +119,30 @@ public class FutureImpl<T> implements Future<T> {
 
   /**
    * Set the result. Any handler will be called, if there is one
-   * 
-   * @return
    */
   @Override
-  public boolean complete(T result) {
-    if (isComplete())
-      return false;
-    this.result = result;
-    succeeded = true;
-    checkCallHandler();
-    return true;
+  public void complete(T result) {
+    if (!tryComplete(result))
+      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
 
   @Override
-  public boolean complete() {
-    return complete(null);
+  public void complete() {
+    complete(null);
   }
 
   /**
    * Set the failure. Any handler will be called, if there is one
    */
   @Override
-  public boolean fail(Throwable throwable) {
-    if (isComplete())
-      return false;
-    this.throwable = throwable;
-    failed = true;
-    checkCallHandler();
-    return true;
+  public void fail(Throwable throwable) {
+    if (!tryFail(throwable))
+      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
 
   @Override
-  public boolean fail(String failureMessage) {
-    return fail(new NoStackTraceThrowable(failureMessage));
+  public void fail(String failureMessage) {
+    fail(new NoStackTraceThrowable(failureMessage));
   }
 
   private void checkCallHandler() {
@@ -164,15 +154,64 @@ public class FutureImpl<T> implements Future<T> {
   /*
    * (non-Javadoc)
    * 
+   * @see io.vertx.core.Future#tryComplete(java.lang.Object)
+   */
+  @Override
+  public boolean tryComplete(T result) {
+    if (isComplete())
+      return false;
+    this.result = result;
+    succeeded = true;
+    checkCallHandler();
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.Future#tryComplete()
+   */
+  @Override
+  public boolean tryComplete() {
+    return tryComplete(null);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.Future#tryFail(java.lang.Throwable)
+   */
+  @Override
+  public boolean tryFail(Throwable cause) {
+    if (isComplete())
+      return false;
+    this.throwable = cause;
+    failed = true;
+    checkCallHandler();
+    return true;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.Future#tryFail(java.lang.String)
+   */
+  @Override
+  public boolean tryFail(String failureMessage) {
+    return tryFail(new NoStackTraceThrowable(failureMessage));
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.Future#handle(io.vertx.core.AsyncResult)
    */
   @Override
   public void handle(AsyncResult<T> asyncResult) {
-    if (asyncResult.succeeded()) {
+    if (asyncResult.succeeded())
       complete(asyncResult.result());
-    } else {
+    else
       fail(asyncResult.cause());
-    }
   }
 
 }
