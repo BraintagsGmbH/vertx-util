@@ -19,6 +19,10 @@ import io.vertx.core.Vertx;
  */
 public class CompositeUtil {
 
+  private CompositeUtil() {
+    // hide constructor
+  }
+
   /**
    * Like a composite future with the "join" method, but executes only a given amount, and waits until that amount is
    * finished before starting the next chunk.
@@ -60,7 +64,7 @@ public class CompositeUtil {
    *          the size of each individual chunk. A chunk may be smaller if there is not enough data to fill it
    *          completely
    * @param waitDuration
-   *          the amount of time in MS to wait between chunks
+   *          the amount of time in MS to wait between chunks, if <= 0 the next chunk will start immediately
    * @param vertx
    *          a vertx instance, needed to set a timer to wait between chunks if waitDuration > 0
    * @param biConsumer
@@ -73,9 +77,18 @@ public class CompositeUtil {
   public static <T, U> void executeChunked(Iterator<T> iterator, int chunkSize, long waitDuration, Vertx vertx,
       BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, Handler<AsyncResult<List<Future<U>>>> handler) {
     List<Future<U>> totalFutures = new ArrayList<>();
-    executeChunk(iterator, chunkSize, waitDuration, vertx, biConsumer, totalFutures, result -> {
+    if (chunkSize <= 0) {
+      throw new IllegalArgumentException("'chunkSize' must be > 0");
+    }
+
+    if (!iterator.hasNext()) {
+      // empty list, don't even start
       handler.handle(Future.succeededFuture(totalFutures));
-    });
+    } else {
+      executeChunk(iterator, chunkSize, waitDuration, vertx, biConsumer, totalFutures, result -> {
+        handler.handle(Future.succeededFuture(totalFutures));
+      });
+    }
   }
 
   /**
