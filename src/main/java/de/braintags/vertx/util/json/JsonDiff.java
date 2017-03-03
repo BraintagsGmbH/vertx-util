@@ -15,6 +15,7 @@ package de.braintags.vertx.util.json;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,7 +34,7 @@ import io.vertx.core.json.Json;
  * object.
  * if the index is prefixed with a "#", the field value is the index of the element in the base array.
  * Otherwise there is a diff between the base element and the data element at the corresponding index.
- * 
+ *
  * @author mpluecker
  *
  */
@@ -45,7 +46,7 @@ public class JsonDiff {
 
   /**
    * Creates a diff from base to data.
-   * 
+   *
    * @param base
    *          is not modified
    * @param data
@@ -148,7 +149,7 @@ public class JsonDiff {
 
   /**
    * Applies the diff to the base node. If the base is not a value node, the base node will be modified and returned.
-   * 
+   *
    * @param base
    *          MAY BE MODIFIED!
    * @param diff
@@ -227,6 +228,6 @@ public class JsonDiff {
     }
 
     baseNode.removeAll();
-    baseNode.addAll(Arrays.asList(newValues));
+    baseNode.addAll(Arrays.asList(newValues).stream().filter(entry -> entry != null).collect(Collectors.toList()));
   }
 }
