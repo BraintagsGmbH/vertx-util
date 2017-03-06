@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.util;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * <br>
  * <br>
@@ -30,7 +33,8 @@ public class AbstractIdentifier {
   /**
    * @param identifier
    */
-  public AbstractIdentifier(String identifier) {
+  @JsonCreator
+  public AbstractIdentifier(final String identifier) {
     super();
     this.identifier = identifier;
     this.hashCode = identifier.hashCode();
@@ -39,6 +43,7 @@ public class AbstractIdentifier {
   /**
    * @return the identifier
    */
+  @JsonValue
   public String getIdentifier() {
     return identifier;
   }
