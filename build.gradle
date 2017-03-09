@@ -9,7 +9,4 @@ compileJava {
 }
 
 dependencies {
-	compile group:'org.bouncycastle', name:'bcprov-jdk15on', version:'1.56'
-	compile group:'org.bouncycastle', name:'bcprov-ext-jdk15on', version:'1.55'
-	compile group:'org.bouncycastle', name:'bcpkix-jdk15on', version:'1.56'
 }
