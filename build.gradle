@@ -9,4 +9,5 @@ compileJava {
 }
 
 dependencies {
+  compile 'commons-validator:commons-validator:1.5.1'
 }
