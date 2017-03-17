@@ -1,7 +1,16 @@
 package de.braintags.vertx;
-
-
-import java.util.Set;
+/*
+ * #%L
+ * Vert.x utilities from Braintags
+ * %%
+ * Copyright (C) 2017 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -71,20 +80,11 @@ public class BtVertxTestBase {
     if (vertx != null) {
       Async async = context.async();
       LOGGER.debug("going to close vertx");
-      Set<String> deploymentIds = vertx.deploymentIDs();
-      if (!deploymentIds.isEmpty()) {
-        deploymentIds.forEach(di -> {
-          LOGGER.info("undeploying " + di);
-          vertx.undeploy(di);
-        });
+      vertx.close(ar -> {
+        vertx = null;
+        LOGGER.debug("close called");
         async.complete();
-      } else {
-        vertx.close(ar -> {
-          vertx = null;
-          LOGGER.debug("close called");
-          async.complete();
-        });
-      }
+      });
       async.awaitSuccess();
     }
   }
