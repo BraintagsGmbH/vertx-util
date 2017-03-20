@@ -21,21 +21,21 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
  * @param T
  *          the value type of containig leafs
  */
 public class Node<T> extends Child<T> {
-  private Tree<T> tree;
-  private String name;
-  private List<Leaf<T>> values = new ArrayList<>();
+  private Tree<T>       tree;
+  private String        name;
+  private List<Leaf<T>> values     = new ArrayList<>();
   private List<Node<T>> childNodes = new ArrayList<>();
 
   /**
    * Creates a new node
-   * 
+   *
    * @param parentNode
    *          the parent node, which may be null for a root node
    * @param name
@@ -49,7 +49,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Let the visitor traverse the tree and collect or generate some data
-   * 
+   *
    * @param visitor
    */
   public void visit(ITreeVisitor<?, T> visitor) {
@@ -68,7 +68,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Add a new entry as value of the node
-   * 
+   *
    * @param value
    */
   public void addValue(T value) {
@@ -82,7 +82,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Creates an instance of {@link Leaf} with the given value
-   * 
+   *
    * @param value
    * @return
    */
@@ -92,16 +92,16 @@ public class Node<T> extends Child<T> {
 
   /**
    * Get the child nodes of the current node
-   * 
+   *
    * @return
    */
-  protected List<Node<T>> getChildNodes() {
+  public List<Node<T>> getChildNodes() {
     return childNodes;
   }
 
   /**
    * Get the first node with the fitting name
-   * 
+   *
    * @param nodeName
    * @return a fitting node with the given name or NULL, if none found
    */
@@ -111,7 +111,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Get the first node with the fitting name. If none is found, it will be created
-   * 
+   *
    * @param nodeName
    * @return a found or created child node
    */
@@ -144,7 +144,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * The pure name of the current node
-   * 
+   *
    * @return the name
    */
   public String getName() {
@@ -153,7 +153,7 @@ public class Node<T> extends Child<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override
@@ -169,7 +169,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Export the given node into Json
-   * 
+   *
    * @return
    */
   public JsonObject toJson() {
@@ -189,7 +189,7 @@ public class Node<T> extends Child<T> {
 
   /**
    * Get the number of alle children ( nodes and leafs )
-   * 
+   *
    * @return
    */
   public int getCompleteSize() {
