@@ -25,7 +25,7 @@ import io.vertx.core.Handler;
 /**
  * The abstract implementation defines an unmodifyable list, cause all methods, which are changing the content are
  * throwing an {@link UnsupportedOperationException}
- * 
+ *
  * @author Michael Remme
  * @param <E>
  *          the underlaying class to be used
@@ -35,7 +35,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
       .getLogger(AbstractCollectionAsync.class);
 
   /**
-   * 
+   *
    */
   public AbstractCollectionAsync() {
   }
@@ -58,7 +58,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#containsAll(de.braintags.vertx.util.util.CollectionAsync,
    * io.vertx.core.Handler)
    */
@@ -88,23 +88,25 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   private boolean containsAll(Object[] objects, Object[] searchObjects) {
     for (Object searchObject : searchObjects) {
-      if (!contains(objects, searchObject))
+      if (!contains(objects, searchObject)) {
         return false;
+      }
     }
     return true;
   }
 
   private boolean contains(Object[] objects, Object searchObject) {
     for (Object sourceObject : objects) {
-      if (sourceObject.equals(searchObject))
+      if (sourceObject.equals(searchObject)) {
         return true;
+      }
     }
     return false;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#toArray(io.vertx.core.Handler)
    */
   @Override
@@ -120,7 +122,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
           LOGGER.error("", result.cause());
           handler.handle(Future.failedFuture(result.cause()));
         } else {
-          LOGGER.debug("futurelist finished");
+          LOGGER.trace("futurelist finished");
           handler.handle(Future.succeededFuture(or));
         }
       });
@@ -136,25 +138,25 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
       Future future = Future.future();
       futures.add(future);
       AtomicInteger ai = new AtomicInteger(counter++);
-      LOGGER.debug("preparing future for position " + counter);
+      LOGGER.trace("preparing future for position " + counter);
       it.next(nr -> {
         if (nr.failed()) {
           future.fail(nr.cause());
         } else {
-          LOGGER.debug("executed position " + ai.get());
+          LOGGER.trace("executed position " + ai.get());
           or[ai.get()] = nr.result();
           future.complete();
         }
       });
     }
 
-    LOGGER.debug("created futurelist with " + futures.size() + " entries ");
+    LOGGER.trace("created futurelist with " + futures.size() + " entries ");
     return futures;
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#add(java.lang.Object)
    */
   @Override
@@ -164,7 +166,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#remove(java.lang.Object)
    */
   @Override
@@ -174,7 +176,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#addAll(de.braintags.vertx.util.util.CollectionAsync)
    */
   @Override
@@ -184,7 +186,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#removeAll(java.util.Collection)
    */
   @Override
@@ -194,7 +196,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.vertx.util.util.CollectionAsync#clear()
    */
   @Override
