@@ -12,10 +12,12 @@
  */
 package de.braintags.vertx.util.security.crypt.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -29,6 +31,35 @@ public class StandardEncoderTest {
       .getLogger(StandardEncoderTest.class);
 
   private StandardEncoder encoder = new StandardEncoder("secret");
+
+  @Test
+  public void ntestBase64() {
+    try {
+      encoder = new StandardEncoder("base64", "secret");
+      assertEquals("base64", encoder.getAlgorithm());
+      String result = encoder.encode("password");
+      assertNotEquals(result, "password");
+      assertTrue(encoder.matches("password", result));
+      Assert.fail("Expected Exception here");
+    } catch (Exception e) {
+      assertTrue("Expected NoSuchAlgorithmException", e.toString().contains("NoSuchAlgorithmException"));
+    }
+    encoder = new StandardEncoder("secret");
+  }
+
+  @Test
+  public void noSuchAlgorithm() {
+    try {
+      encoder = new StandardEncoder("ALGORITHM_NOT_EXIST", "secret");
+      String result = encoder.encode("password");
+      assertNotEquals(result, "password");
+      assertTrue(encoder.matches("password", result));
+      Assert.fail("Expected Exception here");
+    } catch (Exception e) {
+      assertTrue("Expected NoSuchAlgorithmException", e.toString().contains("NoSuchAlgorithmException"));
+    }
+    encoder = new StandardEncoder("secret");
+  }
 
   @Test
   public void matches() {
@@ -55,6 +86,7 @@ public class StandardEncoderTest {
     LOGGER.info(salt);
     encoder = new StandardEncoder(salt);
     String result = encoder.encode("password");
+    assertEquals(salt, encoder.getSalt());
     assertNotEquals(result, "password");
     assertTrue(encoder.matches("password", result));
   }

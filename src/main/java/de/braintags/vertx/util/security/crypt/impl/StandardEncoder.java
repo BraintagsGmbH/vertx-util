@@ -69,8 +69,8 @@ public class StandardEncoder implements IEncoder {
    * @param salt
    */
   public StandardEncoder(String algorithm, CharSequence salt) {
-    this.algorithm = algorithm == null ? DEFAULT_ALG : algorithm;
-    this.salt = salt == null ? "" : salt.toString();
+    setAlgorithm(algorithm == null ? DEFAULT_ALG : algorithm);
+    setSalt(salt == null ? "" : salt.toString());
   }
 
   /**

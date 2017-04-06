@@ -17,7 +17,7 @@ import java.io.ByteArrayInputStream;
 import io.vertx.core.buffer.Buffer;
 
 /**
- * 
+ * An input stream based on {@link Buffer}
  * 
  * @author Michael Remme
  * 

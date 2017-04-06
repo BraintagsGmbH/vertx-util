@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.braintags.vertx.util.assertion.AssertTest;
 import de.braintags.vertx.util.codec.AbstractPojoCodecTest;
 import de.braintags.vertx.util.file.FileSystemUtilTest;
+import de.braintags.vertx.util.file.InputOutputStreamTest;
 import de.braintags.vertx.util.lock.AsyncReadWriteLockTest;
 import de.braintags.vertx.util.security.CRUDPermissionMapTest;
 import de.braintags.vertx.util.security.crypt.impl.StandardEncoderTest;
@@ -33,9 +34,9 @@ import de.braintags.vertx.util.tree.TreeTest;
 @RunWith(Suite.class)
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
-    CollectionAsyncTest.class, FileSystemUtilTest.class, GeoLoationUtilTest.class, AbstractPojoCodecTest.class,
-    AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class,
-    TestResourceUtil.class, EqUtilTest.class })
+    CollectionAsyncTest.class, FileSystemUtilTest.class, InputOutputStreamTest.class, GeoLoationUtilTest.class,
+    AbstractPojoCodecTest.class, AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class,
+    VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class })
 public class TestAllUtil {
 
 }
