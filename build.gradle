@@ -11,4 +11,7 @@ compileJava {
 dependencies {
   compile 'commons-validator:commons-validator:1.5.1'
   compile group: 'io.vertx', name: 'vertx-jwt', version: vertxVersion
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.8.7'
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-guava', version: '2.8.7'
+  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names', version: '2.8.7'
 }

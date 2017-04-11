@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import io.vertx.core.json.Json;
 
@@ -15,6 +19,12 @@ public class JsonConfig {
   private static final List<Config> configs = new ArrayList<>();
 
   static {
+    // add default configuration for all mappers
+    addConfig(mapper -> {
+      mapper.registerModule(new ParameterNamesModule(Mode.DELEGATING));
+      mapper.registerModule(new JodaModule());
+      mapper.registerModule(new GuavaModule());
+    });
     configureObjectMapper(Json.mapper);
     configureObjectMapper(Json.prettyMapper);
   }
@@ -26,7 +36,7 @@ public class JsonConfig {
       }
     }
 
-    objectMappers.add(new WeakReference<ObjectMapper>(mapper));
+    objectMappers.add(new WeakReference<>(mapper));
     for (Config config : configs) {
       config.configure(mapper);
     }
