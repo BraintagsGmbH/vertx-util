@@ -211,7 +211,7 @@ public class JsonDiff {
       JsonNode value = entry.getValue();
       if (fieldName.charAt(0) == '#') {
         newValues[Integer.parseInt(fieldName.substring(1))] = baseNode.get(value.intValue());
-      } else if (!fieldName.equals("size")) {
+      } else if (! "size".equals( fieldName )) {
         int index = Integer.parseInt(fieldName);
         if (value.isObject() && index < baseNode.size()) {
           JsonNode arrayValue = baseNode.get(index).deepCopy();
