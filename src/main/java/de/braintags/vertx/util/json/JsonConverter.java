@@ -40,8 +40,7 @@ public class JsonConverter {
       }
       return jsonArray;
     } else {
-      JsonObject result = JsonObject.mapFrom(jsonNode);
-      return result;
+      return JsonObject.mapFrom(jsonNode);
     }
   }
 

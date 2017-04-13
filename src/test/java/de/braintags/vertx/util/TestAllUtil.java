@@ -20,6 +20,7 @@ import de.braintags.vertx.util.assertion.AssertTest;
 import de.braintags.vertx.util.codec.AbstractPojoCodecTest;
 import de.braintags.vertx.util.file.FileSystemUtilTest;
 import de.braintags.vertx.util.file.InputOutputStreamTest;
+import de.braintags.vertx.util.json.TJsonConverter;
 import de.braintags.vertx.util.lock.AsyncReadWriteLockTest;
 import de.braintags.vertx.util.security.CRUDPermissionMapTest;
 import de.braintags.vertx.util.security.crypt.impl.StandardEncoderTest;
@@ -36,7 +37,7 @@ import de.braintags.vertx.util.tree.TreeTest;
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, InputOutputStreamTest.class, GeoLoationUtilTest.class,
     AbstractPojoCodecTest.class, AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class,
-    VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class })
+    VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class, TJsonConverter.class })
 public class TestAllUtil {
 
 }
