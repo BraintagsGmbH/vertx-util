@@ -24,7 +24,7 @@ import io.vertx.core.logging.LoggerFactory;
  * lock following the semantics of {@link ReadWriteLock}. The LockedExecution must not block (same as for tasks executed
  * on the event loop) and call the provided handler as soon as the lock can be released.
  * 
- * @author Martin Pluecker
+ * @author mpluecker
  */
 public class AsyncReadWriteLock {
 

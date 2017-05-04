@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * An AsyncLock represents the lock handle for an execution.
  * 
- * @author "Martin Pluecker"
+ * @author mpluecker
  */
 public class AsyncLock {
 
