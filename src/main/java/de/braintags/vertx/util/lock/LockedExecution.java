@@ -16,7 +16,7 @@ package de.braintags.vertx.util.lock;
  * A LockedExecution represents a piece of asynchronous work that should be executed with a read or write lock. After
  * the work is done, the lock is released by calling the given handler.
  * 
- * @author "Martin Pluecker"
+ * @author mpluecker
  */
 @FunctionalInterface
 public interface LockedExecution {
