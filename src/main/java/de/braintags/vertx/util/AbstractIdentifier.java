@@ -15,17 +15,7 @@ package de.braintags.vertx.util;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * <br>
- * <br>
- * Copyright: Copyright (c) 16.12.2016 <br>
- * Company: Braintags GmbH <br>
- *
- * @author jkerkenhoff
- *
- */
-
-public class AbstractIdentifier {
+public abstract class AbstractIdentifier implements Comparable<AbstractIdentifier> {
 
   private String identifier;
   private int    hashCode;
@@ -34,7 +24,7 @@ public class AbstractIdentifier {
    * @param identifier
    */
   @JsonCreator
-  public AbstractIdentifier(final String identifier) {
+  protected AbstractIdentifier(final String identifier) {
     super();
     this.identifier = identifier;
     this.hashCode = identifier.hashCode();
@@ -83,6 +73,11 @@ public class AbstractIdentifier {
   @Override
   public String toString() {
     return identifier;
+  }
+
+  @Override
+  public int compareTo(AbstractIdentifier o) {
+    return this.identifier.compareTo(o.identifier);
   }
 
 }
