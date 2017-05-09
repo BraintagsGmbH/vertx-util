@@ -15,13 +15,23 @@ package de.braintags.vertx.util;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Abstract class for simple identifiers
+ * 
+ * @author sschmitt
+ *
+ */
 public abstract class AbstractIdentifier implements Comparable<AbstractIdentifier> {
 
   private String identifier;
-  private int    hashCode;
+  private int hashCode;
 
   /**
+   * Create a new instance with an identifier. The identifier will be the only value used for serialization and
+   * equality-check.
+   * 
    * @param identifier
+   *          the unique identifier
    */
   @JsonCreator
   protected AbstractIdentifier(final String identifier) {
@@ -31,6 +41,8 @@ public abstract class AbstractIdentifier implements Comparable<AbstractIdentifie
   }
 
   /**
+   * Get the unique identifier
+   * 
    * @return the identifier
    */
   @JsonValue
@@ -75,6 +87,11 @@ public abstract class AbstractIdentifier implements Comparable<AbstractIdentifie
     return identifier;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
   @Override
   public int compareTo(AbstractIdentifier o) {
     return this.identifier.compareTo(o.identifier);
