@@ -1,66 +1,69 @@
 <?xml version="1.0"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>vertx-util</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
-	<name>Vert.x utilities from Braintags</name>
-	<description>utility classes for use with vertx</description>
-	<url>https://github.com/BraintagsGmbH/vertx-util</url>
-	
-	<properties>
-		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
-		<testjar.skip>false</testjar.skip>
-		<doc.skip>false</doc.skip>
-		<maven.test.skip>false</maven.test.skip>
-		<source.skip>false</source.skip>
-		<maven.compiler.plugin>false</maven.compiler.plugin>
-		<sonar.skip>false</sonar.skip>
-	</properties>
+  <artifactId>vertx-util</artifactId>
+  <version>1.4.0-SNAPSHOT</version>
+  <name>Vert.x utilities from Braintags</name>
+  <description>utility classes for use with vertx</description>
+  <url>https://github.com/BraintagsGmbH/vertx-util</url>
 
-	
-	<parent>
-		<groupId>de.braintags</groupId>
-		<artifactId>btVertxBasePOM</artifactId>
-		<version>20-SNAPSHOT</version>
-	</parent>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-jwt</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>com.fasterxml.jackson.module</groupId>
-		  <artifactId>jackson-module-parameter-names</artifactId>
-		  <version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-		  <groupId>com.fasterxml.jackson.datatype</groupId>
-		  <artifactId>jackson-datatype-joda</artifactId>
-		  <version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-		  <groupId>com.fasterxml.jackson.datatype</groupId>
-		  <artifactId>jackson-datatype-guava</artifactId>
-		  <version>${jackson.version}</version>
-		</dependency>
-	</dependencies>
+  <properties>
+    <jacoco.haltOnFailure>false</jacoco.haltOnFailure>
+    <testjar.skip>false</testjar.skip>
+    <doc.skip>false</doc.skip>
+    <maven.test.skip>false</maven.test.skip>
+    <source.skip>false</source.skip>
+    <maven.compiler.plugin>false</maven.compiler.plugin>
+    <sonar.skip>false</sonar.skip>
+  </properties>
 
 
-	<scm>
-		<connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
-		<developerConnection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</developerConnection>
-		<url>git@github.com:BraintagsGmbH/vertx-util.git</url>
-	</scm>
-	
-	
+  <parent>
+    <groupId>de.braintags</groupId>
+    <artifactId>btVertxBasePOM</artifactId>
+    <version>20-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3</version>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-jwt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-parameter-names</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-guava</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+  </dependencies>
+
+
+  <scm>
+    <connection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</connection>
+    <developerConnection>scm:git:git@github.com:BraintagsGmbH/vertx-util.git</developerConnection>
+    <url>git@github.com:BraintagsGmbH/vertx-util.git</url>
+  </scm>
+
+
 </project>
