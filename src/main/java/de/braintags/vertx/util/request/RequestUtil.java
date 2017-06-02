@@ -14,6 +14,7 @@ package de.braintags.vertx.util.request;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 
 import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
@@ -117,6 +118,20 @@ public class RequestUtil {
   }
 
   /**
+   * Read all values of the defined key from a request parameter
+   *
+   * @param context
+   *          the context to be handled
+   * @param key
+   *          the key to retrive from the request parameters
+   * @return the values
+   */
+  public static List<String> readParameterAttributes(final RoutingContext context, final String key) {
+    List<String> values = context.request().params().getAll(key);
+    return values;
+  }
+
+  /**
    * Reads a value from the request
    * 
    * @param context
@@ -186,6 +201,23 @@ public class RequestUtil {
   }
 
   /**
+   * Reads all form or parameter values from the request
+   *
+   * @param context
+   *          the context from the current request
+   * @param key
+   *          the key to search for
+   * @return all form values if not empty, otherwise all parameter values
+   */
+  public static List<String> readParameters(final RoutingContext context, final String key) {
+    List<String> values = RequestUtil.readFormAttributes(context, key);
+    if (values.isEmpty()) {
+      values = RequestUtil.readParameterAttributes(context, key);
+    }
+    return values;
+  }
+
+  /**
    * Read the value of the defined key from a transferred form request
    * 
    * @param context
@@ -204,6 +236,20 @@ public class RequestUtil {
       throw new ParameterRequiredException(key);
     }
     return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Read all values of the defined key from a transferred form request
+   *
+   * @param context
+   *          the context to be handled
+   * @param key
+   *          the key to retrive from the form parameters
+   * @return the values
+   */
+  public static List<String> readFormAttributes(final RoutingContext context, final String key) {
+    List<String> values = context.request().formAttributes().getAll(key);
+    return values;
   }
 
   /**
@@ -277,7 +323,7 @@ public class RequestUtil {
     }
     String prePath = context.get(PREPATH_PROPERTY);
     if (prePath != null) {
-      tmpPath = prePath + ((prePath.endsWith("/") || tmpPath.startsWith("/")) ? "" : "/") + tmpPath;
+      tmpPath = prePath + (prePath.endsWith("/") || tmpPath.startsWith("/") ? "" : "/") + tmpPath;
     }
     return tmpPath;
   }
