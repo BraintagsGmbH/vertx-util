@@ -127,8 +127,7 @@ public class RequestUtil {
    * @return the values
    */
   public static List<String> readParameterAttributes(final RoutingContext context, final String key) {
-    List<String> values = context.request().params().getAll(key);
-    return values;
+    return context.request().params().getAll(key);
   }
 
   /**
@@ -248,8 +247,7 @@ public class RequestUtil {
    * @return the values
    */
   public static List<String> readFormAttributes(final RoutingContext context, final String key) {
-    List<String> values = context.request().formAttributes().getAll(key);
-    return values;
+    return context.request().formAttributes().getAll(key);
   }
 
   /**
