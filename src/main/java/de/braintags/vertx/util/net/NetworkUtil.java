@@ -14,11 +14,11 @@ import io.vertx.core.logging.LoggerFactory;
  * @author jkerkenhoff
  *
  */
-public final class Network {
+public final class NetworkUtil {
 
-  private static final Logger logger = LoggerFactory.getLogger(Network.class);
+  private static final Logger logger = LoggerFactory.getLogger(NetworkUtil.class);
 
-  private Network() {
+  private NetworkUtil() {
     // noop
   }
   
