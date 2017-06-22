@@ -24,7 +24,7 @@ import java.util.Base64;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystemException;
-import io.vertx.ext.auth.jwt.JWT;
+import io.vertx.ext.jwt.JWT;
 
 /**
  * Interface for general JWT handling
