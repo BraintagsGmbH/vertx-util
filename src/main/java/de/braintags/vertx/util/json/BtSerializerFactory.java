@@ -60,6 +60,11 @@ public class BtSerializerFactory extends BeanSerializerFactory {
       boolean staticTyping, JsonSerializer<Object> keySerializer,
       TypeSerializer elementTypeSerializer, JsonSerializer<Object> elementValueSerializer)
       throws JsonMappingException {
+    if (!type.getRawClass().equals(ArrayMap.class)) {
+      return super.buildMapSerializer(prov, type, beanDesc, staticTyping, keySerializer, elementTypeSerializer,
+          elementValueSerializer);
+    }
+
     final SerializationConfig config = prov.getConfig();
     JsonSerializer<?> ser = null;
 
