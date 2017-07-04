@@ -74,10 +74,10 @@ public class MapPropertyAsEntry extends PropertyWriter {
       SerializerProvider provider) throws IOException {
 
     gen.writeStartObject();
-    gen.writeFieldName(MapAsArraySerializer2.KEY);
+    gen.writeFieldName(ArrayMapSerializer.KEY);
     _keySerializer.serialize(_key, gen, provider);
 
-    gen.writeFieldName(MapAsArraySerializer2.VALUE);
+    gen.writeFieldName(ArrayMapSerializer.VALUE);
     if (_typeSerializer == null) {
       _valueSerializer.serialize(value, gen, provider);
     } else {

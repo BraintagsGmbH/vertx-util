@@ -1,9 +1,5 @@
 package de.braintags.vertx.util.json;
 
-import java.util.Map;
-import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -15,8 +11,6 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerFactory;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.fasterxml.jackson.databind.type.MapType;
-
-import de.braintags.vertx.util.json.deserializers.MapAsArraySerializer2;
 
 public class BtSerializerFactory extends BeanSerializerFactory {
 
@@ -83,24 +77,6 @@ public class BtSerializerFactory extends BeanSerializerFactory {
     if (ser == null) {
       ser = findSerializerByAnnotations(prov, type, beanDesc); // (2) Annotations
       if (ser == null) {
-        Object filterId = findFilterId(config, beanDesc);
-        // 01-May-2016, tatu: Which base type to use here gets tricky, since
-        // most often it ought to be `Map` or `EnumMap`, but due to abstract
-        // mapping it will more likely be concrete type like `HashMap`.
-        // So, for time being, just pass `Map.class`
-        JsonIgnoreProperties.Value ignorals = config.getDefaultPropertyIgnorals(Map.class,
-            beanDesc.getClassInfo());
-        Set<String> ignored = (ignorals == null) ? null
-            : ignorals.findIgnoredForSerialization();
-        MapAsArraySerializer2 mapSer = MapAsArraySerializer2.construct(ignored,
-            type, staticTyping, elementTypeSerializer,
-            keySerializer, elementValueSerializer, filterId);
-        Object suppressableValue = findSuppressableContentValue(config,
-            type.getContentType(), beanDesc);
-        if (suppressableValue != null) {
-          mapSer = mapSer.withContentInclusion(suppressableValue);
-        }
-        ser = mapSer;
       }
     }
     // [databind#120]: Allow post-processing

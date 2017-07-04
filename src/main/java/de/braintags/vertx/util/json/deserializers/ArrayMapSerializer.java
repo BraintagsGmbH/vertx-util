@@ -31,19 +31,21 @@ import com.fasterxml.jackson.databind.ser.ContainerSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
-import com.fasterxml.jackson.databind.ser.impl.UnknownSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import de.braintags.vertx.util.json.ArrayMap;
+
 /**
- * Standard serializer implementation for serializing {link java.util.Map} types.
+ * Standard serializer implementation for serializing {link {@link ArrayMap}} types.
  * <p>
  * Note: about the only configurable setting currently is ability to filter out
  * entries with specified names.
  */
 @JacksonStdImpl
-public class MapAsArraySerializer2
-    extends ContainerSerializer<Map<?, ?>>
+public class ArrayMapSerializer
+    extends ContainerSerializer<ArrayMap<?, ?>>
     implements ContextualSerializer {
 
   public static final String VALUE = "value";
@@ -133,11 +135,15 @@ public class MapAsArraySerializer2
    * /**********************************************************
    */
 
+  public ArrayMapSerializer() {
+    this(null, null, null, false, null, null, null);
+  }
+
   /**
    * @since 2.5
    */
   @SuppressWarnings("unchecked")
-  protected MapAsArraySerializer2(Set<String> ignoredEntries,
+  protected ArrayMapSerializer(Set<String> ignoredEntries,
       JavaType keyType, JavaType valueType, boolean valueTypeIsStatic,
       TypeSerializer vts,
       JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer) {
@@ -161,13 +167,13 @@ public class MapAsArraySerializer2
    * @since 2.5
    */
   protected void _ensureOverride() {
-    if (getClass() != MapAsArraySerializer2.class) {
+    if (getClass() != ArrayMapSerializer.class) {
       throw new IllegalStateException("Missing override in class " + getClass().getName());
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected MapAsArraySerializer2(MapAsArraySerializer2 src, BeanProperty property,
+  protected ArrayMapSerializer(ArrayMapSerializer src, BeanProperty property,
       JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer,
       Set<String> ignoredEntries) {
     super(Map.class, false);
@@ -189,7 +195,7 @@ public class MapAsArraySerializer2
   /**
    * @since 2.5
    */
-  protected MapAsArraySerializer2(MapAsArraySerializer2 src, TypeSerializer vts,
+  protected ArrayMapSerializer(ArrayMapSerializer src, TypeSerializer vts,
       Object suppressableValue) {
     super(Map.class, false);
     _ignoredEntries = src._ignoredEntries;
@@ -210,7 +216,7 @@ public class MapAsArraySerializer2
     _suppressableValue = suppressableValue;
   }
 
-  protected MapAsArraySerializer2(MapAsArraySerializer2 src, Object filterId, boolean sortKeys) {
+  protected ArrayMapSerializer(ArrayMapSerializer src, Object filterId, boolean sortKeys) {
     super(Map.class, false);
     _ignoredEntries = src._ignoredEntries;
     _keyType = src._keyType;
@@ -227,35 +233,35 @@ public class MapAsArraySerializer2
   }
 
   @Override
-  public MapAsArraySerializer2 _withValueTypeSerializer(TypeSerializer vts) {
+  public ArrayMapSerializer _withValueTypeSerializer(TypeSerializer vts) {
     if (_valueTypeSerializer == vts) {
       return this;
     }
     _ensureOverride();
-    return new MapAsArraySerializer2(this, vts, null);
+    return new ArrayMapSerializer(this, vts, null);
   }
 
   /**
    * @since 2.4
    */
-  public MapAsArraySerializer2 withResolved(BeanProperty property,
+  public ArrayMapSerializer withResolved(BeanProperty property,
       JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer,
       Set<String> ignored, boolean sortKeys) {
     _ensureOverride();
-    MapAsArraySerializer2 ser = new MapAsArraySerializer2(this, property, keySerializer, valueSerializer, ignored);
+    ArrayMapSerializer ser = new ArrayMapSerializer(this, property, keySerializer, valueSerializer, ignored);
     if (sortKeys != ser._sortKeys) {
-      ser = new MapAsArraySerializer2(ser, _filterId, sortKeys);
+      ser = new ArrayMapSerializer(ser, _filterId, sortKeys);
     }
     return ser;
   }
 
   @Override
-  public MapAsArraySerializer2 withFilterId(Object filterId) {
+  public ArrayMapSerializer withFilterId(Object filterId) {
     if (_filterId == filterId) {
       return this;
     }
     _ensureOverride();
-    return new MapAsArraySerializer2(this, filterId, _sortKeys);
+    return new ArrayMapSerializer(this, filterId, _sortKeys);
   }
 
   /**
@@ -264,44 +270,12 @@ public class MapAsArraySerializer2
    * 
    * @since 2.5
    */
-  public MapAsArraySerializer2 withContentInclusion(Object suppressableValue) {
+  public ArrayMapSerializer withContentInclusion(Object suppressableValue) {
     if (suppressableValue == _suppressableValue) {
       return this;
     }
     _ensureOverride();
-    return new MapAsArraySerializer2(this, _valueTypeSerializer, suppressableValue);
-  }
-
-  /**
-   * @since 2.8
-   */
-  public static MapAsArraySerializer2 construct(Set<String> ignoredEntries, JavaType mapType,
-      boolean staticValueType, TypeSerializer vts,
-      JsonSerializer<Object> keySerializer, JsonSerializer<Object> valueSerializer,
-      Object filterId) {
-    JavaType keyType, valueType;
-
-    if (mapType == null) {
-      keyType = valueType = UNSPECIFIED_TYPE;
-    } else {
-      keyType = mapType.getKeyType();
-      valueType = mapType.getContentType();
-    }
-    // If value type is final, it's same as forcing static value typing:
-    if (!staticValueType) {
-      staticValueType = (valueType != null && valueType.isFinal());
-    } else {
-      // also: Object.class can not be handled as static, ever
-      if (valueType.getRawClass() == Object.class) {
-        staticValueType = false;
-      }
-    }
-    MapAsArraySerializer2 ser = new MapAsArraySerializer2(ignoredEntries, keyType, valueType, staticValueType, vts,
-        keySerializer, valueSerializer);
-    if (filterId != null) {
-      ser = ser.withFilterId(filterId);
-    }
-    return ser;
+    return new ArrayMapSerializer(this, _valueTypeSerializer, suppressableValue);
   }
 
   /*
@@ -332,6 +306,30 @@ public class MapAsArraySerializer2
       }
     }
 
+    JavaType keyType = _keyType;
+    JavaType valueType = _valueType;
+    boolean staticValueType = _valueTypeIsStatic;
+
+    JavaType type = property.getType();
+    MapType mapType = type instanceof MapType ? (MapType) type : null;
+    if (keyType == null && valueType == null) {
+      if (mapType == null) {
+        keyType = valueType = UNSPECIFIED_TYPE;
+      } else {
+        keyType = mapType.getKeyType();
+        valueType = mapType.getContentType();
+      }
+      // If value type is final, it's same as forcing static value typing:
+      if (!staticValueType) {
+        staticValueType = (valueType != null && valueType.isFinal());
+      } else {
+        // also: Object.class can not be handled as static, ever
+        if (valueType.getRawClass() == Object.class) {
+          staticValueType = false;
+        }
+      }
+    }
+
     JsonInclude.Value inclV = findIncludeOverrides(provider, property, Map.class);
     JsonInclude.Include incl = inclV.getContentInclusion();
     if ((incl != null) && (incl != JsonInclude.Include.USE_DEFAULTS)) {
@@ -346,7 +344,7 @@ public class MapAsArraySerializer2
       // 30-Sep-2012, tatu: One more thing -- if explicit content type is annotated,
       // we can consider it a static case as well.
       // 20-Aug-2013, tatu: Need to avoid trying to access serializer for java.lang.Object tho
-      if (_valueTypeIsStatic && !_valueType.isJavaLangObject()) {
+      if (staticValueType && !_valueType.isJavaLangObject()) {
         ser = provider.findValueSerializer(_valueType, property);
       }
     } else {
@@ -356,9 +354,8 @@ public class MapAsArraySerializer2
       keySer = _keySerializer;
     }
     if (keySer == null) {
-      keySer = provider.findValueSerializer(_keyType, property);
-      if (keySer instanceof UnknownSerializer) {
-        keySer = null;
+      if (keyType != null && !keyType.isJavaLangObject()) {
+        keySer = provider.findValueSerializer(keyType, property);
       }
     } else {
       keySer = provider.handleSecondaryContextualization(keySer, property);
@@ -387,7 +384,9 @@ public class MapAsArraySerializer2
       }
     }
 
-    MapAsArraySerializer2 mser = withResolved(property, keySer, ser, ignored, sortKeys);
+    ArrayMapSerializer mser = new ArrayMapSerializer(ignored, keyType, valueType, staticValueType, _valueTypeSerializer,
+        keySer, ser);
+
     if (suppressableValue != _suppressableValue) {
       mser = mser.withContentInclusion(suppressableValue);
     }
@@ -422,7 +421,7 @@ public class MapAsArraySerializer2
   }
 
   @Override
-  public boolean isEmpty(SerializerProvider prov, Map<?, ?> value) {
+  public boolean isEmpty(SerializerProvider prov, ArrayMap<?, ?> value) {
     if (value == null || value.isEmpty()) {
       return true;
     }
@@ -469,7 +468,7 @@ public class MapAsArraySerializer2
   }
 
   @Override
-  public boolean hasSingleElement(Map<?, ?> value) {
+  public boolean hasSingleElement(ArrayMap<?, ?> value) {
     return (value.size() == 1);
   }
 
@@ -500,7 +499,7 @@ public class MapAsArraySerializer2
    */
 
   @Override
-  public void serialize(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider)
+  public void serialize(ArrayMap<?, ?> value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
     gen.writeStartArray();
     if (!value.isEmpty()) {
@@ -520,8 +519,8 @@ public class MapAsArraySerializer2
         serializeFilteredFields(value, gen, provider, pf, suppressableValue);
       } else if (suppressableValue != null) {
         serializeOptionalFields(value, gen, provider, suppressableValue);
-      } else if (_valueSerializer != null) {
-        serializeFieldsUsing(value, gen, provider, _valueSerializer);
+      } else if (_keySerializer != null && _valueSerializer != null) {
+        serializeFieldsUsing(value, gen, provider, _keySerializer, _valueSerializer);
       } else {
         serializeFields(value, gen, provider);
       }
@@ -530,7 +529,7 @@ public class MapAsArraySerializer2
   }
 
   @Override
-  public void serializeWithType(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider,
+  public void serializeWithType(ArrayMap<?, ?> value, JsonGenerator gen, SerializerProvider provider,
       TypeSerializer typeSer)
       throws IOException {
     typeSer.writeTypePrefixForObject(value, gen);
@@ -553,8 +552,8 @@ public class MapAsArraySerializer2
         serializeFilteredFields(value, gen, provider, pf, suppressableValue);
       } else if (suppressableValue != null) {
         serializeOptionalFields(value, gen, provider, suppressableValue);
-      } else if (_valueSerializer != null) {
-        serializeFieldsUsing(value, gen, provider, _valueSerializer);
+      } else if (_keySerializer != null && _valueSerializer != null) {
+        serializeFieldsUsing(value, gen, provider, _keySerializer, _valueSerializer);
       } else {
         serializeFields(value, gen, provider);
       }
@@ -709,9 +708,8 @@ public class MapAsArraySerializer2
    * provider.
    */
   public void serializeFieldsUsing(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider,
-      JsonSerializer<Object> ser)
+      JsonSerializer<Object> keySerializer, JsonSerializer<Object> ser)
       throws IOException {
-    final JsonSerializer<Object> keySerializer = _keySerializer;
     final Set<String> ignored = _ignoredEntries;
     final TypeSerializer typeSer = _valueTypeSerializer;
 
@@ -938,11 +936,11 @@ public class MapAsArraySerializer2
     return result.serializer;
   }
 
-  protected Map<?, ?> _orderEntries(Map<?, ?> input, JsonGenerator gen,
+  protected ArrayMap<?, ?> _orderEntries(Map<?, ?> input, JsonGenerator gen,
       SerializerProvider provider, Object suppressableValue) throws IOException {
     // minor optimization: may already be sorted?
     if (input instanceof SortedMap<?, ?>) {
-      return input;
+      return new ArrayMap<Object, Object>(input);
     }
     // [databind#1411]: TreeMap does not like null key... (although note that
     // check above should prevent this code from being called in that case)
@@ -958,9 +956,9 @@ public class MapAsArraySerializer2
         }
         result.put(key, entry.getValue());
       }
-      return result;
+      return new ArrayMap<>(result);
     }
-    return new TreeMap<Object, Object>(input);
+    return new ArrayMap<>(new TreeMap<Object, Object>(input));
   }
 
   /**
