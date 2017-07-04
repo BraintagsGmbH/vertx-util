@@ -1,7 +1,7 @@
 package de.braintags.vertx.util.json;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 
-public abstract class ArrayMap<K, V> implements Map<K, V> {
+public class ArrayMap<K, V> extends LinkedHashMap<K, V> {
 
 }
