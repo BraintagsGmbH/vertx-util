@@ -31,6 +31,8 @@ import com.fasterxml.jackson.databind.ser.ContainerSerializer;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
+import com.fasterxml.jackson.databind.ser.impl.UnknownSerializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
@@ -354,7 +356,10 @@ public class MapAsArraySerializer2
       keySer = _keySerializer;
     }
     if (keySer == null) {
-      keySer = provider.findPrimaryPropertySerializer(_keyType, property);
+      keySer = provider.findValueSerializer(_keyType, property);
+      if (keySer instanceof UnknownSerializer) {
+        keySer = null;
+      }
     } else {
       keySer = provider.handleSecondaryContextualization(keySer, property);
     }
@@ -575,7 +580,7 @@ public class MapAsArraySerializer2
       serializeTypedFields(value, gen, provider, null);
       return;
     }
-    final JsonSerializer<Object> keySerializer = _keySerializer;
+    final JsonSerializer<Object> keySerializer = _keySerializer != null ? _keySerializer : new Dynamic(_property);
     final Set<String> ignored = _ignoredEntries;
 
     PropertySerializerMap serializers = _dynamicValueSerializers;
@@ -1014,6 +1019,57 @@ public class MapAsArraySerializer2
     } catch (Exception e) {
       String keyDesc = "";
       wrapAndThrow(provider, e, value, keyDesc);
+    }
+  }
+
+  /**
+   * Key serializer used when key type is not known statically, and actual key
+   * serializer needs to be dynamically located.
+   */
+  public static class Dynamic extends StdSerializer<Object> {
+    // Important: MUST be transient, to allow serialization of key serializer itself
+    protected transient PropertySerializerMap _dynamicSerializers;
+    private BeanProperty property;
+
+    public Dynamic(BeanProperty property) {
+      super(String.class, false);
+      _dynamicSerializers = PropertySerializerMap.emptyForProperties();
+    }
+
+    Object readResolve() {
+      // Since it's transient, and since JDK serialization by-passes ctor, need this:
+      _dynamicSerializers = PropertySerializerMap.emptyForProperties();
+      return this;
+    }
+
+    @Override
+    public void serialize(Object value, JsonGenerator g, SerializerProvider provider)
+        throws IOException {
+      Class<?> cls = value.getClass();
+      PropertySerializerMap m = _dynamicSerializers;
+      JsonSerializer<Object> ser = m.serializerFor(cls);
+      if (ser == null) {
+        ser = _findAndAddDynamic(m, cls, provider);
+      }
+      ser.serialize(value, g, provider);
+    }
+
+    @Override
+    public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
+        throws JsonMappingException {
+      visitStringFormat(visitor, typeHint);
+    }
+
+    protected JsonSerializer<Object> _findAndAddDynamic(PropertySerializerMap map,
+        Class<?> type, SerializerProvider provider) throws JsonMappingException {
+      PropertySerializerMap.SerializerAndMapResult result =
+          // null -> for now we won't keep ref or pass BeanProperty; could change
+          map.findAndAddSecondarySerializer(type, provider, property);
+      // did we get a new map of serializers? If so, start using it
+      if (map != result.map) {
+        _dynamicSerializers = result.map;
+      }
+      return result.serializer;
     }
   }
 }
