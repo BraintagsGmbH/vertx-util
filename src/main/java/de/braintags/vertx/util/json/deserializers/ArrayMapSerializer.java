@@ -2,6 +2,7 @@ package de.braintags.vertx.util.json.deserializers;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -136,7 +137,7 @@ public class ArrayMapSerializer
    */
 
   public ArrayMapSerializer() {
-    this(null, null, null, false, null, null, null);
+    this(Collections.emptySet(), null, null, false, null, null, null);
   }
 
   /**
@@ -147,7 +148,7 @@ public class ArrayMapSerializer
       JavaType keyType, JavaType valueType, boolean valueTypeIsStatic,
       TypeSerializer vts,
       JsonSerializer<?> keySerializer, JsonSerializer<?> valueSerializer) {
-    super(Map.class, false);
+    super(ArrayMap.class, false);
     _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty())
         ? null : ignoredEntries;
     _keyType = keyType;
@@ -232,6 +233,24 @@ public class ArrayMapSerializer
     _suppressableValue = src._suppressableValue;
   }
 
+  public ArrayMapSerializer(ArrayMapSerializer src, JavaType keyType, JavaType valueType,
+      boolean valueTypeIsStatic, JsonSerializer<?> keySer, JsonSerializer<?> valueSer, Set<String> ignoredEntries) {
+    super(ArrayMap.class, false);
+    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty())
+        ? null : ignoredEntries;
+    _keyType = keyType;
+    _valueType = valueType;
+    _valueTypeIsStatic = valueTypeIsStatic;
+    _valueTypeSerializer = src._valueTypeSerializer;
+    _keySerializer = (JsonSerializer<Object>) keySer;
+    _valueSerializer = (JsonSerializer<Object>) valueSer;
+    _dynamicValueSerializers = src._dynamicValueSerializers;
+    _property = src._property;
+    _filterId = src._filterId;
+    _sortKeys = src._sortKeys;
+    _suppressableValue = src._suppressableValue;
+  }
+
   @Override
   public ArrayMapSerializer _withValueTypeSerializer(TypeSerializer vts) {
     if (_valueTypeSerializer == vts) {
@@ -253,6 +272,13 @@ public class ArrayMapSerializer
       ser = new ArrayMapSerializer(ser, _filterId, sortKeys);
     }
     return ser;
+  }
+
+  private ArrayMapSerializer withResolved(JavaType keyType, JavaType valueType, boolean staticValueType,
+      JsonSerializer<?> keySer, JsonSerializer<?> valueSer, Set<String> ignored) {
+    ArrayMapSerializer result = new ArrayMapSerializer(this, keyType, valueType, staticValueType, keySer, valueSer,
+        ignored);
+    return result;
   }
 
   @Override
@@ -384,8 +410,7 @@ public class ArrayMapSerializer
       }
     }
 
-    ArrayMapSerializer mser = new ArrayMapSerializer(ignored, keyType, valueType, staticValueType, _valueTypeSerializer,
-        keySer, ser);
+    ArrayMapSerializer mser = withResolved(keyType, valueType, staticValueType, keySer, ser, ignored);
 
     if (suppressableValue != _suppressableValue) {
       mser = mser.withContentInclusion(suppressableValue);
