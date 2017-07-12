@@ -2,6 +2,8 @@ apply from: 'gradle/vertx/vertxbase.gradle'
 
 dependencies {
   compile 'commons-validator:commons-validator:1.5.1'
+  compile 'org.apache.commons:commons-lang3:3.6'
+  compile 'org.apache.commons:commons-text:1.1'
   compile group: 'io.vertx', name: 'vertx-jwt', version: vertxVersion
   compile group: 'io.vertx', name: 'vertx-web', version: vertxVersion
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-joda', version: '2.8.7'
