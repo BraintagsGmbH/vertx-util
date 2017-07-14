@@ -87,17 +87,14 @@ public class VertxAsyncTest extends BtVertxTestBase {
     List<String> workList = new ArrayList<>(sourceList);
 
     LOGGER.info("list length: " + workList.size());
-    Handler<AsyncResult<String>> handler = new Handler<AsyncResult<String>>() {
-      @Override
-      public void handle(AsyncResult<String> result) {
-        int lastElementPosition = sourceList.indexOf(result.result());
-        LOGGER.info("last position of element " + result.result() + " is " + lastElementPosition);
-      }
+    Handler<AsyncResult<String>> handler = result -> {
+      int lastElementPosition = sourceList.indexOf(result.result());
+      LOGGER.info("last position of element " + result.result() + " is " + lastElementPosition);
     };
 
     CounterObject<String> co = new CounterObject<>(workList.size(), handler);
     workList.forEach(entry -> {
-      entry.toUpperCase().chars().filter(s -> toRemove.contains(s)).findAny();
+      entry.toUpperCase().chars().filter(s -> toRemove.contains(Character.toString((char) s))).findAny();
       if (co.reduce()) {
         co.setResult(entry);
       }
