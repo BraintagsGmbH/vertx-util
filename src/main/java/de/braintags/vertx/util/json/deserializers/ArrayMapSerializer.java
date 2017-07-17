@@ -46,7 +46,7 @@ import de.braintags.vertx.util.json.ArrayMap;
  */
 @JacksonStdImpl
 public class ArrayMapSerializer
-    extends ContainerSerializer<ArrayMap<?, ?>>
+    extends ContainerSerializer<Map<?, ?>>
     implements ContextualSerializer {
 
   public static final String VALUE = "value";
@@ -370,8 +370,8 @@ public class ArrayMapSerializer
       // 30-Sep-2012, tatu: One more thing -- if explicit content type is annotated,
       // we can consider it a static case as well.
       // 20-Aug-2013, tatu: Need to avoid trying to access serializer for java.lang.Object tho
-      if (staticValueType && !_valueType.isJavaLangObject()) {
-        ser = provider.findValueSerializer(_valueType, property);
+      if (staticValueType && !valueType.isJavaLangObject()) {
+        ser = provider.findValueSerializer(valueType, property);
       }
     } else {
       ser = provider.handleSecondaryContextualization(ser, property);
@@ -446,7 +446,7 @@ public class ArrayMapSerializer
   }
 
   @Override
-  public boolean isEmpty(SerializerProvider prov, ArrayMap<?, ?> value) {
+  public boolean isEmpty(SerializerProvider prov, Map<?, ?> value) {
     if (value == null || value.isEmpty()) {
       return true;
     }
@@ -493,7 +493,7 @@ public class ArrayMapSerializer
   }
 
   @Override
-  public boolean hasSingleElement(ArrayMap<?, ?> value) {
+  public boolean hasSingleElement(Map<?, ?> value) {
     return (value.size() == 1);
   }
 
@@ -524,7 +524,7 @@ public class ArrayMapSerializer
    */
 
   @Override
-  public void serialize(ArrayMap<?, ?> value, JsonGenerator gen, SerializerProvider provider)
+  public void serialize(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
     gen.writeStartArray();
     if (!value.isEmpty()) {
@@ -554,7 +554,7 @@ public class ArrayMapSerializer
   }
 
   @Override
-  public void serializeWithType(ArrayMap<?, ?> value, JsonGenerator gen, SerializerProvider provider,
+  public void serializeWithType(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider,
       TypeSerializer typeSer)
       throws IOException {
     typeSer.writeTypePrefixForObject(value, gen);
