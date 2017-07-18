@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import de.braintags.vertx.util.json.ArrayMap;
 import de.braintags.vertx.util.json.JsonConfig;
+import de.braintags.vertx.util.json.JsonDiff;
 import io.vertx.core.json.Json;
 
 /**
@@ -23,7 +24,7 @@ import io.vertx.core.json.Json;
  * 
  *
  */
-public class TArrayMapSerialiyer {
+public class TArrayMap {
 
   @BeforeClass
   public static void prepare() throws IOException {
@@ -56,13 +57,32 @@ public class TArrayMapSerialiyer {
     Assert.assertNotNull(mapNode);
     Assert.assertTrue(mapNode.isObject());
 
-    JsonNode convertedValueTree = ArrayMapNode.deepConvertNode(Json.mapper.getNodeFactory(), valueTree);
+    JsonNode convertedValueTree = ArrayMapNode.deepConvertNode(valueTree);
     Assert.assertTrue(convertedValueTree != valueTree);
 
     JsonNode convertedMapNode = convertedValueTree.get("map");
     Assert.assertNotNull(convertedMapNode);
     Assert.assertTrue(convertedMapNode instanceof ArrayMapNode);
   }
+
+  @Test
+  public void testArrayMapDiff() throws IOException {
+    MapContainer testDataBase = buildMapContainer();
+    MapContainer testData = buildMapContainer();
+    testData.map.remove(ComplexKey.create("12345", "Hello", "World"));
+    testData.map.put(ComplexKey.create("67890", "foo", "bar"), 30);
+
+    JsonNode valueTreeBase = Json.mapper.valueToTree(testDataBase);
+    System.out.println(valueTreeBase);
+
+    JsonNode diff = JsonDiff.getDiff(valueTreeBase, valueTreeData);
+
+    JsonNode diffApplied = JsonDiff.applyDiff(valueTreeBase, diff);
+    Assert.assertEquals(valueTreeData, diffApplied);
+    MapContainer decodedTextData = Json.mapper.treeToValue(diffApplied, MapContainer.class);
+    Assert.assertEquals(testData, decodedTextData);
+  }
+
 
   private MapContainer buildMapContainer() {
     MapContainer test = new MapContainer();
@@ -103,6 +123,11 @@ public class TArrayMapSerialiyer {
       } else if (!map.equals(other.map))
         return false;
       return true;
+    }
+
+    @Override
+    public String toString() {
+      return "MapContainer [map=" + map + "]";
     }
 
   }

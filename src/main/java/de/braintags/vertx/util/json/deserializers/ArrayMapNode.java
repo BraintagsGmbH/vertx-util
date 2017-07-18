@@ -14,27 +14,26 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
 public class ArrayMapNode extends ValueNode {
 
-  private Map<JsonNode, JsonNode> children;
-  private final JsonNodeFactory nodeFactory;
+  private final Map<JsonNode, JsonNode> children;
 
-  public static JsonNode deepConvertNode(JsonNodeFactory factory, JsonNode node) {
+  public static JsonNode deepConvertNode(JsonNode node) {
     if (node.isObject()) {
       if (node.size() == 1) {
         Entry<String, JsonNode> arrayMapField = node.fields().next();
         if (arrayMapField.getKey().equals(ArrayMapSerializer.ARRAY_MAP) && arrayMapField.getValue().isArray()) {
-          return convertToArrayNode(factory, node, arrayMapField);
+          return convertToArrayNode(node, arrayMapField);
         }
       }
-      return convertObjNode(factory, (ObjectNode) node);
+      return convertObjNode((ObjectNode) node);
     } else if (node.isArray()) {
-      return convertArrayNode(factory, (ArrayNode) node);
+      return convertArrayNode((ArrayNode) node);
     } else {
       return node;
     }
@@ -48,11 +47,11 @@ public class ArrayMapNode extends ValueNode {
     return false;
   }
 
-  private static JsonNode convertArrayNode(JsonNodeFactory factory, ArrayNode node) {
+  private static JsonNode convertArrayNode(ArrayNode node) {
     ArrayNode modified = null;
     for (int i = node.size() - 1; i >= 0; i--) {
       JsonNode oldNode = node.get(i);
-      JsonNode newNode = deepConvertNode(factory, oldNode);
+      JsonNode newNode = deepConvertNode(oldNode);
       if (oldNode != newNode) {
         if (modified == null) {
           modified = node.arrayNode().addAll(node);
@@ -63,12 +62,12 @@ public class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static JsonNode convertObjNode(JsonNodeFactory factory, ObjectNode node) {
+  private static JsonNode convertObjNode(ObjectNode node) {
     ObjectNode modified = null;
     Iterator<Entry<String, JsonNode>> fielditer = node.fields();
     while (fielditer.hasNext()) {
       Entry<String, JsonNode> field = fielditer.next();
-      JsonNode newNode = deepConvertNode(factory, field.getValue());
+      JsonNode newNode = deepConvertNode(field.getValue());
       if (field.getValue() != newNode) {
         if (modified == null) {
           modified = node.objectNode();
@@ -81,7 +80,7 @@ public class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static ArrayMapNode convertToArrayNode(JsonNodeFactory factory, JsonNode node,
+  private static ArrayMapNode convertToArrayNode(JsonNode node,
       Entry<String, JsonNode> arrayMapField) {
     Map<JsonNode, JsonNode> children = new LinkedHashMap<>();
     ArrayNode entries = (ArrayNode) arrayMapField.getValue();
@@ -98,10 +97,10 @@ public class ArrayMapNode extends ValueNode {
         Entry<String, JsonNode> field = fielditer.next();
         switch (field.getKey()) {
           case ArrayMapSerializer.KEY:
-            key = deepConvertNode(factory, field.getValue());
+            key = deepConvertNode(field.getValue());
             break;
           case ArrayMapSerializer.VALUE:
-            key = deepConvertNode(factory, field.getValue());
+            value = deepConvertNode(field.getValue());
             break;
           default:
             throw new IllegalArgumentException(
@@ -110,15 +109,14 @@ public class ArrayMapNode extends ValueNode {
       }
       children.put(key, value);
     }
-    return new ArrayMapNode(factory, children);
+    return new ArrayMapNode(children);
   }
 
-  public ArrayMapNode(JsonNodeFactory nodeFactory) {
-    this.nodeFactory = nodeFactory;
+  public ArrayMapNode() {
+    children = new LinkedHashMap<>();
   }
 
-  public ArrayMapNode(JsonNodeFactory nodeFactory, Map<JsonNode, JsonNode> children) {
-    this.nodeFactory = nodeFactory;
+  public ArrayMapNode(Map<JsonNode, JsonNode> children) {
     this.children = children;
   }
 
@@ -148,6 +146,20 @@ public class ArrayMapNode extends ValueNode {
     g.writeEndArray();
   }
 
+  public ObjectNode toRegularNode(JsonNodeCreator nodeFactory) {
+    ArrayNode childrenNode = nodeFactory.arrayNode();
+    for (Map.Entry<JsonNode, JsonNode> en : children.entrySet()) {
+      ObjectNode entryNode = nodeFactory.objectNode();
+      entryNode.set(ArrayMapSerializer.KEY, en.getKey());
+      entryNode.set(ArrayMapSerializer.VALUE, en.getValue());
+      childrenNode.add(entryNode);
+    }
+    
+    ObjectNode node = nodeFactory.objectNode();
+    node.set(ArrayMapSerializer.ARRAY_MAP, childrenNode);
+    return node;
+  }
+
   @Override
   public void serializeWithType(JsonGenerator g, SerializerProvider provider,
       TypeSerializer typeSer)
@@ -160,10 +172,19 @@ public class ArrayMapNode extends ValueNode {
     typeSer.writeTypeSuffixForObject(this, g);
   }
 
+  public Map<JsonNode, JsonNode> getChildren() {
+    return children;
+  }
+
+  @Override
+  public int size() {
+    return children.size();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public ArrayMapNode deepCopy() {
-    ArrayMapNode ret = new ArrayMapNode(nodeFactory);
+    ArrayMapNode ret = new ArrayMapNode();
 
     for (Map.Entry<JsonNode, JsonNode> entry : children.entrySet())
       ret.children.put(entry.getKey().deepCopy(), entry.getValue().deepCopy());
@@ -173,7 +194,7 @@ public class ArrayMapNode extends ValueNode {
 
   @Override
   public JsonToken asToken() {
-    return JsonToken.VALUE_EMBEDDED_OBJECT;
+    return JsonToken.START_OBJECT;
   }
 
   @Override
@@ -225,8 +246,42 @@ public class ArrayMapNode extends ValueNode {
   }
 
   @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(32 + (size() << 4));
+    sb.append("{\"");
+    sb.append(ArrayMapSerializer.ARRAY_MAP);
+    sb.append("\":[");
+    int count = 0;
+    for (Map.Entry<JsonNode, JsonNode> en : children.entrySet()) {
+      if (count > 0) {
+        sb.append(", ");
+      }
+      ++count;
+      sb.append("{\"");
+      sb.append(ArrayMapSerializer.KEY);
+      sb.append("\":");
+      if (en.getKey() != null) {
+        sb.append(en.getKey().toString());
+      } else {
+        sb.append("null");
+      }
+      sb.append(", \"");
+      sb.append(ArrayMapSerializer.VALUE);
+      sb.append("\":");
+      if (en.getValue() != null) {
+        sb.append(en.getValue().toString());
+      } else {
+        sb.append("null");
+      }
+      sb.append("}");
+    }
+    sb.append("]}");
+    return sb.toString();
+  }
+
+  @Override
   public JsonNodeType getNodeType() {
-    return JsonNodeType.POJO;
+    return null;
   }
 
   @Override

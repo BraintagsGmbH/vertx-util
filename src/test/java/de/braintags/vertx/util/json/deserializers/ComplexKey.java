@@ -67,4 +67,9 @@ public class ComplexKey {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "ComplexKey [identifier=" + identifier + ", keyProperties=" + keyProperties + "]";
+  }
+
 }
