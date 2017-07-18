@@ -73,7 +73,7 @@ public class TArrayMap {
     testData.map.put(ComplexKey.create("67890", "foo", "bar"), 30);
 
     JsonNode valueTreeBase = Json.mapper.valueToTree(testDataBase);
-    System.out.println(valueTreeBase);
+    JsonNode valueTreeData = Json.mapper.valueToTree(testData);
 
     JsonNode diff = JsonDiff.getDiff(valueTreeBase, valueTreeData);
 

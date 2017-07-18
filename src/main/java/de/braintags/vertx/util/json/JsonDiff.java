@@ -43,6 +43,14 @@ import io.vertx.core.json.Json;
  */
 public class JsonDiff {
 
+  /**
+   * Creates a diff from base to data.
+   *
+   * @param base
+   *          is not modified
+   * @param data
+   *          is not modified
+   */
   public static JsonNode getDiff(JsonNode base, JsonNode data) {
     return getDiff(base, data, Json.mapper.getNodeFactory(), false);
   }
@@ -57,7 +65,11 @@ public class JsonDiff {
    * @param nodeFactory
    *          a JsonNodeFactory
    */
-  public static JsonNode getDiff(JsonNode base, JsonNode data, JsonNodeFactory nodeFactory,
+  public static JsonNode getDiff(JsonNode base, JsonNode data, JsonNodeFactory nodeFactory) {
+    return getDiff(base, data, nodeFactory, false);
+  }
+
+  private static JsonNode getDiff(JsonNode base, JsonNode data, JsonNodeFactory nodeFactory,
       boolean arrayMapsConverted) {
     if (base.getNodeType() != data.getNodeType()) {
       return data.deepCopy();
