@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.Module;
@@ -48,11 +47,6 @@ public class ArrayMapModule extends Module {
         }
       }
 
-      @Override
-      public JsonDeserializer<?> findTreeNodeDeserializer(Class<? extends JsonNode> nodeType,
-          DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-        return ArrayMapNodeDeserializer.getDeserializer(nodeType);
-      }
     });
 
     context.addSerializers(new Serializers.Base() {
