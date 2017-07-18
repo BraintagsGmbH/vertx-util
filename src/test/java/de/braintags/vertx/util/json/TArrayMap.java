@@ -1,4 +1,4 @@
-package de.braintags.vertx.util.json.deserializers;
+package de.braintags.vertx.util.json;
 
 import static org.junit.Assert.assertTrue;
 
@@ -14,9 +14,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import de.braintags.vertx.util.json.ArrayMap;
 import de.braintags.vertx.util.json.JsonConfig;
 import de.braintags.vertx.util.json.JsonDiff;
+import de.braintags.vertx.util.json.deserializers.ArrayMap;
+import de.braintags.vertx.util.json.deserializers.ArrayMapSerializer;
+import de.braintags.vertx.util.json.deserializers.ComplexKey;
 import io.vertx.core.json.Json;
 
 /**

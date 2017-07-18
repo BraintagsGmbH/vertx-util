@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
@@ -33,7 +32,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
 /**
- * Basic serializer that can take JSON "Object" structure and
+ * Custom serializer that can take a special {@link ArrayMapNode} structure and
  * construct a {@link java.util.Map} instance, with typed contents.
  * <p>
  * Note: for untyped content (one indicated by passing Object.class
@@ -41,7 +40,6 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  * It can also construct {@link java.util.Map}s, but not with specific
  * POJO types, only other containers and primitives/wrappers.
  */
-@JacksonStdImpl
 public class ArrayMapDeserializer
     extends MapDeserializer
     implements ContextualDeserializer, ResolvableDeserializer {

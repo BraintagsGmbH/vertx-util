@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.braintags.vertx.util.EqUtil;
-import de.braintags.vertx.util.json.deserializers.ArrayMapNode;
 import io.vertx.core.json.Json;
 
 /**

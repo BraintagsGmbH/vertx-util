@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper;
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonMapFormatVisitor;
@@ -36,28 +35,22 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import de.braintags.vertx.util.json.ArrayMap;
-
 /**
- * Standard serializer implementation for serializing {link {@link ArrayMap}} types.
+ * Serializer implementation for serializing {link {@link ArrayMap}} types.
  * <p>
- * Note: about the only configurable setting currently is ability to filter out
- * entries with specified names.
  */
-@JacksonStdImpl
 public class ArrayMapSerializer
     extends ContainerSerializer<Map<?, ?>>
     implements ContextualSerializer {
 
   public static final String VALUE = "value";
-
   public static final String KEY = "key";
+  public static final String ARRAY_MAP = "@arrayMap";
 
   private static final long serialVersionUID = 1L;
 
   protected final static JavaType UNSPECIFIED_TYPE = TypeFactory.unknownType();
 
-  protected static final String ARRAY_MAP = "@arrayMap";
 
   /**
    * Map-valued property being serialized with this instance

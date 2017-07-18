@@ -1,4 +1,4 @@
-package de.braintags.vertx.util.json.deserializers;
+package de.braintags.vertx.util.json;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -19,7 +19,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
-public class ArrayMapNode extends ValueNode {
+import de.braintags.vertx.util.json.deserializers.ArrayMap;
+import de.braintags.vertx.util.json.deserializers.ArrayMapSerializer;
+
+/**
+ * Internal intermediate {@link JsonNode} for dealing with {@link ArrayMap} encoding.
+ * 
+ * @author mpluecker
+ *
+ */
+class ArrayMapNode extends ValueNode {
 
   private final Map<JsonNode, JsonNode> children;
 
