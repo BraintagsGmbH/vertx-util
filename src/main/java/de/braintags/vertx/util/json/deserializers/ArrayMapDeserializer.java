@@ -2,15 +2,20 @@ package de.braintags.vertx.util.json.deserializers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -24,6 +29,7 @@ import com.fasterxml.jackson.databind.deser.ValueInstantiator;
 import com.fasterxml.jackson.databind.deser.impl.ReadableObjectId.Referring;
 import com.fasterxml.jackson.databind.deser.std.MapDeserializer;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
 /**
@@ -41,16 +47,26 @@ public class ArrayMapDeserializer
     implements ContextualDeserializer, ResolvableDeserializer {
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Key deserializer to use; either passed via constructor
+   * (when indicated by annotations), or resolved when
+   * {@link #resolve} is called;
+   */
+  protected JsonDeserializer<?> _objKeyDeserializer;
+
+  private BeanDescription _beanDesc;
+
   /*
    * /**********************************************************
    * /* Life-cycle
    * /**********************************************************
    */
-
-  public ArrayMapDeserializer(JavaType mapType, ValueInstantiator valueInstantiator,
-      KeyDeserializer keyDeser, JsonDeserializer<Object> valueDeser,
+  public ArrayMapDeserializer(JavaType mapType, BeanDescription beanDesc, ValueInstantiator valueInstantiator,
+      JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser,
       TypeDeserializer valueTypeDeser) {
-    super(mapType, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
+    super(mapType, valueInstantiator, null, valueDeser, valueTypeDeser);
+    this._beanDesc = beanDesc;
+    this._objKeyDeserializer = keyDeser;
   }
 
   /**
@@ -62,27 +78,40 @@ public class ArrayMapDeserializer
   }
 
   protected ArrayMapDeserializer(ArrayMapDeserializer src,
-      KeyDeserializer keyDeser, JsonDeserializer<Object> valueDeser,
+      BeanDescription beanDesc, ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser,
+      JsonDeserializer<Object> valueDeser,
       TypeDeserializer valueTypeDeser,
       Set<String> ignorable) {
-    super(src, keyDeser, valueDeser, valueTypeDeser, ignorable);
+    this(src._mapType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
+    _propertyBasedCreator = src._propertyBasedCreator;
+    _delegateDeserializer = src._delegateDeserializer;
+    if (ignorable != null && !ignorable.isEmpty()) {
+      throw new UnsupportedOperationException("ignored entries are note supported for array maps");
+    }
+  }
+
+  @Override
+  @Deprecated
+  protected MapDeserializer withResolved(KeyDeserializer keyDeser, TypeDeserializer valueTypeDeser,
+      JsonDeserializer<?> valueDeser, Set<String> ignorable) {
+    // do not use this! You need a JsonDeserializer as keyDeser
+    throw new UnsupportedOperationException();
   }
 
   /**
    * Fluent factory method used to create a copy with slightly
    * different settings. When sub-classing, MUST be overridden.
    */
-  @Override
   @SuppressWarnings("unchecked")
-  protected ArrayMapDeserializer withResolved(KeyDeserializer keyDeser,
+  protected ArrayMapDeserializer withResolved(ValueInstantiator valueInstatiator, JsonDeserializer<?> keyDeser,
       TypeDeserializer valueTypeDeser, JsonDeserializer<?> valueDeser,
       Set<String> ignorable) {
 
-    if ((_keyDeserializer == keyDeser) && (_valueDeserializer == valueDeser)
+    if ((_objKeyDeserializer == keyDeser) && (_valueDeserializer == valueDeser)
         && (_valueTypeDeserializer == valueTypeDeser) && (_ignorableProperties == ignorable)) {
       return this;
     }
-    return new ArrayMapDeserializer(this,
+    return new ArrayMapDeserializer(this, _beanDesc, valueInstatiator,
         keyDeser, (JsonDeserializer<Object>) valueDeser, valueTypeDeser, ignorable);
   }
 
@@ -98,20 +127,56 @@ public class ArrayMapDeserializer
     _standardStringKey = false;
   }
 
-  /*
-   * /**********************************************************
-   * /* ContainerDeserializerBase API
-   * /**********************************************************
+  /**
+   * Method called to finalize setup of this deserializer,
+   * when it is known for which property deserializer is needed for.
    */
-
   @Override
-  public JavaType getContentType() {
-    return _mapType.getContentType();
-  }
+  public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+      BeanProperty property) throws JsonMappingException {
+    JsonDeserializer<?> kd = _objKeyDeserializer;
+    if (kd == null) {
+      kd = ctxt.findNonContextualValueDeserializer(_mapType.getKeyType());
+    } else {
+      if (kd instanceof ContextualDeserializer) {
+        kd = ((ContextualDeserializer) kd).createContextual(ctxt, property);
+      }
+    }
 
-  @Override
-  public JsonDeserializer<Object> getContentDeserializer() {
-    return _valueDeserializer;
+    JsonDeserializer<?> vd = _valueDeserializer;
+    // [databind#125]: May have a content converter
+    if (property != null) {
+      vd = findConvertingContentDeserializer(ctxt, property, vd);
+    }
+    final JavaType vt = _mapType.getContentType();
+    if (vd == null) {
+      vd = ctxt.findContextualValueDeserializer(vt, property);
+    } else { // if directly assigned, probably not yet contextual, so:
+      vd = ctxt.handleSecondaryContextualization(vd, property, vt);
+    }
+    TypeDeserializer vtd = _valueTypeDeserializer;
+    if (vtd != null) {
+      vtd = vtd.forProperty(property);
+    }
+    Set<String> ignored = _ignorableProperties;
+    AnnotationIntrospector intr = ctxt.getAnnotationIntrospector();
+    if (intr != null && property != null) {
+      AnnotatedMember member = property.getMember();
+      if (member != null) {
+        JsonIgnoreProperties.Value ignorals = intr.findPropertyIgnorals(member);
+        if (ignorals != null) {
+          Set<String> ignoresToAdd = ignorals.findIgnoredForDeserialization();
+          if (!ignoresToAdd.isEmpty()) {
+            ignored = (ignored == null) ? new HashSet<>() : new HashSet<>(ignored);
+            for (String str : ignoresToAdd) {
+              ignored.add(str);
+            }
+          }
+        }
+      }
+    }
+    ValueInstantiator valueInstantiator = ctxt.getFactory().findValueInstantiator(ctxt, _beanDesc);
+    return withResolved(valueInstantiator, kd, vtd, vd, ignored);
   }
 
   /*
@@ -119,31 +184,6 @@ public class ArrayMapDeserializer
    * /* JsonDeserializer API
    * /**********************************************************
    */
-
-  /**
-   * Turns out that these are expensive enough to create so that caching
-   * does make sense.
-   * <p>
-   * IMPORTANT: but, note, that instances CAN NOT BE CACHED if there is
-   * a value type deserializer; this caused an issue with 2.4.4 of
-   * JAXB Annotations (failing a test).
-   * It is also possible that some other settings could make deserializers
-   * un-cacheable; but on the other hand, caching can make a big positive
-   * difference with performance... so it's a hard choice.
-   * 
-   * @since 2.4.4
-   */
-  @Override
-  public boolean isCachable() {
-    /*
-     * As per [databind#735], existence of value or key deserializer (only passed
-     * if annotated to use non-standard one) should also prevent caching.
-     */
-    return (_valueDeserializer == null)
-        && (_keyDeserializer == null)
-        && (_valueTypeDeserializer == null)
-        && (_ignorableProperties == null);
-  }
 
   @Override
   @SuppressWarnings("unchecked")
@@ -161,8 +201,7 @@ public class ArrayMapDeserializer
     }
     // Ok: must point to START_OBJECT, FIELD_NAME or END_OBJECT
     final Map<Object, Object> result = (Map<Object, Object>) _valueInstantiator.createUsingDefault(ctxt);
-    JsonToken t = p.getCurrentToken();
-    if (t != JsonToken.START_ARRAY) {
+    if (!p.isExpectedStartObjectToken()) {
       return (Map<Object, Object>) ctxt.handleUnexpectedToken(getMapClass(), p);
     }
     _readAsArrayAndBind(p, ctxt, result);
@@ -178,8 +217,7 @@ public class ArrayMapDeserializer
     p.setCurrentValue(result);
 
     // Ok: must point to START_OBJECT or FIELD_NAME
-    JsonToken t = p.getCurrentToken();
-    if (t != JsonToken.START_ARRAY) {
+    if (!p.isExpectedStartObjectToken()) {
       return (Map<Object, Object>) ctxt.handleUnexpectedToken(getMapClass(), p);
     }
     _readAsArrayAndBind(p, ctxt, result);
@@ -190,8 +228,7 @@ public class ArrayMapDeserializer
   public Object deserializeWithType(JsonParser jp, DeserializationContext ctxt,
       TypeDeserializer typeDeserializer)
       throws IOException, JsonProcessingException {
-    JsonToken t = jp.getCurrentToken();
-    if (t != JsonToken.START_ARRAY) {
+    if (!jp.isExpectedStartObjectToken()) {
       return ctxt.handleUnexpectedToken(getMapClass(), jp);
     }
     return typeDeserializer.deserializeTypedFromObject(jp, ctxt);
@@ -205,7 +242,7 @@ public class ArrayMapDeserializer
 
   protected final void _readAsArrayAndBind(JsonParser p, DeserializationContext ctxt,
       Map<Object, Object> result) throws IOException {
-    final KeyDeserializer keyDes = _keyDeserializer;
+    final JsonDeserializer<?> keyDes = _objKeyDeserializer;
     final JsonDeserializer<Object> valueDes = _valueDeserializer;
     final TypeDeserializer typeDeser = _valueTypeDeserializer;
 
@@ -215,57 +252,94 @@ public class ArrayMapDeserializer
       referringAccumulator = new MapReferringAccumulator(_mapType.getContentType().getRawClass(), result);
     }
 
-    String keyStr;
-    if (p.isExpectedStartArrayToken()) {
-      keyStr = p.nextFieldName();
-    } else {
-      JsonToken t = p.getCurrentToken();
-      if (t == JsonToken.END_OBJECT) {
-        return;
-      }
-      if (t != JsonToken.FIELD_NAME) {
-        ctxt.reportWrongTokenException(p, JsonToken.FIELD_NAME, null);
-      }
-      keyStr = p.getCurrentName();
+    String headerField = p.nextFieldName();
+    if (!ArrayMapSerializer.ARRAY_MAP.equals(headerField)) {
+      throw new JsonMappingException(p, "missing fieldname entry " + ArrayMapSerializer.ARRAY_MAP,
+          p.getCurrentLocation());
     }
-
-    for (; keyStr != null; keyStr = p.nextFieldName()) {
-      Object key = keyDes.deserializeKey(keyStr, ctxt);
-      // And then the value...
-      JsonToken t = p.nextToken();
-      if (_ignorableProperties != null && _ignorableProperties.contains(keyStr)) {
-        p.skipChildren();
-        continue;
-      }
-      try {
-        // Note: must handle null explicitly here; value deserializers won't
-        Object value;
-        if (t == JsonToken.VALUE_NULL) {
-          value = valueDes.getNullValue(ctxt);
-        } else if (typeDeser == null) {
-          value = valueDes.deserialize(p, ctxt);
-        } else {
-          value = valueDes.deserializeWithType(p, ctxt, typeDeser);
+    if (p.nextToken() != JsonToken.START_ARRAY) {
+      ctxt.handleUnexpectedToken(getMapClass(), p);
+      return;
+    }
+    // currently at START_ARRAY
+    p.nextToken();
+    while (p.getCurrentToken() != JsonToken.END_ARRAY) {
+      if (p.isExpectedStartObjectToken()) {
+        Object key = null;
+        Object value = null;
+        while (true) {
+          String fieldName = p.nextFieldName();
+          if (fieldName == null) {
+            if (p.getCurrentToken() != JsonToken.END_OBJECT) {
+              ctxt.handleUnexpectedToken(getMapClass(), p);
+              return;
+            } else {
+              p.nextToken();
+              break;
+            }
+          }
+          switch (fieldName) {
+            case ArrayMapSerializer.KEY:
+              p.nextToken();
+              key = deserialize(p, ctxt, keyDes, null);
+              break;
+            case ArrayMapSerializer.VALUE:
+              // And then the value...
+              try {
+                p.nextToken();
+                value = deserialize(p, ctxt, valueDes, typeDeser);
+                if (useObjectId) {
+                  referringAccumulator.put(key, value);
+                } else {
+                  result.put(key, value);
+                }
+              } catch (UnresolvedForwardReference reference) {
+                handleUnresolvedReference(p, referringAccumulator, key, reference);
+              } catch (Exception e) {
+                wrapAndThrow(e, result, key.toString());
+              }
+              break;
+            default:
+              throw new JsonMappingException(p, "unknown map entry field: " + fieldName, p.getCurrentLocation());
+          }
         }
-        if (useObjectId) {
-          referringAccumulator.put(key, value);
-        } else {
-          result.put(key, value);
-        }
-      } catch (UnresolvedForwardReference reference) {
-        handleUnresolvedReference(p, referringAccumulator, key, reference);
-      } catch (Exception e) {
-        wrapAndThrow(e, result, keyStr);
+      } else {
+        ctxt.handleUnexpectedToken(getMapClass(), p);
+        break;
       }
     }
   }
 
-   @Override
+  private Object deserialize(JsonParser p, DeserializationContext ctxt, final JsonDeserializer<?> valueDes,
+      final TypeDeserializer typeDeser) throws JsonMappingException, IOException, JsonProcessingException {
+    // Note: must handle null explicitly here; value deserializers won't
+    Object value;
+    if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
+      value = valueDes.getNullValue(ctxt);
+      p.nextToken();
+    } else if (typeDeser == null) {
+      value = valueDes.deserialize(p, ctxt);
+    } else {
+      value = valueDes.deserializeWithType(p, ctxt, typeDeser);
+    }
+    return value;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public Map<Object, Object> _deserializeUsingCreator(JsonParser p, DeserializationContext ctxt) throws IOException {
     throw new UnsupportedOperationException();
   }
 
+  private void handleUnresolvedReference(JsonParser jp, MapReferringAccumulator accumulator,
+      Object key, UnresolvedForwardReference reference)
+      throws JsonMappingException {
+    if (accumulator == null) {
+      throw JsonMappingException.from(jp, "Unresolved forward reference but no identity info.", reference);
+    }
+    Referring referring = accumulator.handleUnresolvedReference(reference, key);
+    reference.getRoid().appendReferring(referring);
+  }
 
   private final static class MapReferringAccumulator {
     private final Class<?> _valueType;

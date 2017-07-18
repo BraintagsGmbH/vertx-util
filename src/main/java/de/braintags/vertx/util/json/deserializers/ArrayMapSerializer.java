@@ -57,6 +57,8 @@ public class ArrayMapSerializer
 
   protected final static JavaType UNSPECIFIED_TYPE = TypeFactory.unknownType();
 
+  protected static final String ARRAY_MAP = "@arrayMap";
+
   /**
    * Map-valued property being serialized with this instance
    */
@@ -526,6 +528,8 @@ public class ArrayMapSerializer
   @Override
   public void serialize(Map<?, ?> value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
+    gen.writeStartObject();
+    gen.writeFieldName(ArrayMapSerializer.ARRAY_MAP);
     gen.writeStartArray();
     if (!value.isEmpty()) {
       Object suppressableValue = _suppressableValue;
@@ -551,6 +555,7 @@ public class ArrayMapSerializer
       }
     }
     gen.writeEndArray();
+    gen.writeEndObject();
   }
 
   @Override
