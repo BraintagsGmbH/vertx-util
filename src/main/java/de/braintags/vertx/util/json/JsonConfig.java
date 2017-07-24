@@ -36,6 +36,7 @@ public class JsonConfig {
       mapper.registerModule(new ParameterNamesModule(Mode.DELEGATING));
       mapper.registerModule(new JodaModule());
       mapper.registerModule(new GuavaModule());
+      mapper.registerModule(new ArrayMapModule());
     });
     configureObjectMapper(Json.mapper);
     configureObjectMapper(Json.prettyMapper);
