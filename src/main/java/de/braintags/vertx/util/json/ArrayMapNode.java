@@ -31,6 +31,14 @@ class ArrayMapNode extends ValueNode {
 
   private final Map<JsonNode, JsonNode> children;
 
+  public static boolean isArrayMapNode(JsonNode node) {
+    if (node.isObject() && node.size() == 1) {
+      Entry<String, JsonNode> arrayMapField = node.fields().next();
+      return arrayMapField.getKey().equals(ArrayMapSerializer.ARRAY_MAP) && arrayMapField.getValue().isArray();
+    }
+    return false;
+  }
+
   public static JsonNode deepConvertNode(JsonNode node) {
     if (node.isObject()) {
       if (node.size() == 1) {
@@ -47,13 +55,6 @@ class ArrayMapNode extends ValueNode {
     }
   }
 
-  public static boolean isArrayMapNode(JsonNode node) {
-    if (node.isObject() && node.size() == 1) {
-      Entry<String, JsonNode> arrayMapField = node.fields().next();
-      return arrayMapField.getKey().equals(ArrayMapSerializer.ARRAY_MAP) && arrayMapField.getValue().isArray();
-    }
-    return false;
-  }
 
   private static JsonNode convertArrayNode(ArrayNode node) {
     ArrayNode modified = null;
@@ -119,6 +120,64 @@ class ArrayMapNode extends ValueNode {
     return new ArrayMapNode(children);
   }
 
+  public static JsonNode toRegularNode(JsonNode node, JsonNodeCreator nodeFactory) {
+    if (node.isObject()) {
+      return toRegularNode((ObjectNode) node, nodeFactory);
+    } else if (node.isArray()) {
+      return toRegularNode((ArrayNode) node, nodeFactory);
+    } else if (node instanceof ArrayMapNode) {
+      return toRegularNode((ArrayMapNode) node, nodeFactory);
+    } else {
+      return node;
+    }
+  }
+
+  public static ObjectNode toRegularNode(ArrayMapNode node, JsonNodeCreator nodeFactory) {
+    ArrayNode childrenNode = nodeFactory.arrayNode();
+    for (Map.Entry<JsonNode, JsonNode> en : node.children.entrySet()) {
+      ObjectNode entryNode = nodeFactory.objectNode();
+      entryNode.set(ArrayMapSerializer.KEY, toRegularNode(en.getKey(), nodeFactory));
+      entryNode.set(ArrayMapSerializer.VALUE, toRegularNode(en.getValue(), nodeFactory));
+      childrenNode.add(entryNode);
+    }
+
+    ObjectNode result = nodeFactory.objectNode();
+    result.set(ArrayMapSerializer.ARRAY_MAP, childrenNode);
+    return result;
+  }
+
+  private static JsonNode toRegularNode(ArrayNode node, JsonNodeCreator nodeFactory) {
+    ArrayNode modified = null;
+    for (int i = node.size() - 1; i >= 0; i--) {
+      JsonNode oldNode = node.get(i);
+      JsonNode newNode = toRegularNode(oldNode, nodeFactory);
+      if (oldNode != newNode) {
+        if (modified == null) {
+          modified = node.arrayNode().addAll(node);
+        }
+        modified.set(i, newNode);
+      }
+    }
+    return modified != null ? modified : node;
+  }
+
+  private static JsonNode toRegularNode(ObjectNode node, JsonNodeCreator nodeFactory) {
+    ObjectNode modified = null;
+    Iterator<Entry<String, JsonNode>> fielditer = node.fields();
+    while (fielditer.hasNext()) {
+      Entry<String, JsonNode> field = fielditer.next();
+      JsonNode newNode = toRegularNode(field.getValue(), nodeFactory);
+      if (field.getValue() != newNode) {
+        if (modified == null) {
+          modified = node.objectNode();
+          modified.setAll(node);
+        }
+        modified.set(field.getKey(), newNode);
+      }
+    }
+    return modified != null ? modified : node;
+  }
+
   public ArrayMapNode() {
     children = new LinkedHashMap<>();
   }
@@ -151,20 +210,6 @@ class ArrayMapNode extends ValueNode {
       g.writeEndObject();
     }
     g.writeEndArray();
-  }
-
-  public ObjectNode toRegularNode(JsonNodeCreator nodeFactory) {
-    ArrayNode childrenNode = nodeFactory.arrayNode();
-    for (Map.Entry<JsonNode, JsonNode> en : children.entrySet()) {
-      ObjectNode entryNode = nodeFactory.objectNode();
-      entryNode.set(ArrayMapSerializer.KEY, en.getKey());
-      entryNode.set(ArrayMapSerializer.VALUE, en.getValue());
-      childrenNode.add(entryNode);
-    }
-    
-    ObjectNode node = nodeFactory.objectNode();
-    node.set(ArrayMapSerializer.ARRAY_MAP, childrenNode);
-    return node;
   }
 
   @Override
@@ -252,6 +297,7 @@ class ArrayMapNode extends ValueNode {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(32 + (size() << 4));
+    sb.append("FOOOO");
     sb.append("{\"");
     sb.append(ArrayMapSerializer.ARRAY_MAP);
     sb.append("\":[");
@@ -269,7 +315,7 @@ class ArrayMapNode extends ValueNode {
       } else {
         sb.append("null");
       }
-      sb.append(", \"");
+      sb.append(",\"");
       sb.append(ArrayMapSerializer.VALUE);
       sb.append("\":");
       if (en.getValue() != null) {

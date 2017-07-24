@@ -294,7 +294,7 @@ public class ArrayMapDeserializer
               } catch (UnresolvedForwardReference reference) {
                 handleUnresolvedReference(p, referringAccumulator, key, reference);
               } catch (Exception e) {
-                wrapAndThrow(e, result, key.toString());
+                wrapAndThrow(e, result, key != null ? key.toString() : "null");
               }
               break;
             default:
@@ -305,6 +305,10 @@ public class ArrayMapDeserializer
         ctxt.handleUnexpectedToken(getMapClass(), p);
         break;
       }
+    }
+
+    if (p.nextToken() != JsonToken.END_OBJECT) {
+      throw new JsonMappingException(p, "expected " + JsonToken.END_OBJECT, p.getCurrentLocation());
     }
   }
 

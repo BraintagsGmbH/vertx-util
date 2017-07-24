@@ -79,7 +79,7 @@ public class JsonDiff {
       if (base instanceof ArrayMapNode && data instanceof ArrayMapNode) {
         return arrayMapDiff((ArrayMapNode) base, (ArrayMapNode) data, nodeFactory, arrayMapsConverted);
       } else {
-        throw new IllegalArgumentException("node is null and node is not ArrayMapNode");
+        throw new IllegalArgumentException("nodeType is null and base and/or data is not ArrayMapNode");
       }
     }
     switch (nodeType) {
@@ -127,7 +127,7 @@ public class JsonDiff {
       if (baseNode != null) {
         JsonNode subDiff = getDiff(baseNode, dataNode, nodeFactory, arrayMapsConverted);
         if (subDiff != null) {
-          if (!subDiff.isObject() || subDiff.size() > 0) {
+          if ((!subDiff.isObject() && !(subDiff instanceof ArrayMapNode)) || subDiff.size() > 0) {
             diff.set(fieldName, subDiff);
           }
         }
@@ -158,7 +158,7 @@ public class JsonDiff {
       } else {
         JsonNode subDiff = getDiff(baseValue, dataEntry.getValue(), nodeFactory, arrayMapsConverted);
         if (subDiff != null) {
-          if (!subDiff.isObject() || subDiff.size() > 0) {
+          if ((!subDiff.isObject() && !(subDiff instanceof ArrayMapNode)) || subDiff.size() > 0) {
             diffChildren.put(dataEntry.getKey(), subDiff);
           }
         }
@@ -230,7 +230,19 @@ public class JsonDiff {
     if (base.isNull()) {
       return diff.deepCopy();
     }
-    switch (base.getNodeType()) {
+    JsonNodeType nodeType = base.getNodeType();
+    if (nodeType == null) {
+      if (base instanceof ArrayMapNode && diff instanceof ArrayMapNode) {
+        ArrayMapNode arrayBase = (ArrayMapNode) base;
+        ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
+        applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
+        return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
+      } else {
+        throw new IllegalArgumentException("nodeType is null and base and/or diff is not ArrayMapNode");
+      }
+    }
+
+    switch (nodeType) {
       case ARRAY:
         if (diff.isObject()) {
           applyArrayDiff((ArrayNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
@@ -239,27 +251,28 @@ public class JsonDiff {
           return diff.deepCopy();
         }
       case OBJECT:
-      case POJO:
         if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
           applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
-          return arrayBase.toRegularNode(nodeFactory);
-        } else if (base instanceof ArrayMapNode) {
-          ArrayMapNode arrayBase = (ArrayMapNode) base;
-          ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
-          applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
-          return arrayBase.toRegularNode(nodeFactory);
+          return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
         } else if (diff.isObject()) {
           applyObjectDiff((ObjectNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
           return base;
         } else {
           return diff.deepCopy();
         }
-      case MISSING:
-        throw new IllegalArgumentException("node type may not be " + JsonNodeType.MISSING);
-      default:
+      case BINARY:
+      case BOOLEAN:
+      case NULL:
+      case NUMBER:
+      case STRING:
         return diff.deepCopy();
+
+      case POJO:
+      case MISSING:
+      default:
+        throw new IllegalArgumentException("node type may not be " + nodeType);
     }
   }
 
@@ -280,6 +293,9 @@ public class JsonDiff {
 
   private static void applyArrayMapDiff(ArrayMapNode base, ArrayMapNode diff, JsonNodeFactory nodeFactory,
       boolean arrayMapsConverted) {
+    if (diff == null) {
+      return;
+    }
     Map<JsonNode, JsonNode> baseChildren = base.getChildren();
     for (Map.Entry<JsonNode, JsonNode> diffEntry : diff.getChildren().entrySet()) {
       if (diffEntry.getValue() == null) {
