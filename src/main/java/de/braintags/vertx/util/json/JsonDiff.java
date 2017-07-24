@@ -70,10 +70,19 @@ public class JsonDiff {
 
   private static JsonNode getDiff(JsonNode base, JsonNode data, JsonNodeFactory nodeFactory,
       boolean arrayMapsConverted) {
-    if (base.getNodeType() != data.getNodeType()) {
+    JsonNodeType nodeType = base.getNodeType();
+    if (nodeType != data.getNodeType()) {
       return data.deepCopy();
     }
-    switch (base.getNodeType()) {
+
+    if (nodeType == null) {
+      if (base instanceof ArrayMapNode && data instanceof ArrayMapNode) {
+        return arrayMapDiff((ArrayMapNode) base, (ArrayMapNode) data, nodeFactory, arrayMapsConverted);
+      } else {
+        throw new IllegalArgumentException("node is null and node is not ArrayMapNode");
+      }
+    }
+    switch (nodeType) {
       case ARRAY:
         return arrayDiff((ArrayNode) base, (ArrayNode) data, nodeFactory, arrayMapsConverted);
       case OBJECT:
@@ -84,12 +93,16 @@ public class JsonDiff {
         } else {
           return objectDiff((ObjectNode) base, (ObjectNode) data, nodeFactory, arrayMapsConverted);
         }
-      case POJO:
-        return arrayMapDiff((ArrayMapNode) base, (ArrayMapNode) data, nodeFactory, arrayMapsConverted);
-      case MISSING:
-        throw new IllegalArgumentException("node type may not be " + JsonNodeType.MISSING);
-      default:
+      case BINARY:
+      case BOOLEAN:
+      case NULL:
+      case NUMBER:
+      case STRING:
         return valueDiff(base, data);
+      case POJO:
+      case MISSING:
+      default:
+        throw new IllegalArgumentException("node type may not be " + nodeType);
     }
   }
 

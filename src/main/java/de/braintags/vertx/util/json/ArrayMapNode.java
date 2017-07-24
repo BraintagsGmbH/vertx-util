@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -85,7 +84,6 @@ class ArrayMapNode extends ValueNode {
         modified.set(field.getKey(), newNode);
       }
     }
-
     return modified != null ? modified : node;
   }
 
@@ -137,11 +135,11 @@ class ArrayMapNode extends ValueNode {
   public void serialize(JsonGenerator g, SerializerProvider provider)
       throws IOException {
     g.writeStartObject();
-    innserSerialize(g, provider);
+    innerSerialize(g, provider);
     g.writeEndObject();
   }
 
-  private void innserSerialize(JsonGenerator g, SerializerProvider provider) throws IOException {
+  private void innerSerialize(JsonGenerator g, SerializerProvider provider) throws IOException {
     g.writeFieldName(ArrayMapSerializer.ARRAY_MAP);
     g.writeStartArray();
     for (Map.Entry<JsonNode, JsonNode> en : children.entrySet()) {
@@ -173,11 +171,8 @@ class ArrayMapNode extends ValueNode {
   public void serializeWithType(JsonGenerator g, SerializerProvider provider,
       TypeSerializer typeSer)
       throws IOException {
-    @SuppressWarnings("deprecation")
-    boolean trimEmptyArray = (provider != null) &&
-        !provider.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
     typeSer.writeTypePrefixForObject(this, g);
-    innserSerialize(g, provider);
+    innerSerialize(g, provider);
     typeSer.writeTypeSuffixForObject(this, g);
   }
 
