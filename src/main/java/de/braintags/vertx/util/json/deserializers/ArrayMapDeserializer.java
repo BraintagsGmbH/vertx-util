@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator;
@@ -80,7 +79,6 @@ public class ArrayMapDeserializer
       BeanDescription beanDesc, ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser,
       JsonDeserializer<Object> valueDeser,
       TypeDeserializer valueTypeDeser,
-      NullValueProvider nuller,
       Set<String> ignorable) {
     this(src._containerType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
     _propertyBasedCreator = src._propertyBasedCreator;
