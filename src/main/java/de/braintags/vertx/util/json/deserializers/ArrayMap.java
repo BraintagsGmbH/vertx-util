@@ -23,7 +23,7 @@ public final class ArrayMap<K, V> extends LinkedHashMap<K, V> {
   ArrayMap() {
   }
 
-  ArrayMap(Map<? extends K, ? extends V> source) {
+  public ArrayMap(final Map<? extends K, ? extends V> source) {
     super(source);
   }
 
