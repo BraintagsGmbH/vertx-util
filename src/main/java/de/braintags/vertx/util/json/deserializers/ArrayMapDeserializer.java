@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.deser.NullValueProvider;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.UnresolvedForwardReference;
 import com.fasterxml.jackson.databind.deser.ValueInstantiator;
@@ -54,6 +54,7 @@ public class ArrayMapDeserializer
 
   private BeanDescription _beanDesc;
 
+
   /*
    * /**********************************************************
    * /* Life-cycle
@@ -79,21 +80,14 @@ public class ArrayMapDeserializer
       BeanDescription beanDesc, ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser,
       JsonDeserializer<Object> valueDeser,
       TypeDeserializer valueTypeDeser,
+      NullValueProvider nuller,
       Set<String> ignorable) {
-    this(src._mapType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
+    this(src._containerType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
     _propertyBasedCreator = src._propertyBasedCreator;
     _delegateDeserializer = src._delegateDeserializer;
     if (ignorable != null && !ignorable.isEmpty()) {
       throw new UnsupportedOperationException("ignored entries are note supported for array maps");
     }
-  }
-
-  @Override
-  @Deprecated
-  protected MapDeserializer withResolved(KeyDeserializer keyDeser, TypeDeserializer valueTypeDeser,
-      JsonDeserializer<?> valueDeser, Set<String> ignorable) {
-    // do not use this! You need a JsonDeserializer as keyDeser
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -134,7 +128,7 @@ public class ArrayMapDeserializer
       BeanProperty property) throws JsonMappingException {
     JsonDeserializer<?> kd = _objKeyDeserializer;
     if (kd == null) {
-      kd = ctxt.findNonContextualValueDeserializer(_mapType.getKeyType());
+      kd = ctxt.findNonContextualValueDeserializer(_containerType.getKeyType());
     } else {
       if (kd instanceof ContextualDeserializer) {
         kd = ((ContextualDeserializer) kd).createContextual(ctxt, property);
@@ -146,7 +140,7 @@ public class ArrayMapDeserializer
     if (property != null) {
       vd = findConvertingContentDeserializer(ctxt, property, vd);
     }
-    final JavaType vt = _mapType.getContentType();
+    final JavaType vt = _containerType.getContentType();
     if (vd == null) {
       vd = ctxt.findContextualValueDeserializer(vt, property);
     } else { // if directly assigned, probably not yet contextual, so:
@@ -194,7 +188,7 @@ public class ArrayMapDeserializer
           _delegateDeserializer.deserialize(p, ctxt));
     }
     if (!_hasDefaultCreator) {
-      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), p,
+      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), getValueInstantiator(), p,
           "no default constructor found");
     }
     // Ok: must point to START_OBJECT, FIELD_NAME or END_OBJECT
@@ -247,7 +241,7 @@ public class ArrayMapDeserializer
     MapReferringAccumulator referringAccumulator = null;
     boolean useObjectId = valueDes.getObjectIdReader() != null;
     if (useObjectId) {
-      referringAccumulator = new MapReferringAccumulator(_mapType.getContentType().getRawClass(), result);
+      referringAccumulator = new MapReferringAccumulator(_containerType.getContentType().getRawClass(), result);
     }
 
     String headerField = p.nextFieldName();
