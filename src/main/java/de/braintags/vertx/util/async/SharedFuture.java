@@ -43,15 +43,27 @@ public class SharedFuture<T> implements Future<T> {
   }
 
   /**
-   * Create a FutureResult that has already succeeded
+   * Create a SharedFuture that has already succeeded
    * 
    * @param result
    *          The result
    */
-  public SharedFuture(T result) {
+  public SharedFuture(final T result) {
     this();
     complete(result);
   }
+
+  /**
+   * Create a SharedFuture that has already failed
+   * 
+   * @param cause
+   *          The cause
+   */
+  public SharedFuture(final Throwable cause) {
+    this();
+    fail(cause);
+  }
+
 
   /**
    * The result of the operation. This will be null if the operation failed.
@@ -97,11 +109,11 @@ public class SharedFuture<T> implements Future<T> {
    * Set a handler for the result. It will get called when it's complete
    */
   @Override
-  public Future<T> setHandler(Handler<AsyncResult<T>> handler) {
+  public Future<T> setHandler(final Handler<AsyncResult<T>> handler) {
     return addHandler(handler);
   }
 
-  public Future<T> addHandler(Handler<AsyncResult<T>> handler) {
+  public Future<T> addHandler(final Handler<AsyncResult<T>> handler) {
     boolean handleImmediately;
     synchronized (this) {
       if (handler != null && isComplete()) {
@@ -121,7 +133,7 @@ public class SharedFuture<T> implements Future<T> {
    * Set the result. Any handler will be called, if there is one
    */
   @Override
-  public void complete(T result) {
+  public void complete(final T result) {
     if (!tryComplete(result))
       throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
@@ -135,13 +147,13 @@ public class SharedFuture<T> implements Future<T> {
    * Set the failure. Any handler will be called, if there is one
    */
   @Override
-  public void fail(Throwable throwable) {
+  public void fail(final Throwable throwable) {
     if (!tryFail(throwable))
       throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
 
   @Override
-  public void fail(String failureMessage) {
+  public void fail(final String failureMessage) {
     fail(new NoStackTraceThrowable(failureMessage));
   }
 
@@ -151,7 +163,7 @@ public class SharedFuture<T> implements Future<T> {
    * @see io.vertx.core.Future#tryComplete(java.lang.Object)
    */
   @Override
-  public synchronized boolean tryComplete(T result) {
+  public synchronized boolean tryComplete(final T result) {
     if (isComplete())
       return false;
     this.result = result;
@@ -176,7 +188,7 @@ public class SharedFuture<T> implements Future<T> {
    * @see io.vertx.core.Future#tryFail(java.lang.Throwable)
    */
   @Override
-  public synchronized boolean tryFail(Throwable cause) {
+  public synchronized boolean tryFail(final Throwable cause) {
     if (isComplete())
       return false;
     this.throwable = cause;
@@ -198,7 +210,7 @@ public class SharedFuture<T> implements Future<T> {
    * @see io.vertx.core.Future#tryFail(java.lang.String)
    */
   @Override
-  public boolean tryFail(String failureMessage) {
+  public boolean tryFail(final String failureMessage) {
     return tryFail(new NoStackTraceThrowable(failureMessage));
   }
 
@@ -208,7 +220,7 @@ public class SharedFuture<T> implements Future<T> {
    * @see io.vertx.core.Future#handle(io.vertx.core.AsyncResult)
    */
   @Override
-  public void handle(AsyncResult<T> asyncResult) {
+  public void handle(final AsyncResult<T> asyncResult) {
     if (asyncResult.succeeded())
       complete(asyncResult.result());
     else
