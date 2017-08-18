@@ -15,7 +15,6 @@ package de.braintags.vertx.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -46,7 +45,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
   }
 
   @Override
-  public void contains(Object o, Handler<AsyncResult<Boolean>> handler) {
+  public void contains(final Object o, final Handler<AsyncResult<Boolean>> handler) {
     toArray(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -63,7 +62,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * io.vertx.core.Handler)
    */
   @Override
-  public void containsAll(CollectionAsync<?> c, Handler<AsyncResult<Boolean>> handler) {
+  public void containsAll(final CollectionAsync<?> c, final Handler<AsyncResult<Boolean>> handler) {
     if (c.isEmpty() || isEmpty()) {
       handler.handle(Future.succeededFuture(false));
       return;
@@ -86,7 +85,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
     });
   }
 
-  private boolean containsAll(Object[] objects, Object[] searchObjects) {
+  private boolean containsAll(final Object[] objects, final Object[] searchObjects) {
     for (Object searchObject : searchObjects) {
       if (!contains(objects, searchObject)) {
         return false;
@@ -95,7 +94,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
     return true;
   }
 
-  private boolean contains(Object[] objects, Object searchObject) {
+  private boolean contains(final Object[] objects, final Object searchObject) {
     for (Object sourceObject : objects) {
       if (sourceObject.equals(searchObject)) {
         return true;
@@ -110,47 +109,33 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * @see de.braintags.vertx.util.util.CollectionAsync#toArray(io.vertx.core.Handler)
    */
   @Override
-  public void toArray(Handler<AsyncResult<Object[]>> handler) {
-    Object[] or = new Object[size()];
-
+  public void toArray(final Handler<AsyncResult<Object[]>> handler) {
     if (isEmpty()) {
-      handler.handle(Future.succeededFuture(or));
+      handler.handle(Future.succeededFuture(new Object[size()]));
     } else {
-      List<Future> fl = createFutureList(or);
+      @SuppressWarnings("rawtypes")
+      List<Future> fl = createFutureList();
       CompositeFuture.all(fl).setHandler(result -> {
         if (result.failed()) {
-          LOGGER.error("", result.cause());
+          LOGGER.error("error converting results to array", result.cause());
           handler.handle(Future.failedFuture(result.cause()));
         } else {
           LOGGER.trace("futurelist finished");
-          handler.handle(Future.succeededFuture(or));
+          handler.handle(Future.succeededFuture(result.result().list().toArray()));
         }
       });
     }
   }
 
   @SuppressWarnings("rawtypes")
-  private List<Future> createFutureList(Object[] or) {
+  private List<Future> createFutureList() {
     List<Future> futures = new ArrayList<>();
     IteratorAsync<E> it = iterator();
-    int counter = 0;
     while (it.hasNext()) {
-      Future future = Future.future();
+      Future<E> future = Future.future();
       futures.add(future);
-      AtomicInteger ai = new AtomicInteger(counter++);
-      LOGGER.trace("preparing future for position " + counter);
-      it.next(nr -> {
-        if (nr.failed()) {
-          future.fail(nr.cause());
-        } else {
-          LOGGER.trace("executed position " + ai.get());
-          or[ai.get()] = nr.result();
-          future.complete();
-        }
-      });
+      it.next(future);
     }
-
-    LOGGER.trace("created futurelist with " + futures.size() + " entries ");
     return futures;
   }
 
@@ -160,7 +145,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * @see de.braintags.vertx.util.util.CollectionAsync#add(java.lang.Object)
    */
   @Override
-  public boolean add(E e) {
+  public boolean add(final E e) {
     throw new UnsupportedOperationException();
   }
 
@@ -170,7 +155,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * @see de.braintags.vertx.util.util.CollectionAsync#remove(java.lang.Object)
    */
   @Override
-  public boolean remove(Object o) {
+  public boolean remove(final Object o) {
     throw new UnsupportedOperationException();
   }
 
@@ -180,7 +165,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * @see de.braintags.vertx.util.util.CollectionAsync#addAll(de.braintags.vertx.util.util.CollectionAsync)
    */
   @Override
-  public boolean addAll(CollectionAsync<? extends E> c) {
+  public boolean addAll(final CollectionAsync<? extends E> c) {
     throw new UnsupportedOperationException();
   }
 
@@ -190,7 +175,7 @@ public abstract class AbstractCollectionAsync<E> implements CollectionAsync<E> {
    * @see de.braintags.vertx.util.util.CollectionAsync#removeAll(java.util.Collection)
    */
   @Override
-  public boolean removeAll(Collection<?> c) {
+  public boolean removeAll(final Collection<?> c) {
     throw new UnsupportedOperationException();
   }
 
