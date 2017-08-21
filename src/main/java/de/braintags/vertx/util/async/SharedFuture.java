@@ -29,11 +29,11 @@ import io.vertx.core.impl.NoStackTraceThrowable;
  */
 public class SharedFuture<T> implements Future<T> {
 
-  private boolean failed;
-  private boolean succeeded;
+  protected boolean failed;
+  protected boolean succeeded;
   private final List<Handler<AsyncResult<T>>> handlers;
-  private T result;
-  private Throwable throwable;
+  protected T result;
+  protected Throwable throwable;
 
   /**
    * Create a FutureResult that hasn't completed yet
@@ -197,7 +197,7 @@ public class SharedFuture<T> implements Future<T> {
     return true;
   }
 
-  private synchronized void callHandlers() {
+  protected synchronized void callHandlers() {
     for (Handler<AsyncResult<T>> handler : handlers) {
       handler.handle(this);
     }
