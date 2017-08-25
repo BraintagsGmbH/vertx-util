@@ -43,7 +43,7 @@ public interface JWTHandler {
    *          config to create a {@link JWT} from
    * @return a new {@link JWT} instance
    */
-  public static JWT createJWT(Vertx vertx, JWTSettings config) {
+  public static JWT createJWT(final Vertx vertx, final JWTSettings config) {
     final KeyStoreSettings keyStore = config.getKeystoreSettings();
 
     try {
@@ -72,7 +72,7 @@ public interface JWTHandler {
 
     } catch (KeyStoreException | IOException | FileSystemException | CertificateException
         | NoSuchAlgorithmException e) {
-      throw new RuntimeException(e); // NOSONAR Should not happen
+      throw new Error(e); // NOSONAR Should not happen
     }
   }
 }
