@@ -85,10 +85,17 @@ public class JsonReadStreamTest extends BtVertxTestBase {
     } else {
       context.assertFalse(ws.buffer.length() > 0, "buffer should not be written");
     }
-    LOGGER.debug(ws.buffer);
+    String textResult = ws.buffer.toString();
+    LOGGER.debug(textResult);
     context.assertEquals(succeededCount, ws.count, "not all instances were written");
 
-    LOGGER.debug(ws.buffer);
+    if (jsonConform) {
+      context.assertTrue(textResult.startsWith("["), "json conform does not start with array");
+      context.assertTrue(textResult.endsWith("]"), "json conform does not end with array");
+    } else {
+      context.assertTrue(textResult.startsWith("{"), "json NOT conform does not start with {");
+      context.assertTrue(textResult.endsWith("}"), "json NOT conform does not start with }");
+    }
     try {
       JsonArray arr = new JsonArray(ws.buffer);
       if (jsonConform) {

@@ -101,13 +101,20 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
     try {
       boolean fst = firstElementWritten.getAndSet(true);
       Buffer b = Buffer.buffer();
-      if (array) {
-        b.appendString(fst ? " , " : "[ ");
+      if (fst) {
+        if (array) {
+          b.appendString(",");
+        }
+        b.appendString("\n");
+      } else { // we are writing the first element
+        if (array) {
+          b.appendString("[ ");
+        }
       }
-      b.appendString(pretty ? "\n" : "");
+
       b.appendString(pretty ? Json.encodePrettily(instance) : Json.encode(instance));
       if (array && !instances.hasNext()) {
-        b.appendString(" ] ");
+        b.appendString(" ]");
       }
       return b;
     } catch (Exception e) {
