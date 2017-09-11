@@ -137,6 +137,9 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
 
   @Override
   public ReadStream<Buffer> resume() {
+    if (contentHandler == null) {
+      throw new NullPointerException("There is not content handler set");
+    }
     if (paused.compareAndSet(true, false)) {
       next();
     }

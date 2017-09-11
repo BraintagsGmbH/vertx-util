@@ -51,6 +51,17 @@ public class JsonReadStreamTest extends BtVertxTestBase {
     }
   }
 
+  @Test(expected = NullPointerException.class)
+  public void testStream_NoContentHandler(final TestContext context) throws IOException {
+    JsonReadStream<TestClass> jr = new JsonReadStream<>(objectList, false, true);
+    Async async = context.async();
+    jr.endHandler(end -> async.complete());
+    jr.exceptionHandler(new ErrorHandler(context, async));
+    Pump p = Pump.pump(jr, null);
+    p.start();
+    async.await();
+  }
+
   @Test
   public void testStream_Embedded_JsonConformNonPretty(final TestContext context) throws IOException {
     JsonReadStream<TestClass> jr = new JsonReadStream<>(objectList, false, true);
