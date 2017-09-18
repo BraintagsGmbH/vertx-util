@@ -112,7 +112,7 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
         }
       }
 
-      b.appendString(pretty ? Json.encodePrettily(instance) : Json.encode(instance));
+      b.appendString(pretty ? encodeInstancePretty(instance) : encodeInstance(instance));
       if (array && !instances.hasNext()) {
         b.appendString(" ]");
       }
@@ -120,6 +120,26 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
     } catch (Exception e) {
       throw handleException(e);
     }
+  }
+
+  /**
+   * creates the output for one instance as pretty format
+   * 
+   * @param instance
+   * @return
+   */
+  protected String encodeInstancePretty(final T instance) {
+    return Json.encodePrettily(instance);
+  }
+
+  /**
+   * creates the output for one instance as strait format
+   * 
+   * @param instance
+   * @return
+   */
+  protected String encodeInstance(final T instance) {
+    return Json.encode(instance);
   }
 
   private RuntimeException handleException(final Exception e) {
