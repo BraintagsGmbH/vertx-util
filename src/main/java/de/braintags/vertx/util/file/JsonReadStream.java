@@ -113,8 +113,11 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
       }
 
       b.appendString(pretty ? encodeInstancePretty(instance) : encodeInstance(instance));
-      if (array && !instances.hasNext()) {
-        b.appendString(" ]");
+      if (!instances.hasNext()) {
+        if (array) {
+          b.appendString(" ]");
+        }
+        b.appendString("\n");
       }
       return b;
     } catch (Exception e) {
