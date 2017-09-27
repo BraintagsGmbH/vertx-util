@@ -20,6 +20,7 @@ import de.braintags.vertx.util.assertion.AssertTest;
 import de.braintags.vertx.util.codec.AbstractPojoCodecTest;
 import de.braintags.vertx.util.file.FileSystemUtilTest;
 import de.braintags.vertx.util.file.InputOutputStreamTest;
+import de.braintags.vertx.util.file.JsonReadStreamTest;
 import de.braintags.vertx.util.json.TJsonConverter;
 import de.braintags.vertx.util.json.deserializers.THttpServerOptionsDeserializer;
 import de.braintags.vertx.util.lock.AsyncReadWriteLockTest;
@@ -36,7 +37,8 @@ import de.braintags.vertx.util.tree.TreeTest;
 @RunWith(Suite.class)
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
-    CollectionAsyncTest.class, FileSystemUtilTest.class, InputOutputStreamTest.class, GeoLoationUtilTest.class,
+    CollectionAsyncTest.class, FileSystemUtilTest.class, InputOutputStreamTest.class, JsonReadStreamTest.class,
+    GeoLoationUtilTest.class,
     AbstractPojoCodecTest.class, AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class,
     VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class, TJsonConverter.class,
     THttpServerOptionsDeserializer.class })
