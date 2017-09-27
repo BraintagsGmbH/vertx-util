@@ -21,7 +21,7 @@ package de.braintags.vertx.util.geojson;
 public abstract class GeoJsonObject {
 
   /**
-   * Get the {@link GeoJsonType} which is covered by the imeplementation
+   * Get the {@link GeoJsonType} which is covered by the implementation
    * 
    * @return
    */
@@ -29,17 +29,12 @@ public abstract class GeoJsonObject {
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    return true;
+    return o != null && getClass() == o.getClass();
   }
 
   @Override
   public int hashCode() {
-    return 0;
+    return getClass().hashCode();
   }
+
 }
