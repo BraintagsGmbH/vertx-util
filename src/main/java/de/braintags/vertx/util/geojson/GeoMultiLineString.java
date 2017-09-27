@@ -64,24 +64,11 @@ public class GeoMultiLineString extends GeoJsonObject {
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
     if (!super.equals(o)) {
       return false;
     }
-
     GeoMultiLineString polygon = (GeoMultiLineString) o;
-
-    if (!coordinates.equals(polygon.coordinates)) {
-      return false;
-    }
-
-    return true;
+    return coordinates.equals(polygon.coordinates);
   }
 
   @Override

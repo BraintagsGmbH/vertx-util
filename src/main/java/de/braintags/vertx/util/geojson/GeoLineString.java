@@ -61,24 +61,12 @@ public class GeoLineString extends GeoJsonObject {
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
     if (!super.equals(o)) {
       return false;
     }
-
     GeoLineString lineString = (GeoLineString) o;
+    return coordinates.equals(lineString.coordinates);
 
-    if (!coordinates.equals(lineString.coordinates)) {
-      return false;
-    }
-
-    return true;
   }
 
   @Override
