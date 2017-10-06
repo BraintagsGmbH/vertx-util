@@ -72,12 +72,7 @@ public class TArrayMap {
     NestedMapObject testDataBase = buildNestedMapObject();
     NestedMapObject testData = buildNestedMapObject();
 
-    Iterator<Entry<MapContainer, MapContainer>> entryIterator = testData.map.entrySet().iterator();
-    Entry<MapContainer, MapContainer> firstEntry = entryIterator.next();
-    firstEntry.setValue(buildMapContainer("freshValue"));
-    Entry<MapContainer, MapContainer> secondEntry = entryIterator.next();
-    entryIterator.remove();
-    testData.map.put(buildMapContainer("NewKey2"), buildMapContainer("NewValue2"));
+    modifyMap(testData, "");
 
     JsonNode valueTreeBase = Json.mapper.valueToTree(testDataBase);
     JsonNode valueTreeData = Json.mapper.valueToTree(testData);
@@ -90,6 +85,37 @@ public class TArrayMap {
     Assert.assertEquals(testData, decodedTextData);
   }
 
+  @Test
+  public void testArrayMapSquashDiff() throws IOException {
+    NestedMapObject testDataBase = buildNestedMapObject();
+    NestedMapObject testData = buildNestedMapObject();
+
+    modifyMap(testData, "1");
+    JsonNode valueTreeBase = Json.mapper.valueToTree(testDataBase);
+    JsonNode valueTreeData = Json.mapper.valueToTree(testData);
+    modifyMap(testData, "2");
+    JsonNode secondModification = Json.mapper.valueToTree(testData);
+
+    JsonNode diff = JsonDiff.getDiff(valueTreeBase, valueTreeData);
+    JsonNode secondDiff = JsonDiff.getDiff(valueTreeData, secondModification);
+
+    diff = JsonDiff.squashDiff(diff, secondDiff);
+
+    JsonNode diffApplied = JsonDiff.applyDiff(valueTreeBase, diff);
+    Assert.assertEquals(secondModification, diffApplied);
+    NestedMapObject decodedTextData = Json.mapper.treeToValue(diffApplied, NestedMapObject.class);
+    Assert.assertEquals(testData, decodedTextData);
+  }
+
+  private void modifyMap(final NestedMapObject testData, final String suffix) {
+    Iterator<Entry<MapContainer, MapContainer>> entryIterator = testData.map.entrySet().iterator();
+    Entry<MapContainer, MapContainer> firstEntry = entryIterator.next();
+    firstEntry.setValue(buildMapContainer("freshValue" + suffix));
+    Entry<MapContainer, MapContainer> secondEntry = entryIterator.next();
+    entryIterator.remove();
+    testData.map.put(buildMapContainer("NewKey2" + suffix), buildMapContainer("NewValue2" + suffix));
+  }
+
   private NestedMapObject buildNestedMapObject() {
     NestedMapObject test = new NestedMapObject();
     test.map.put(buildMapContainer("Key1"), buildMapContainer("Value1"));
@@ -97,7 +123,7 @@ public class TArrayMap {
     return test;
   }
 
-  private MapContainer buildMapContainer(String prefix) {
+  private MapContainer buildMapContainer(final String prefix) {
     MapContainer test = new MapContainer();
     test.map.put(ComplexKey.create(prefix + "12345", "Hello", "World"), 10);
     return test;
@@ -121,7 +147,7 @@ public class TArrayMap {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
       if (this == obj)
         return true;
       if (obj == null)
@@ -162,7 +188,7 @@ public class TArrayMap {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
       if (this == obj)
         return true;
       if (obj == null)

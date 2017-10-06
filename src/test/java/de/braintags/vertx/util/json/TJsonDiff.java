@@ -30,9 +30,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import de.braintags.vertx.util.json.JsonDiff;
-
-public class JsonDiffTest {
+public class TJsonDiff {
 
   /**
    * Test method for {@link de.braintags.vertx.util.json.JsonDiff#getDiff(ObjectNode, ObjectNode, JsonNodeFactory)} and
@@ -246,6 +244,49 @@ public class JsonDiffTest {
     assertEquals(pojo, decodedPojo);
   }
 
+  /**
+   * Test method for {@link de.braintags.vertx.util.json.JsonDiff#squashDiff(JsonNode, JsonNode)}.
+   * 
+   * @throws JsonProcessingException
+   */
+  @Test
+  public void testSquashDiff() throws JsonProcessingException {
+    SimplePojo pojo = new SimplePojo();
+
+    SimplePojo recursive = new SimplePojo();
+    recursive.setInteger(42);
+    pojo.setRecursive(recursive);
+    pojo.setRemoved(new SimplePojo());
+    pojo.setInteger(10);
+    pojo.setString("Hello");
+    pojo.setArray(new ArrayList<>(Arrays.asList(new SimplePojo(41), new SimplePojo(42), new SimplePojo(43))));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode pojoJson = objectMapper.valueToTree(pojo);
+
+    recursive.setInteger(2);
+    recursive.setString("World");
+    pojo.setInteger(5);
+    ObjectNode modifiedPojoJson = objectMapper.valueToTree(pojo);
+
+    JsonNode diff = JsonDiff.getDiff(pojoJson, modifiedPojoJson, objectMapper.getNodeFactory());
+
+    pojo.setRemoved(null);
+    recursive.setInteger(5);
+    recursive.setString("Foo");
+    pojo.setInteger(10);
+    ObjectNode secondModification = objectMapper.valueToTree(pojo);
+
+    JsonNode secondDiff = JsonDiff.getDiff(modifiedPojoJson, secondModification, objectMapper.getNodeFactory());
+
+    diff = JsonDiff.squashDiff(diff, secondDiff);
+
+    pojoJson = (ObjectNode) JsonDiff.applyDiff(pojoJson, diff);
+    Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
+
+    assertEquals(pojo, decodedPojo);
+  }
+
   private static class SimplePojo {
 
     private SimplePojo recursive;
@@ -258,7 +299,7 @@ public class JsonDiffTest {
     public SimplePojo() {
     }
 
-    public SimplePojo(int integer) {
+    public SimplePojo(final int integer) {
       this.integer = integer;
     }
 
@@ -266,7 +307,7 @@ public class JsonDiffTest {
       return recursive;
     }
 
-    public void setRecursive(SimplePojo recursive) {
+    public void setRecursive(final SimplePojo recursive) {
       this.recursive = recursive;
     }
 
@@ -274,7 +315,7 @@ public class JsonDiffTest {
       return removed;
     }
 
-    public void setRemoved(SimplePojo removed) {
+    public void setRemoved(final SimplePojo removed) {
       this.removed = removed;
     }
 
@@ -282,7 +323,7 @@ public class JsonDiffTest {
       return integer;
     }
 
-    public void setInteger(int integer) {
+    public void setInteger(final int integer) {
       this.integer = integer;
     }
 
@@ -290,7 +331,7 @@ public class JsonDiffTest {
       return string;
     }
 
-    public void setString(String string) {
+    public void setString(final String string) {
       this.string = string;
     }
 
@@ -298,7 +339,7 @@ public class JsonDiffTest {
       return array;
     }
 
-    public void setArray(List<SimplePojo> array) {
+    public void setArray(final List<SimplePojo> array) {
       this.array = array;
     }
 
@@ -315,7 +356,7 @@ public class JsonDiffTest {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
       if (this == obj)
         return true;
       if (obj == null)
