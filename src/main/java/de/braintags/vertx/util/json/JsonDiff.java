@@ -42,6 +42,9 @@ import io.vertx.core.json.Json;
  */
 public class JsonDiff {
 
+  static final String VALUE = "value";
+  static final String DIFF = "diff";
+
   /**
    * Creates a diff from base to data.
    *
@@ -173,30 +176,29 @@ public class JsonDiff {
     return new ArrayMapNode(diffChildren);
   }
 
-  private static ObjectNode arrayDiff(final ArrayNode baseNode, final ArrayNode dataNode, final JsonNodeFactory nodeFactory,
+  private static ArrayNode arrayDiff(final ArrayNode baseNode, final ArrayNode dataNode,
+      final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
-    ObjectNode elements = nodeFactory.objectNode();
+    ArrayNode elements = nodeFactory.arrayNode(dataNode.size());
     boolean[] usedIndices = new boolean[baseNode.size()];
     for (int index = 0; index < dataNode.size(); index++) {
       JsonNode element = dataNode.get(index);
       int oldIndex = indexOf(baseNode, element, usedIndices);
       if (oldIndex >= 0) {
-        if (index != oldIndex) {
-          elements.set("#" + Integer.toString(index), nodeFactory.numberNode(oldIndex));
-        }
+        elements.add(nodeFactory.numberNode(oldIndex));
         usedIndices[oldIndex] = true;
       } else {
+        ObjectNode valueNode = nodeFactory.objectNode();
         if (baseNode.size() > index) {
           JsonNode diffEncoding = getDiff(baseNode.get(index), element, nodeFactory, arrayMapsConverted);
           assert diffEncoding != null;
-          elements.set(Integer.toString(index), diffEncoding);
+          valueNode.set(DIFF, diffEncoding);
         } else {
-          elements.set(Integer.toString(index), element.deepCopy());
+          valueNode.set(VALUE, element.deepCopy());
         }
+        elements.add(valueNode);
       }
     }
-    elements.set("size", nodeFactory.numberNode(dataNode.size()));
-
     return elements;
   }
 
@@ -244,8 +246,8 @@ public class JsonDiff {
 
     switch (nodeType) {
       case ARRAY:
-        if (diff.isObject()) {
-          applyArrayDiff((ArrayNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
+        if (diff.isArray()) {
+          applyArrayDiff((ArrayNode) base, (ArrayNode) diff, nodeFactory, arrayMapsConverted);
           return base;
         } else {
           return diff.deepCopy();
@@ -314,39 +316,27 @@ public class JsonDiff {
     }
   }
 
-  private static void applyArrayDiff(final ArrayNode baseNode, final ObjectNode diffNode,
+  private static void applyArrayDiff(final ArrayNode baseNode, final ArrayNode diff,
       final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
-    JsonNode[] newValues = new JsonNode[diffNode.get("size").intValue()];
-    for (int i = Math.min(newValues.length, baseNode.size()) - 1; i >= 0; i--) {
-      newValues[i] = baseNode.get(i);
-    }
-
-    Iterator<Entry<String, JsonNode>> iterator = diffNode.fields();
-    while (iterator.hasNext()) {
-      Entry<String, JsonNode> entry = iterator.next();
-      String fieldName = entry.getKey();
-      JsonNode value = entry.getValue();
-      if (fieldName.charAt(0) == '#') {
-        newValues[Integer.parseInt(fieldName.substring(1))] = baseNode.get(value.intValue());
-      } else if (! "size".equals( fieldName )) {
-        int index = Integer.parseInt(fieldName);
-        if (value.isObject() && index < baseNode.size()) {
-          JsonNode arrayValue = baseNode.get(index).deepCopy();
-          if (arrayValue.isObject()) {
-            internalApplyDiff(arrayValue, value, nodeFactory, arrayMapsConverted);
-            newValues[index] = arrayValue;
-          } else {
-            newValues[index] = value.deepCopy();
-          }
+    JsonNode[] newValues = new JsonNode[diff.size()];
+    for (int i = 0; i < diff.size(); i++) {
+      JsonNode diffNode = diff.get(i);
+      if (diffNode.isNumber()) {
+        newValues[i] = baseNode.get(diffNode.asInt());
+      } else {
+        ObjectNode obj = (ObjectNode) diffNode;
+        JsonNode valueDiff = obj.get(DIFF);
+        if (valueDiff != null) {
+          newValues[i] = internalApplyDiff(baseNode.get(i), valueDiff, nodeFactory, arrayMapsConverted);
         } else {
-          newValues[index] = value.deepCopy();
+          newValues[i] = obj.get(VALUE);
         }
       }
     }
 
     baseNode.removeAll();
-    baseNode.addAll(Arrays.asList(newValues).stream().filter(entry -> entry != null).collect(Collectors.toList()));
+    baseNode.addAll(Arrays.asList(newValues).stream().collect(Collectors.toList()));
   }
 
   /**
@@ -393,6 +383,9 @@ public class JsonDiff {
         } else {
           return diff.deepCopy();
         }
+      case ARRAY:
+        squashArrayDiff((ArrayNode) base, (ArrayNode) diff, nodeFactory, arrayMapsConverted);
+        return base;
       case BINARY:
       case BOOLEAN:
       case NULL:
@@ -441,6 +434,28 @@ public class JsonDiff {
         }
       }
     }
+  }
+
+  private static void squashArrayDiff(final ArrayNode base, final ArrayNode diff, final JsonNodeFactory nodeFactory,
+      final boolean arrayMapsConverted) {
+    JsonNode[] newValues = new JsonNode[diff.size()];
+    for (int i = 0; i < diff.size(); i++) {
+      JsonNode diffNode = diff.get(i);
+      if (diffNode.isNumber()) {
+        newValues[i] = base.get(diffNode.asInt());
+      } else {
+        ObjectNode obj = (ObjectNode) diffNode;
+        JsonNode valueDiff = obj.get(DIFF);
+        if (valueDiff != null) {
+          newValues[i] = internalSquashDiff(base.get(i), valueDiff, nodeFactory, arrayMapsConverted);
+        } else {
+          newValues[i] = obj.get(VALUE);
+        }
+      }
+    }
+
+    base.removeAll();
+    base.addAll(Arrays.asList(newValues).stream().collect(Collectors.toList()));
   }
 
 }
