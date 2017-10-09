@@ -44,6 +44,7 @@ public class JsonDiff {
 
   static final String VALUE = "value";
   static final String DIFF = "diff";
+  static final String INDEX = "index";
 
   /**
    * Creates a diff from base to data.
@@ -193,6 +194,7 @@ public class JsonDiff {
           JsonNode diffEncoding = getDiff(baseNode.get(index), element, nodeFactory, arrayMapsConverted);
           assert diffEncoding != null;
           valueNode.set(DIFF, diffEncoding);
+          valueNode.set(INDEX, nodeFactory.numberNode(index));
         } else {
           valueNode.set(VALUE, element.deepCopy());
         }
@@ -242,6 +244,10 @@ public class JsonDiff {
       } else {
         throw new IllegalArgumentException("nodeType is null and base and/or diff is not ArrayMapNode");
       }
+    }
+
+    if (nodeType != diff.getNodeType()) {
+      return diff.deepCopy();
     }
 
     switch (nodeType) {
@@ -328,7 +334,8 @@ public class JsonDiff {
         ObjectNode obj = (ObjectNode) diffNode;
         JsonNode valueDiff = obj.get(DIFF);
         if (valueDiff != null) {
-          newValues[i] = internalApplyDiff(baseNode.get(i), valueDiff, nodeFactory, arrayMapsConverted);
+          newValues[i] = internalApplyDiff(baseNode.get(obj.get(INDEX).intValue()).deepCopy(), valueDiff, nodeFactory,
+              arrayMapsConverted);
         } else {
           newValues[i] = obj.get(VALUE);
         }
@@ -445,9 +452,28 @@ public class JsonDiff {
         newValues[i] = base.get(diffNode.asInt());
       } else {
         ObjectNode obj = (ObjectNode) diffNode;
+
         JsonNode valueDiff = obj.get(DIFF);
         if (valueDiff != null) {
-          newValues[i] = internalSquashDiff(base.get(i), valueDiff, nodeFactory, arrayMapsConverted);
+          JsonNode baseNode = base.get(obj.get(INDEX).asInt());
+          if (baseNode.isNumber()) {
+            ObjectNode newDiff = obj.deepCopy();
+            newDiff.set(INDEX, baseNode.deepCopy());
+            newValues[i] = newDiff;
+          } else {
+            JsonNode baseValue = baseNode.get(DIFF);
+            if (baseValue != null) {
+              ObjectNode newValue = nodeFactory.objectNode();
+              newValue.set(DIFF, internalSquashDiff(baseValue, valueDiff, nodeFactory, arrayMapsConverted));
+              newValue.set(INDEX, baseNode.get(INDEX));
+              newValues[i] = newValue;
+            } else {
+              ObjectNode newValue = nodeFactory.objectNode();
+              newValue.set(VALUE,
+                  internalApplyDiff(baseNode.get(VALUE).deepCopy(), valueDiff, nodeFactory, arrayMapsConverted));
+              newValues[i] = newValue;
+            }
+          }
         } else {
           newValues[i] = obj.get(VALUE);
         }

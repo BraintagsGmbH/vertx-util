@@ -215,9 +215,9 @@ public class TJsonDiff {
     ObjectMapper objectMapper = new ObjectMapper();
     Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
-    JsonNode diff = JsonDiff.getDiff(pojos.getLeft(), pojos.getMiddle(), objectMapper.getNodeFactory());
+    JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
-    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft(), diff);
+    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
 
     assertEquals(pojos.getRight(), decodedPojo);
@@ -259,7 +259,7 @@ public class TJsonDiff {
     ObjectMapper objectMapper = new ObjectMapper();
     Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
-    JsonNode diff = JsonDiff.getDiff(pojos.getLeft(), pojos.getMiddle(), objectMapper.getNodeFactory());
+    JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
     SimplePojo pojo = pojos.getRight();
 
@@ -267,15 +267,17 @@ public class TJsonDiff {
     pojo.getRecursive().setInteger(5);
     pojo.getRecursive().setString("Foo");
     pojo.setInteger(10);
+    pojo.getArray().remove(0);
+    pojo.getArray().add(1, new SimplePojo(102));
     ObjectNode secondModification = objectMapper.valueToTree(pojo);
 
     JsonNode secondDiff = JsonDiff.getDiff(pojos.getMiddle(), secondModification, objectMapper.getNodeFactory());
 
     JsonNode squashedDiff = JsonDiff.squashDiff(diff, secondDiff);
 
-    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft(), squashedDiff);
-    Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
+    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), squashedDiff);
 
+    Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
     assertEquals(pojo, decodedPojo);
   }
 
