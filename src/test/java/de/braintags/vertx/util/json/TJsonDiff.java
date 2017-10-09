@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,9 +31,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import de.braintags.vertx.util.json.JsonDiff;
-
-public class JsonDiffTest {
+public class TJsonDiff {
 
   /**
    * Test method for {@link de.braintags.vertx.util.json.JsonDiff#getDiff(ObjectNode, ObjectNode, JsonNodeFactory)} and
@@ -182,22 +181,22 @@ public class JsonDiffTest {
     // check the diff
     assertTrue(diff.has("array"));
     JsonNode diffArray = diff.get("array");
-    assertTrue(diffArray.isObject());
-    assertTrue(diffArray.has("size"));
-    assertEquals(diffArray.get("size").intValue(), 5);
+    assertTrue(diffArray.isArray());
+    assertEquals(5, diffArray.size());
 
-    assertTrue(diffArray.has("0"));
-    JsonNode objectDiff = diffArray.get("0");
-    assertTrue(objectDiff.has("diffField"));
-    assertEquals(nc.numberNode(11), objectDiff.get("diffField"));
+    assertTrue(diffArray.get(0).isObject());
+    JsonNode objectDiff = diffArray.get(0);
+    assertTrue(objectDiff.has(JsonDiff.DIFF));
+    JsonNode innerDiff = objectDiff.get(JsonDiff.DIFF);
+    assertTrue(innerDiff.has("diffField"));
+    assertEquals(nc.numberNode(11), innerDiff.get("diffField"));
 
-    assertEquals(nc.numberNode(5), diffArray.get("#1"));
-    assertFalse(diffArray.has("#2")); // not changed
-    assertEquals(nc.numberNode(1), diffArray.get("#3"));
-    assertFalse(diffArray.has("#4")); // removed
-    assertFalse(diffArray.has("#5")); // removed
-
-    assertEquals(diffArray.get("4"), nc.numberNode(5));
+    assertEquals(nc.numberNode(5), diffArray.get(1));
+    assertEquals(nc.numberNode(2), diffArray.get(2)); // not changed
+    assertEquals(nc.numberNode(1), diffArray.get(3));
+    JsonNode numberDiff = diffArray.get(4);
+    assertTrue(numberDiff.has(JsonDiff.DIFF));
+    assertEquals(nc.numberNode(5), numberDiff.get(JsonDiff.DIFF));
 
     // apply diff and compare
     ObjectNode undiff = baseBackup.deepCopy();
@@ -213,6 +212,18 @@ public class JsonDiffTest {
    */
   @Test
   public void testPojoDiff() throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
+
+    JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
+
+    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
+    Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
+
+    assertEquals(pojos.getRight(), decodedPojo);
+  }
+
+  private Triple<JsonNode, JsonNode, SimplePojo> getDiffPojos(final ObjectMapper objectMapper) {
     SimplePojo pojo = new SimplePojo();
 
     SimplePojo recursive = new SimplePojo();
@@ -222,8 +233,6 @@ public class JsonDiffTest {
     pojo.setInteger(10);
     pojo.setString("Hello");
     pojo.setArray(new ArrayList<>(Arrays.asList(new SimplePojo(41), new SimplePojo(42), new SimplePojo(43))));
-
-    ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode pojoJson = objectMapper.valueToTree(pojo);
 
     pojo.setRemoved(null);
@@ -235,14 +244,40 @@ public class JsonDiffTest {
     pojo.getArray().add(1, new SimplePojo(102));
     pojo.getArray().add(1, new SimplePojo(103));
     pojo.getArray().get(3).setString("Hello");
-
     ObjectNode modifiedPojoJson = objectMapper.valueToTree(pojo);
+    
+    return Triple.of(pojoJson, modifiedPojoJson, pojo);
+  }
 
-    JsonNode diff = JsonDiff.getDiff(pojoJson, modifiedPojoJson, objectMapper.getNodeFactory());
+  /**
+   * Test method for {@link de.braintags.vertx.util.json.JsonDiff#squashDiff(JsonNode, JsonNode)}.
+   * 
+   * @throws JsonProcessingException
+   */
+  @Test
+  public void testSquashDiff() throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
-    pojoJson = (ObjectNode) JsonDiff.applyDiff(pojoJson, diff);
+    JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
+
+    SimplePojo pojo = pojos.getRight();
+
+    pojo.setRemoved(null);
+    pojo.getRecursive().setInteger(5);
+    pojo.getRecursive().setString("Foo");
+    pojo.setInteger(10);
+    pojo.getArray().remove(0);
+    pojo.getArray().add(1, new SimplePojo(102));
+    ObjectNode secondModification = objectMapper.valueToTree(pojo);
+
+    JsonNode secondDiff = JsonDiff.getDiff(pojos.getMiddle(), secondModification, objectMapper.getNodeFactory());
+
+    JsonNode squashedDiff = JsonDiff.squashDiff(diff, secondDiff);
+
+    ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), squashedDiff);
+
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
-
     assertEquals(pojo, decodedPojo);
   }
 
@@ -258,7 +293,7 @@ public class JsonDiffTest {
     public SimplePojo() {
     }
 
-    public SimplePojo(int integer) {
+    public SimplePojo(final int integer) {
       this.integer = integer;
     }
 
@@ -266,7 +301,7 @@ public class JsonDiffTest {
       return recursive;
     }
 
-    public void setRecursive(SimplePojo recursive) {
+    public void setRecursive(final SimplePojo recursive) {
       this.recursive = recursive;
     }
 
@@ -274,7 +309,7 @@ public class JsonDiffTest {
       return removed;
     }
 
-    public void setRemoved(SimplePojo removed) {
+    public void setRemoved(final SimplePojo removed) {
       this.removed = removed;
     }
 
@@ -282,7 +317,7 @@ public class JsonDiffTest {
       return integer;
     }
 
-    public void setInteger(int integer) {
+    public void setInteger(final int integer) {
       this.integer = integer;
     }
 
@@ -290,7 +325,7 @@ public class JsonDiffTest {
       return string;
     }
 
-    public void setString(String string) {
+    public void setString(final String string) {
       this.string = string;
     }
 
@@ -298,7 +333,7 @@ public class JsonDiffTest {
       return array;
     }
 
-    public void setArray(List<SimplePojo> array) {
+    public void setArray(final List<SimplePojo> array) {
       this.array = array;
     }
 
@@ -315,7 +350,7 @@ public class JsonDiffTest {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
       if (this == obj)
         return true;
       if (obj == null)
