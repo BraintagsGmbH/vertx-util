@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -343,7 +342,7 @@ public class JsonDiff {
     }
 
     baseNode.removeAll();
-    baseNode.addAll(Arrays.asList(newValues).stream().collect(Collectors.toList()));
+    baseNode.addAll(Arrays.asList(newValues));
   }
 
   /**
@@ -481,7 +480,7 @@ public class JsonDiff {
     }
 
     base.removeAll();
-    base.addAll(Arrays.asList(newValues).stream().collect(Collectors.toList()));
+    base.addAll(Arrays.asList(newValues));
   }
 
 }
