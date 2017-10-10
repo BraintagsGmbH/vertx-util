@@ -149,8 +149,8 @@ public class JsonDiff {
     return diff;
   }
 
-  private static ArrayMapNode arrayMapDiff(final ArrayMapNode base, final ArrayMapNode data, final JsonNodeFactory nodeFactory,
-      final boolean arrayMapsConverted) {
+  private static ArrayMapNode arrayMapDiff(final ArrayMapNode base, final ArrayMapNode data,
+      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     Map<JsonNode, JsonNode> diffChildren = new LinkedHashMap<>();
 
     Map<JsonNode, JsonNode> baseChildren = base.getChildren();
@@ -177,8 +177,7 @@ public class JsonDiff {
   }
 
   private static ArrayNode arrayDiff(final ArrayNode baseNode, final ArrayNode dataNode,
-      final JsonNodeFactory nodeFactory,
-      final boolean arrayMapsConverted) {
+      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     ArrayNode elements = nodeFactory.arrayNode(dataNode.size());
     boolean[] usedIndices = new boolean[baseNode.size()];
     for (int index = 0; index < dataNode.size(); index++) {
@@ -229,7 +228,8 @@ public class JsonDiff {
     return internalApplyDiff(base, diff, Json.mapper.getNodeFactory(), false);
   }
 
-  private static JsonNode internalApplyDiff(final JsonNode base, final JsonNode diff, final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
+  private static JsonNode internalApplyDiff(final JsonNode base, final JsonNode diff, final JsonNodeFactory nodeFactory,
+      final boolean arrayMapsConverted) {
     if (base.isNull()) {
       return diff.deepCopy();
     }
@@ -292,7 +292,7 @@ public class JsonDiff {
       JsonNode baseNode = base.get(fieldName);
       JsonNode diffNode = diffField.getValue();
       if (baseNode != null) {
-        base.set(fieldName, internalApplyDiff(baseNode, diffNode,nodeFactory, arrayMapsConverted));
+        base.set(fieldName, internalApplyDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
       } else {
         base.set(fieldName, diffNode.deepCopy());
       }
@@ -300,8 +300,7 @@ public class JsonDiff {
   }
 
   private static void applyArrayMapDiff(final ArrayMapNode base, final ArrayMapNode diff,
-      final JsonNodeFactory nodeFactory,
-      final boolean arrayMapsConverted) {
+      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     if (diff == null) {
       return;
     }
@@ -321,8 +320,7 @@ public class JsonDiff {
     }
   }
 
-  private static void applyArrayDiff(final ArrayNode baseNode, final ArrayNode diff,
-      final JsonNodeFactory nodeFactory,
+  private static void applyArrayDiff(final ArrayNode baseNode, final ArrayNode diff, final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
     JsonNode[] newValues = new JsonNode[diff.size()];
     for (int i = 0; i < diff.size(); i++) {
@@ -483,5 +481,12 @@ public class JsonDiff {
     base.addAll(Arrays.asList(newValues));
   }
 
+  public static JsonNode getEmptyDiff(final JsonNodeFactory nodeFactory) {
+    return nodeFactory.objectNode();
+  }
+
+  public static JsonNode getEmptyDiff() {
+    return getEmptyDiff(Json.mapper.getNodeFactory());
+  }
+
 }
- 
