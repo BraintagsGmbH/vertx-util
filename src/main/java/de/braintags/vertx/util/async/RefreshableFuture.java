@@ -4,6 +4,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
 /**
  * This class acts as a self-refreshing cache for futures. <br>
  * If the limit of the cacheable future expires, the future will be recreated in the background and the new future
@@ -16,6 +19,8 @@ import java.util.function.Supplier;
  * @param <T>
  */
 public class RefreshableFuture<T> {
+
+  private static final Logger logger = LoggerFactory.getLogger(RefreshableFuture.class);
 
   private final long hardLimit;
   private final Function<T, Boolean> shouldRefreshFilter;
@@ -90,6 +95,8 @@ public class RefreshableFuture<T> {
           this.softExpires = newFuture.expires();
           this.hardExpires = System.currentTimeMillis() + hardLimit;
           this.currentFuture = newFuture;
+        } else {
+          logger.error("Error soft-refreshing future", res.cause());
         }
         refreshing.set(false);
       });
