@@ -79,9 +79,10 @@ public class RefreshableFuture<T> {
     if (shouldRefreshFilter != null && currentFuture.succeeded() && !shouldRefreshFilter.apply(currentFuture.result()))
       return currentFuture;
 
-    if (System.currentTimeMillis() > hardExpires) {
+    long currentTimeMillis = System.currentTimeMillis();
+    if (currentTimeMillis > hardExpires) {
       hardRefresh();
-    } else if (System.currentTimeMillis() > softExpires) {
+    } else if (currentTimeMillis > softExpires) {
       softRefresh();
     }
     return currentFuture;
