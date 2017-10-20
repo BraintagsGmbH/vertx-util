@@ -27,8 +27,7 @@ public class RefreshableFuture<T> {
   private final Supplier<CacheableFuture<T>> supplier;
   private final AtomicBoolean refreshing = new AtomicBoolean(false);
 
-  private long softExpires;
-  private long hardExpires;
+  private volatile long hardExpires;
   private CacheableFuture<T> currentFuture;
 
   /**
@@ -59,9 +58,7 @@ public class RefreshableFuture<T> {
     this.hardLimit = hardLimit;
     this.shouldRefreshFilter = shouldRefreshFilter;
     this.currentFuture = supplier.get();
-    this.softExpires = currentFuture.expires();
     this.hardExpires = System.currentTimeMillis() + hardLimit;
-    assert this.softExpires <= this.hardExpires;
     this.supplier = supplier;
   }
 
@@ -76,13 +73,14 @@ public class RefreshableFuture<T> {
    * @return a valid future
    */
   public CacheableFuture<T> get() {
-    if (shouldRefreshFilter != null && currentFuture.succeeded() && !shouldRefreshFilter.apply(currentFuture.result()))
+    if (!currentFuture.isComplete() || (shouldRefreshFilter != null && currentFuture.succeeded()
+        && !shouldRefreshFilter.apply(currentFuture.result())))
       return currentFuture;
 
     long currentTimeMillis = System.currentTimeMillis();
     if (currentTimeMillis > hardExpires) {
       hardRefresh();
-    } else if (currentTimeMillis > softExpires) {
+    } else if (currentTimeMillis > currentFuture.expires()) {
       softRefresh();
     }
     return currentFuture;
@@ -93,7 +91,6 @@ public class RefreshableFuture<T> {
       CacheableFuture<T> newFuture = supplier.get();
       newFuture.setHandler(res -> {
         if (res.succeeded()) {
-          this.softExpires = newFuture.expires();
           this.hardExpires = System.currentTimeMillis() + hardLimit;
           this.currentFuture = newFuture;
         } else {
@@ -107,7 +104,6 @@ public class RefreshableFuture<T> {
   private synchronized void hardRefresh() {
     if (System.currentTimeMillis() > hardExpires) {
       CacheableFuture<T> newFuture = supplier.get();
-      this.softExpires = newFuture.expires();
       this.hardExpires = System.currentTimeMillis() + hardLimit;
       this.currentFuture = newFuture;
       refreshing.set(false);
