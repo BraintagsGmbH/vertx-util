@@ -22,7 +22,7 @@ import io.vertx.core.impl.NoStackTraceThrowable;
 
 /**
  * Implementation of future which is thread safe and supports multiple handlers (set handler is add handler);
- * 
+ *
  * @author mpluecker
  *
  * @param <T>
@@ -44,7 +44,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /**
    * Create a SharedFuture that has already succeeded
-   * 
+   *
    * @param result
    *          The result
    */
@@ -55,7 +55,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /**
    * Create a SharedFuture that has already failed
-   * 
+   *
    * @param cause
    *          The cause
    */
@@ -63,7 +63,6 @@ public class SharedFuture<T> implements Future<T> {
     this();
     fail(cause);
   }
-
 
   /**
    * The result of the operation. This will be null if the operation failed.
@@ -159,7 +158,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Future#tryComplete(java.lang.Object)
    */
   @Override
@@ -174,7 +173,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Future#tryComplete()
    */
   @Override
@@ -184,7 +183,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Future#tryFail(java.lang.Throwable)
    */
   @Override
@@ -206,7 +205,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Future#tryFail(java.lang.String)
    */
   @Override
@@ -216,7 +215,7 @@ public class SharedFuture<T> implements Future<T> {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Future#handle(io.vertx.core.AsyncResult)
    */
   @Override
@@ -225,6 +224,12 @@ public class SharedFuture<T> implements Future<T> {
       complete(asyncResult.result());
     else
       fail(asyncResult.cause());
+  }
+
+  public static <T> SharedFuture<T> wrap(final Future<T> future) {
+    SharedFuture<T> f = new SharedFuture<>();
+    future.setHandler(f);
+    return f;
   }
 
 }
