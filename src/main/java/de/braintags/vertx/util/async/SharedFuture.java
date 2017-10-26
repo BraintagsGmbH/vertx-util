@@ -1,235 +1,67 @@
-/*-
- * #%L
- * Vert.x utilities from Braintags
- * %%
- * Copyright (C) 2017 Braintags GmbH
- * %%
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * #L%
- */
 package de.braintags.vertx.util.async;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.impl.NoStackTraceThrowable;
 
 /**
- * Implementation of future which is thread safe and supports multiple handlers (set handler is add handler);
- *
+ * Future of an asynchronous process whose result can be cached.
+ * This results specifies how long it can be cached via the expires field.
+ * 
  * @author mpluecker
  *
  * @param <T>
  */
-public class SharedFuture<T> implements Future<T> {
+public interface SharedFuture<T> extends Future<T> {
 
-  protected boolean failed;
-  protected boolean succeeded;
-  private final List<Handler<AsyncResult<T>>> handlers;
-  protected T result;
-  protected Throwable throwable;
-
-  /**
-   * Create a FutureResult that hasn't completed yet
-   */
-  public SharedFuture() {
-    handlers = new ArrayList<>();
-  }
-
-  /**
-   * Create a SharedFuture that has already succeeded
-   *
-   * @param result
-   *          The result
-   */
-  public SharedFuture(final T result) {
-    this();
-    complete(result);
-  }
-
-  /**
-   * Create a SharedFuture that has already failed
-   *
-   * @param cause
-   *          The cause
-   */
-  public SharedFuture(final Throwable cause) {
-    this();
-    fail(cause);
-  }
-
-  /**
-   * The result of the operation. This will be null if the operation failed.
-   */
-  @Override
-  public T result() {
-    return result;
-  }
-
-  /**
-   * An exception describing failure. This will be null if the operation succeeded.
-   */
-  @Override
-  public Throwable cause() {
-    return throwable;
-  }
-
-  /**
-   * Did it succeeed?
-   */
-  @Override
-  public boolean succeeded() {
-    return succeeded;
-  }
-
-  /**
-   * Did it fail?
-   */
-  @Override
-  public boolean failed() {
-    return failed;
-  }
-
-  /**
-   * Has it completed?
-   */
-  @Override
-  public boolean isComplete() {
-    return failed || succeeded;
-  }
-
-  /**
-   * Set a handler for the result. It will get called when it's complete
-   */
-  @Override
-  public Future<T> setHandler(final Handler<AsyncResult<T>> handler) {
-    return addHandler(handler);
-  }
-
-  public Future<T> addHandler(final Handler<AsyncResult<T>> handler) {
-    boolean handleImmediately;
-    synchronized (this) {
-      if (handler != null && isComplete()) {
-        handleImmediately = true;
-      } else {
-        handlers.add(handler);
-        handleImmediately = false;
-      }
+  public static <T> SharedFuture<T> toCacheable(final Future<T> future) {
+    if (future instanceof SharedFuture) {
+      return (SharedFuture<T>) future;
+    } else {
+      SharedFuture<T> res = SharedFuture.future();
+      future.setHandler(res);
+      return res;
     }
-    if (handleImmediately) {
-      handler.handle(this);
-    }
-    return this;
   }
 
-  /**
-   * Set the result. Any handler will be called, if there is one
-   */
-  @Override
-  public void complete(final T result) {
-    if (!tryComplete(result))
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  public static <T> SharedFuture<T> future() {
+    return new SharedFutureImpl<>();
   }
 
-  @Override
-  public void complete() {
-    complete(null);
+  public static <T> SharedFuture<T> succeededFuture(final T result) {
+    return new SharedFutureImpl<>(result);
   }
 
-  /**
-   * Set the failure. Any handler will be called, if there is one
-   */
-  @Override
-  public void fail(final Throwable throwable) {
-    if (!tryFail(throwable))
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  public static <T> SharedFuture<T> failedFuture(final Throwable cause) {
+    return new SharedFutureImpl<>(cause);
   }
 
   @Override
-  public void fail(final String failureMessage) {
-    fail(new NoStackTraceThrowable(failureMessage));
-  }
+  <U> SharedFuture<U> compose(final Function<T, Future<U>> mapper);
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see io.vertx.core.Future#tryComplete(java.lang.Object)
-   */
   @Override
-  public synchronized boolean tryComplete(final T result) {
-    if (isComplete())
-      return false;
-    this.result = result;
-    succeeded = true;
-    callHandlers();
-    return true;
-  }
+  <U> SharedFuture<U> map(final Function<T, U> mapper);
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see io.vertx.core.Future#tryComplete()
-   */
   @Override
-  public boolean tryComplete() {
-    return tryComplete(null);
-  }
+  <V> SharedFuture<V> map(final V value);
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see io.vertx.core.Future#tryFail(java.lang.Throwable)
-   */
   @Override
-  public synchronized boolean tryFail(final Throwable cause) {
-    if (isComplete())
-      return false;
-    this.throwable = cause;
-    failed = true;
-    callHandlers();
-    return true;
-  }
+  SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper);
 
-  protected synchronized void callHandlers() {
-    for (Handler<AsyncResult<T>> handler : handlers) {
-      handler.handle(this);
-    }
-    handlers.clear();
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see io.vertx.core.Future#tryFail(java.lang.String)
-   */
   @Override
-  public boolean tryFail(final String failureMessage) {
-    return tryFail(new NoStackTraceThrowable(failureMessage));
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see io.vertx.core.Future#handle(io.vertx.core.AsyncResult)
-   */
-  @Override
-  public void handle(final AsyncResult<T> asyncResult) {
-    if (asyncResult.succeeded())
-      complete(asyncResult.result());
-    else
-      fail(asyncResult.cause());
-  }
+  <V> SharedFuture<V> mapEmpty();
 
   public static <T> SharedFuture<T> wrap(final Future<T> future) {
-    SharedFuture<T> f = new SharedFuture<>();
+    SharedFuture<T> f = new SharedFutureImpl<>();
     future.setHandler(f);
     return f;
   }
+
+  @Override
+  SharedFuture<T> setHandler(Handler<AsyncResult<T>> handler);
+
+  SharedFuture<T> addHandler(Handler<AsyncResult<T>> asyncAssertSuccess);
 
 }
