@@ -289,7 +289,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
 
   @Override
   public <V> SharedFuture<V> mapEmpty() {
-    return map(null);
+    return map((V) null);
   }
 
   @Override

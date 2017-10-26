@@ -42,7 +42,11 @@ public class JsonConfig {
     configureObjectMapper(Json.prettyMapper);
   }
 
-  public static synchronized void configureObjectMapper(ObjectMapper mapper) {
+  public static void staticInit() {
+
+  }
+
+  public static synchronized void configureObjectMapper(final ObjectMapper mapper) {
     for (WeakReference<ObjectMapper> objectMapper : objectMappers) {
       if (objectMapper.get() == mapper) {
         return;
@@ -55,7 +59,7 @@ public class JsonConfig {
     }
   }
 
-  public static synchronized void addConfig(Config config) {
+  public static synchronized void addConfig(final Config config) {
     if (configs.contains(config)) {
       return;
     }
@@ -77,4 +81,5 @@ public class JsonConfig {
   public interface Config {
     void configure(ObjectMapper mapper);
   }
+
 }
