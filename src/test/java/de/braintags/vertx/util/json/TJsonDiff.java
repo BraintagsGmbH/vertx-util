@@ -213,7 +213,7 @@ public class TJsonDiff {
   @Test
   public void testPojoDiff() throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
+    Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
@@ -223,7 +223,7 @@ public class TJsonDiff {
     assertEquals(pojos.getRight(), decodedPojo);
   }
 
-  private Triple<JsonNode, JsonNode, SimplePojo> getDiffPojos(final ObjectMapper objectMapper) {
+  private Triple<ObjectNode, ObjectNode, SimplePojo> getDiffPojos(final ObjectMapper objectMapper) {
     SimplePojo pojo = new SimplePojo();
 
     SimplePojo recursive = new SimplePojo();
@@ -257,7 +257,7 @@ public class TJsonDiff {
   @Test
   public void testSquashDiff() throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    Triple<JsonNode, JsonNode, SimplePojo> pojos = getDiffPojos(objectMapper);
+    Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
@@ -279,6 +279,30 @@ public class TJsonDiff {
 
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
     assertEquals(pojo, decodedPojo);
+  }
+
+  /**
+   * Test method for {@link de.braintags.vertx.util.json.JsonDiff#retainDiffTree(JsonNode, JsonNode, JsonNode)}.
+   * 
+   * @throws JsonProcessingException
+   */
+  @Test
+  public void testRetainDiffTree() throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
+
+    ObjectNode diff = (ObjectNode) JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(),
+        objectMapper.getNodeFactory());
+
+    diff.remove("array");
+    ObjectNode secondDiff = diff.deepCopy();
+    secondDiff.remove("removed");
+    ObjectNode recursive = (ObjectNode) secondDiff.get("recursive");
+    recursive.remove("integer");
+    secondDiff.remove("integer");
+    secondDiff = (ObjectNode) JsonDiff.retainDiffTree(pojos.getLeft(), diff, secondDiff);
+
+    assertEquals(diff, secondDiff);
   }
 
   private static class SimplePojo {
