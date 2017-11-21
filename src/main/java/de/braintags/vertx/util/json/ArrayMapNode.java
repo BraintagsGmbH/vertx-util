@@ -31,7 +31,7 @@ class ArrayMapNode extends ValueNode {
 
   private final Map<JsonNode, JsonNode> children;
 
-  public static boolean isArrayMapNode(JsonNode node) {
+  public static boolean isArrayMapNode(final JsonNode node) {
     if (node.isObject() && node.size() == 1) {
       Entry<String, JsonNode> arrayMapField = node.fields().next();
       return arrayMapField.getKey().equals(ArrayMapSerializer.ARRAY_MAP) && arrayMapField.getValue().isArray();
@@ -39,7 +39,7 @@ class ArrayMapNode extends ValueNode {
     return false;
   }
 
-  public static JsonNode deepConvertNode(JsonNode node) {
+  public static JsonNode deepConvertNode(final JsonNode node) {
     if (node.isObject()) {
       if (node.size() == 1) {
         Entry<String, JsonNode> arrayMapField = node.fields().next();
@@ -55,7 +55,8 @@ class ArrayMapNode extends ValueNode {
     }
   }
 
-  private static JsonNode convertArrayNode(ArrayNode node) {
+
+  private static JsonNode convertArrayNode(final ArrayNode node) {
     ArrayNode modified = null;
     for (int i = node.size() - 1; i >= 0; i--) {
       JsonNode oldNode = node.get(i);
@@ -70,7 +71,7 @@ class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static JsonNode convertObjNode(ObjectNode node) {
+  private static JsonNode convertObjNode(final ObjectNode node) {
     ObjectNode modified = null;
     Iterator<Entry<String, JsonNode>> fielditer = node.fields();
     while (fielditer.hasNext()) {
@@ -87,7 +88,8 @@ class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static ArrayMapNode convertToArrayNode(JsonNode node, Entry<String, JsonNode> arrayMapField) {
+  private static ArrayMapNode convertToArrayNode(final JsonNode node,
+      final Entry<String, JsonNode> arrayMapField) {
     Map<JsonNode, JsonNode> children = new LinkedHashMap<>();
     ArrayNode entries = (ArrayNode) arrayMapField.getValue();
     for (JsonNode e : entries) {
@@ -118,7 +120,7 @@ class ArrayMapNode extends ValueNode {
     return new ArrayMapNode(children);
   }
 
-  public static JsonNode toRegularNode(JsonNode node, JsonNodeCreator nodeFactory) {
+  public static JsonNode toRegularNode(final JsonNode node, final JsonNodeCreator nodeFactory) {
     if (node.isObject()) {
       return toRegularNode((ObjectNode) node, nodeFactory);
     } else if (node.isArray()) {
@@ -130,7 +132,7 @@ class ArrayMapNode extends ValueNode {
     }
   }
 
-  public static ObjectNode toRegularNode(ArrayMapNode node, JsonNodeCreator nodeFactory) {
+  public static ObjectNode toRegularNode(final ArrayMapNode node, final JsonNodeCreator nodeFactory) {
     ArrayNode childrenNode = nodeFactory.arrayNode();
     for (Map.Entry<JsonNode, JsonNode> en : node.children.entrySet()) {
       ObjectNode entryNode = nodeFactory.objectNode();
@@ -144,7 +146,7 @@ class ArrayMapNode extends ValueNode {
     return result;
   }
 
-  private static JsonNode toRegularNode(ArrayNode node, JsonNodeCreator nodeFactory) {
+  private static JsonNode toRegularNode(final ArrayNode node, final JsonNodeCreator nodeFactory) {
     ArrayNode modified = null;
     for (int i = node.size() - 1; i >= 0; i--) {
       JsonNode oldNode = node.get(i);
@@ -159,7 +161,7 @@ class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static JsonNode toRegularNode(ObjectNode node, JsonNodeCreator nodeFactory) {
+  private static JsonNode toRegularNode(final ObjectNode node, final JsonNodeCreator nodeFactory) {
     ObjectNode modified = null;
     Iterator<Entry<String, JsonNode>> fielditer = node.fields();
     while (fielditer.hasNext()) {
@@ -180,7 +182,10 @@ class ArrayMapNode extends ValueNode {
     children = new LinkedHashMap<>();
   }
 
-  public ArrayMapNode(Map<JsonNode, JsonNode> children) {
+  public ArrayMapNode(final Map<JsonNode, JsonNode> children) {
+    if (children.values().contains(null)) {
+      throw new IllegalStateException();
+    }
     this.children = children;
   }
 
@@ -189,13 +194,14 @@ class ArrayMapNode extends ValueNode {
    * all of its descendants using specified JSON generator.
    */
   @Override
-  public void serialize(JsonGenerator g, SerializerProvider provider) throws IOException {
+  public void serialize(final JsonGenerator g, final SerializerProvider provider)
+      throws IOException {
     g.writeStartObject();
     innerSerialize(g, provider);
     g.writeEndObject();
   }
 
-  private void innerSerialize(JsonGenerator g, SerializerProvider provider) throws IOException {
+  private void innerSerialize(final JsonGenerator g, final SerializerProvider provider) throws IOException {
     g.writeFieldName(ArrayMapSerializer.ARRAY_MAP);
     g.writeStartArray();
     for (Map.Entry<JsonNode, JsonNode> en : children.entrySet()) {
@@ -210,7 +216,8 @@ class ArrayMapNode extends ValueNode {
   }
 
   @Override
-  public void serializeWithType(JsonGenerator g, SerializerProvider provider, TypeSerializer typeSer)
+  public void serializeWithType(final JsonGenerator g, final SerializerProvider provider,
+      final TypeSerializer typeSer)
       throws IOException {
     typeSer.writeTypePrefixForObject(this, g);
     innerSerialize(g, provider);
@@ -248,7 +255,7 @@ class ArrayMapNode extends ValueNode {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (o == this)
       return true;
     if (o == null)
@@ -262,12 +269,12 @@ class ArrayMapNode extends ValueNode {
   /**
    * @since 2.3
    */
-  protected boolean _childrenEqual(ArrayMapNode other) {
+  protected boolean _childrenEqual(final ArrayMapNode other) {
     return children.equals(other.children);
   }
 
   @Override
-  public boolean equals(Comparator<JsonNode> comparator, JsonNode o) {
+  public boolean equals(final Comparator<JsonNode> comparator, final JsonNode o) {
     if (!(o instanceof ArrayMapNode)) {
       return false;
     }
@@ -334,5 +341,6 @@ class ArrayMapNode extends ValueNode {
   public String asText() {
     return "";
   }
+
 
 }

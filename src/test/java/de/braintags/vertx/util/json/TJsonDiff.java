@@ -14,6 +14,7 @@ package de.braintags.vertx.util.json;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +33,20 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import de.braintags.vertx.util.json.deserializers.ArrayMap;
+import de.braintags.vertx.util.json.deserializers.ArrayMapSerializer;
+import de.braintags.vertx.util.json.deserializers.ComplexKey;
+import io.vertx.core.json.Json;
+
 public class TJsonDiff {
+
+  private static final ComplexKey ARRAY_MAP_KEY_1 = ComplexKey.create("Key1", "foo", "bar");
+  private static final ComplexKey ARRAY_MAP_KEY_REMOVED = ComplexKey.create("Key_Removed", "Hello", "World");
+
+  @BeforeClass
+  public static void setup() {
+    JsonConfig.staticInit();
+  }
 
   /**
    * Test method for {@link de.braintags.vertx.util.json.JsonDiff#getDiff(ObjectNode, ObjectNode, JsonNodeFactory)} and
@@ -212,12 +227,15 @@ public class TJsonDiff {
    */
   @Test
   public void testPojoDiff() throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = Json.mapper;
     Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
     ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
+    System.out.println(Json.prettyMapper.writeValueAsString(pojos.getLeft()));
+    System.out.println(Json.prettyMapper.writeValueAsString(diff));
+    System.out.println(Json.prettyMapper.writeValueAsString(pojoJson));
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
 
     assertEquals(pojos.getRight(), decodedPojo);
@@ -233,6 +251,18 @@ public class TJsonDiff {
     pojo.setInteger(10);
     pojo.setString("Hello");
     pojo.setArray(new ArrayList<>(Arrays.asList(new SimplePojo(41), new SimplePojo(42), new SimplePojo(43))));
+    ArrayMap<ComplexKey, SimplePojo> arrayMap = new ArrayMap<>();
+
+    SimplePojo pojo1 = new SimplePojo();
+    SimplePojo pojoRemoved = new SimplePojo();
+
+    pojo1.string = "POJO 1";
+    pojo1.integer = 10;
+    pojoRemoved.string = "POJO 2";
+    arrayMap.put(ARRAY_MAP_KEY_1, pojo1);
+    arrayMap.put(ARRAY_MAP_KEY_REMOVED, pojoRemoved);
+
+    pojo.setArrayMap(arrayMap);
     ObjectNode pojoJson = objectMapper.valueToTree(pojo);
 
     pojo.setRemoved(null);
@@ -244,8 +274,10 @@ public class TJsonDiff {
     pojo.getArray().add(1, new SimplePojo(102));
     pojo.getArray().add(1, new SimplePojo(103));
     pojo.getArray().get(3).setString("Hello");
+    pojo1.string = "POJO 1 Modified";
+    arrayMap.remove(ARRAY_MAP_KEY_REMOVED);
     ObjectNode modifiedPojoJson = objectMapper.valueToTree(pojo);
-
+    
     return Triple.of(pojoJson, modifiedPojoJson, pojo);
   }
 
@@ -256,7 +288,7 @@ public class TJsonDiff {
    */
   @Test
   public void testSquashDiff() throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = Json.mapper;
     Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
@@ -269,6 +301,11 @@ public class TJsonDiff {
     pojo.setInteger(10);
     pojo.getArray().remove(0);
     pojo.getArray().add(1, new SimplePojo(102));
+
+    SimplePojo arrayMapPojo = pojo.getArrayMap().get(ARRAY_MAP_KEY_1);
+    arrayMapPojo.string = "POJO Second Modification";
+    arrayMapPojo.integer = 20;
+
     ObjectNode secondModification = objectMapper.valueToTree(pojo);
 
     JsonNode secondDiff = JsonDiff.getDiff(pojos.getMiddle(), secondModification, objectMapper.getNodeFactory());
@@ -288,11 +325,12 @@ public class TJsonDiff {
    */
   @Test
   public void testRetainDiffTree() throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = Json.mapper;
     Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     ObjectNode diff = (ObjectNode) JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(),
         objectMapper.getNodeFactory());
+
 
     diff.remove("array");
     ObjectNode secondDiff = diff.deepCopy();
@@ -300,6 +338,12 @@ public class TJsonDiff {
     ObjectNode recursive = (ObjectNode) secondDiff.get("recursive");
     recursive.remove("integer");
     secondDiff.remove("integer");
+    ObjectNode arrayMap = (ObjectNode) secondDiff.get("arrayMap");
+    ObjectNode arrayMapInternal = (ObjectNode) arrayMap.get(ArrayMapSerializer.ARRAY_MAP);
+    ObjectNode entry = (ObjectNode) arrayMapInternal.get(0);
+    ObjectNode value = (ObjectNode) entry.get(ArrayMapSerializer.VALUE);
+    assertNotNull(value.remove("integer"));
+
     secondDiff = (ObjectNode) JsonDiff.retainDiffTree(pojos.getLeft(), diff, secondDiff);
 
     assertEquals(diff, secondDiff);
@@ -309,10 +353,12 @@ public class TJsonDiff {
 
     private SimplePojo recursive;
     private SimplePojo removed;
-    private int integer;
-    private String string;
+    private int        integer;
+    private String     string;
 
     private List<SimplePojo> array;
+
+    private ArrayMap<ComplexKey, SimplePojo> arrayMap;
 
     public SimplePojo() {
     }
@@ -361,11 +407,20 @@ public class TJsonDiff {
       this.array = array;
     }
 
+    public ArrayMap<ComplexKey, SimplePojo> getArrayMap() {
+      return arrayMap;
+    }
+
+    public void setArrayMap(final ArrayMap<ComplexKey, SimplePojo> arrayMap) {
+      this.arrayMap = arrayMap;
+    }
+
     @Override
     public int hashCode() {
       final int prime = 31;
       int result = 1;
       result = prime * result + ((array == null) ? 0 : array.hashCode());
+      result = prime * result + ((arrayMap == null) ? 0 : arrayMap.hashCode());
       result = prime * result + integer;
       result = prime * result + ((recursive == null) ? 0 : recursive.hashCode());
       result = prime * result + ((removed == null) ? 0 : removed.hashCode());
@@ -387,6 +442,11 @@ public class TJsonDiff {
           return false;
       } else if (!array.equals(other.array))
         return false;
+      if (arrayMap == null) {
+        if (other.arrayMap != null)
+          return false;
+      } else if (!arrayMap.equals(other.arrayMap))
+        return false;
       if (integer != other.integer)
         return false;
       if (recursive == null) {
@@ -405,6 +465,12 @@ public class TJsonDiff {
       } else if (!string.equals(other.string))
         return false;
       return true;
+    }
+
+    @Override
+    public String toString() {
+      return "SimplePojo [recursive=" + recursive + ", removed=" + removed + ", integer=" + integer + ", string="
+          + string + ", array=" + array + ", arrayMap=" + arrayMap + "]";
     }
 
   }

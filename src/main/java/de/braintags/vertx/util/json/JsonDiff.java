@@ -79,8 +79,10 @@ public class JsonDiff {
     }
 
     if (nodeType == null) {
-      if (base instanceof ArrayMapNode && data instanceof ArrayMapNode) {
-        return arrayMapDiff((ArrayMapNode) base, (ArrayMapNode) data, nodeFactory, arrayMapsConverted);
+      if (base instanceof ArrayMapNode || data instanceof ArrayMapNode) {
+        ArrayMapNode b = base.isNull() ? new ArrayMapNode() : (ArrayMapNode) base;
+        ArrayMapNode d = data.isNull() ? new ArrayMapNode() : (ArrayMapNode) data;
+        return arrayMapDiff(b, d, nodeFactory, arrayMapsConverted);
       } else {
         throw new IllegalArgumentException("nodeType is null and base and/or data is not ArrayMapNode");
       }
@@ -89,10 +91,10 @@ public class JsonDiff {
       case ARRAY:
         return arrayDiff((ArrayNode) base, (ArrayNode) data, nodeFactory, arrayMapsConverted);
       case OBJECT:
-        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
+        if (!arrayMapsConverted && (ArrayMapNode.isArrayMapNode(base) || ArrayMapNode.isArrayMapNode(data))) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode arrayData = (ArrayMapNode) ArrayMapNode.deepConvertNode(data);
-          return arrayMapDiff(arrayBase, arrayData, nodeFactory, true);
+          return ArrayMapNode.toRegularNode(arrayMapDiff(arrayBase, arrayData, nodeFactory, true), nodeFactory);
         } else {
           return objectDiff((ObjectNode) base, (ObjectNode) data, nodeFactory, arrayMapsConverted);
         }
@@ -170,7 +172,7 @@ public class JsonDiff {
 
     for (JsonNode baseKey : baseChildren.keySet()) {
       if (!data.getChildren().containsKey(baseKey)) {
-        diffChildren.put(baseKey, null);
+        diffChildren.put(baseKey, nodeFactory.nullNode());
       }
     }
     return new ArrayMapNode(diffChildren);
@@ -235,11 +237,11 @@ public class JsonDiff {
     }
     JsonNodeType nodeType = base.getNodeType();
     if (nodeType == null) {
-      if (base instanceof ArrayMapNode && diff instanceof ArrayMapNode) {
-        ArrayMapNode arrayBase = (ArrayMapNode) base;
-        ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
-        applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
-        return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
+      if (base instanceof ArrayMapNode || diff instanceof ArrayMapNode) {
+        ArrayMapNode b = base.isNull() ? new ArrayMapNode() : (ArrayMapNode) base;
+        ArrayMapNode d = diff.isNull() ? new ArrayMapNode() : (ArrayMapNode) diff;
+        applyArrayMapDiff(b, d, nodeFactory, true);
+        return ArrayMapNode.toRegularNode(b, nodeFactory);
       } else {
         throw new IllegalArgumentException("nodeType is null and base and/or diff is not ArrayMapNode");
       }
@@ -258,7 +260,7 @@ public class JsonDiff {
           return diff.deepCopy();
         }
       case OBJECT:
-        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
+        if (!arrayMapsConverted && (ArrayMapNode.isArrayMapNode(base) || ArrayMapNode.isArrayMapNode(diff))) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
           applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);

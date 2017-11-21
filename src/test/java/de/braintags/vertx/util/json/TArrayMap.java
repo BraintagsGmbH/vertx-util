@@ -111,15 +111,16 @@ public class TArrayMap {
     Iterator<Entry<MapContainer, MapContainer>> entryIterator = testData.map.entrySet().iterator();
     Entry<MapContainer, MapContainer> firstEntry = entryIterator.next();
     firstEntry.setValue(buildMapContainer("freshValue" + suffix));
-    Entry<MapContainer, MapContainer> secondEntry = entryIterator.next();
-    entryIterator.remove();
-    testData.map.put(buildMapContainer("NewKey2" + suffix), buildMapContainer("NewValue2" + suffix));
+    // Entry<MapContainer, MapContainer> secondEntry = entryIterator.next();
+    // entryIterator.remove();
+    // testData.map.put(buildMapContainer("NewKey2" + suffix), buildMapContainer("NewValue2" + suffix));
   }
 
   private NestedMapObject buildNestedMapObject() {
     NestedMapObject test = new NestedMapObject();
     test.map.put(buildMapContainer("Key1"), buildMapContainer("Value1"));
     test.map.put(buildMapContainer("Key2"), buildMapContainer("Value2"));
+    // test.map.put(buildMapContainer("KeyNull"), null);
     return test;
   }
 
