@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public final class ArrayMap<K, V> extends LinkedHashMap<K, V> {
 
   @JsonCreator
-  ArrayMap() {
+  public ArrayMap() {
   }
 
   public ArrayMap(final Map<? extends K, ? extends V> source) {
