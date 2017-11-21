@@ -241,7 +241,7 @@ public class JsonDiff {
         ArrayMapNode b = base.isNull() ? new ArrayMapNode() : (ArrayMapNode) base;
         ArrayMapNode d = diff.isNull() ? new ArrayMapNode() : (ArrayMapNode) diff;
         applyArrayMapDiff(b, d, nodeFactory, true);
-        return ArrayMapNode.toRegularNode(b, nodeFactory);
+        return b;
       } else {
         throw new IllegalArgumentException("nodeType is null and base and/or diff is not ArrayMapNode");
       }
@@ -308,7 +308,7 @@ public class JsonDiff {
     }
     Map<JsonNode, JsonNode> baseChildren = base.getChildren();
     for (Map.Entry<JsonNode, JsonNode> diffEntry : diff.getChildren().entrySet()) {
-      if (diffEntry.getValue() == null) {
+      if (diffEntry.getValue() == null || diffEntry.getValue().isNull()) {
         baseChildren.remove(diffEntry.getKey());
       } else {
         JsonNode baseValue = baseChildren.get(diffEntry.getKey());
@@ -506,10 +506,10 @@ public class JsonDiff {
     if (nodeType == null) {
       if (base instanceof ArrayMapNode && diff instanceof ArrayMapNode) {
         ArrayMapNode arrayBase = (ArrayMapNode) base;
-        ArrayMapNode originalArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
+        ArrayMapNode retainedArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
         ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
-        retainDiffTreeArrayMapDiff(arrayBase, originalArrayDiff, arrayDiff, nodeFactory, true);
-        return arrayBase;
+        retainDiffTreeArrayMapDiff(arrayBase, retainedArrayDiff, arrayDiff, nodeFactory, true);
+        return arrayDiff;
       } else {
         throw new IllegalArgumentException("nodeType is null and base and/or diff is not ArrayMapNode");
       }
@@ -519,10 +519,10 @@ public class JsonDiff {
       case OBJECT:
         if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
-          ArrayMapNode originalArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
+          ArrayMapNode retainedArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
-          retainDiffTreeArrayMapDiff(arrayBase, originalArrayDiff, arrayDiff, nodeFactory, true);
-          return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
+          retainDiffTreeArrayMapDiff(arrayBase, retainedArrayDiff, arrayDiff, nodeFactory, true);
+          return ArrayMapNode.toRegularNode(arrayDiff, nodeFactory);
         } else if (diff.isObject()) {
           retainDiffTreeObjectDiff((ObjectNode) base, (ObjectNode) retainedFields, (ObjectNode) diff, nodeFactory,
               arrayMapsConverted);
@@ -550,32 +550,31 @@ public class JsonDiff {
   private static void retainDiffTreeObjectDiff(final ObjectNode base, final ObjectNode retainedFields,
       final ObjectNode diff,
       final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
-    Iterator<Entry<String, JsonNode>> originalFields = retainedFields.fields();
-    while (originalFields.hasNext()) {
-      Entry<String, JsonNode> edgeField = originalFields.next();
-      String fieldName = edgeField.getKey();
-      JsonNode originalFieldValue = edgeField.getValue();
+    Iterator<Entry<String, JsonNode>> retainedFieldsIterator = retainedFields.fields();
+    while (retainedFieldsIterator.hasNext()) {
+      Entry<String, JsonNode> retainedField = retainedFieldsIterator.next();
+      String fieldName = retainedField.getKey();
+      JsonNode retainedFieldValue = retainedField.getValue();
+      JsonNode baseFieldValue = base.get(fieldName);
+      if (baseFieldValue == null) {
+        baseFieldValue = nodeFactory.nullNode();
+      }
       if (!diff.has(fieldName)) {
-        if (base.has(fieldName)) {
-          JsonNode baseFieldValue = base.get(fieldName);
-          if (baseFieldValue instanceof ArrayMapNode) {
-            diff.set(fieldName,
-                internalRetainDiffTree(baseFieldValue, originalFieldValue, new ArrayMapNode(), nodeFactory,
-                arrayMapsConverted));
-          } else if (originalFieldValue.isObject()) {
-            diff.set(fieldName, internalRetainDiffTree(baseFieldValue, originalFieldValue, nodeFactory.objectNode(),
-                nodeFactory, arrayMapsConverted));
-          } else if (originalFieldValue.isNull() || originalFieldValue.isValueNode()) {
-            diff.set(fieldName, originalFieldValue.deepCopy());
-          } else {
-            throw new IllegalStateException("changes in the diff would by lost by merging: " + fieldName);
-          }
+        if (baseFieldValue instanceof ArrayMapNode || retainedFieldValue instanceof ArrayMapNode) {
+          diff.set(fieldName, internalRetainDiffTree(baseFieldValue, retainedFieldValue, new ArrayMapNode(),
+              nodeFactory, arrayMapsConverted));
+        } else if (retainedFieldValue.isObject()) {
+          diff.set(fieldName, internalRetainDiffTree(baseFieldValue, retainedFieldValue, nodeFactory.objectNode(),
+              nodeFactory, arrayMapsConverted));
+        } else if (retainedFieldValue.isNull() || retainedFieldValue.isValueNode()) {
+          diff.set(fieldName, baseFieldValue.deepCopy());
+        } else {
+          throw new IllegalStateException("changes in the diff would by lost by merging: " + fieldName);
         }
       } else {
-        JsonNode baseFieldValue = base.get(fieldName);
         JsonNode diffValue = diff.get(fieldName);
         diff.set(fieldName,
-            internalRetainDiffTree(baseFieldValue, originalFieldValue, diffValue, nodeFactory, arrayMapsConverted));
+            internalRetainDiffTree(baseFieldValue, retainedFieldValue, diffValue, nodeFactory, arrayMapsConverted));
       }
     }
   }
@@ -587,30 +586,28 @@ public class JsonDiff {
       return;
     }
     Map<JsonNode, JsonNode> baseChildren = base.getChildren();
-    Map<JsonNode, JsonNode> diffChildren = retainedFields.getChildren();
-    for (Map.Entry<JsonNode, JsonNode> originalEntry : retainedFields.getChildren().entrySet()) {
-      JsonNode key = originalEntry.getKey();
+    Map<JsonNode, JsonNode> diffChildren = diff.getChildren();
+    for (Map.Entry<JsonNode, JsonNode> retainedEntry : retainedFields.getChildren().entrySet()) {
+      JsonNode key = retainedEntry.getKey();
+      JsonNode baseFieldValue = baseChildren.get(key);
+      if (baseFieldValue == null) {
+        baseFieldValue = nodeFactory.nullNode();
+      }
       if (!diffChildren.containsKey(key)) {
-        if (baseChildren.containsKey(key)) {
-          JsonNode baseFieldValue = baseChildren.get(key);
-          if (baseFieldValue instanceof ArrayMapNode) {
-            diffChildren.put(key, internalRetainDiffTree(baseFieldValue, originalEntry.getValue(),
-                new ArrayMapNode(),
-                nodeFactory, arrayMapsConverted));
-          } else if (baseFieldValue.isObject()) {
-            diffChildren.put(key,
-                internalRetainDiffTree(baseFieldValue, originalEntry.getValue(), nodeFactory.objectNode(),
-                nodeFactory, arrayMapsConverted));
-          } else if (baseFieldValue.isNull() || baseFieldValue.isValueNode()) {
-            diffChildren.put(key, originalEntry.getValue().deepCopy());
-          } else {
-            throw new IllegalStateException("changes in the diff would by lost by merging: " + key);
-          }
+        if (baseFieldValue instanceof ArrayMapNode) {
+          diffChildren.put(key, internalRetainDiffTree(baseFieldValue, retainedEntry.getValue(), new ArrayMapNode(),
+              nodeFactory, arrayMapsConverted));
+        } else if (baseFieldValue.isObject()) {
+          diffChildren.put(key, internalRetainDiffTree(baseFieldValue, retainedEntry.getValue(),
+              nodeFactory.objectNode(), nodeFactory, arrayMapsConverted));
+        } else if (baseFieldValue.isNull() || baseFieldValue.isValueNode()) {
+          diffChildren.put(key, baseFieldValue.deepCopy());
+        } else {
+          throw new IllegalStateException("changes in the diff would by lost by merging: " + key);
         }
       } else {
-        JsonNode baseFieldValue = baseChildren.get(key);
         JsonNode diffValue = diffChildren.get(key);
-        diffChildren.put(key, internalRetainDiffTree(baseFieldValue, originalEntry.getValue(), diffValue, nodeFactory,
+        diffChildren.put(key, internalRetainDiffTree(baseFieldValue, retainedEntry.getValue(), diffValue, nodeFactory,
             arrayMapsConverted));
       }
     }

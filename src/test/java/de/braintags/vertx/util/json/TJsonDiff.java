@@ -233,9 +233,6 @@ public class TJsonDiff {
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
 
     ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
-    System.out.println(Json.prettyMapper.writeValueAsString(pojos.getLeft()));
-    System.out.println(Json.prettyMapper.writeValueAsString(diff));
-    System.out.println(Json.prettyMapper.writeValueAsString(pojoJson));
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
 
     assertEquals(pojos.getRight(), decodedPojo);
@@ -331,7 +328,6 @@ public class TJsonDiff {
     ObjectNode diff = (ObjectNode) JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(),
         objectMapper.getNodeFactory());
 
-
     diff.remove("array");
     ObjectNode secondDiff = diff.deepCopy();
     secondDiff.remove("removed");
@@ -339,12 +335,12 @@ public class TJsonDiff {
     recursive.remove("integer");
     secondDiff.remove("integer");
     ObjectNode arrayMap = (ObjectNode) secondDiff.get("arrayMap");
-    ObjectNode arrayMapInternal = (ObjectNode) arrayMap.get(ArrayMapSerializer.ARRAY_MAP);
+    ArrayNode arrayMapInternal = (ArrayNode) arrayMap.get(ArrayMapSerializer.ARRAY_MAP);
     ObjectNode entry = (ObjectNode) arrayMapInternal.get(0);
     ObjectNode value = (ObjectNode) entry.get(ArrayMapSerializer.VALUE);
-    assertNotNull(value.remove("integer"));
+    assertNotNull(value.remove("string"));
 
-    secondDiff = (ObjectNode) JsonDiff.retainDiffTree(pojos.getLeft(), diff, secondDiff);
+    secondDiff = (ObjectNode) JsonDiff.retainDiffTree(pojos.getMiddle(), diff, secondDiff);
 
     assertEquals(diff, secondDiff);
   }
