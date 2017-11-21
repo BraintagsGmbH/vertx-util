@@ -39,12 +39,12 @@ public class ArrayMapModule extends Module {
   }
 
   @Override
-  public void setupModule(SetupContext context) {
+  public void setupModule(final SetupContext context) {
     context.addDeserializers(new Deserializers.Base() {
       @Override
-      public JsonDeserializer<?> findMapDeserializer(MapType type, DeserializationConfig config,
-          BeanDescription beanDesc, KeyDeserializer keyDeserializer, TypeDeserializer elementTypeDeserializer,
-          JsonDeserializer<?> elementDeserializer) throws JsonMappingException {
+      public JsonDeserializer<?> findMapDeserializer(final MapType type, final DeserializationConfig config,
+          final BeanDescription beanDesc, final KeyDeserializer keyDeserializer, final TypeDeserializer elementTypeDeserializer,
+          final JsonDeserializer<?> elementDeserializer) throws JsonMappingException {
 
         if (beanDesc.getClassInfo().getRawType().equals(ArrayMap.class)) {
           return new ArrayMapDeserializer(type, beanDesc, new ValueInstantiator.Base(ArrayMap.class), null,
@@ -60,9 +60,9 @@ public class ArrayMapModule extends Module {
     context.addSerializers(new Serializers.Base() {
 
       @Override
-      public JsonSerializer<?> findMapSerializer(SerializationConfig config, MapType type, BeanDescription beanDesc,
-          JsonSerializer<Object> keySerializer, TypeSerializer elementTypeSerializer,
-          JsonSerializer<Object> elementValueSerializer) {
+      public JsonSerializer<?> findMapSerializer(final SerializationConfig config, final MapType type, final BeanDescription beanDesc,
+          final JsonSerializer<Object> keySerializer, final TypeSerializer elementTypeSerializer,
+          final JsonSerializer<Object> elementValueSerializer) {
         if (beanDesc.getBeanClass().equals(ArrayMap.class)) {
           return new ArrayMapSerializer();
         } else {
