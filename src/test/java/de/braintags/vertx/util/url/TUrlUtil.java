@@ -79,5 +79,4 @@ public class TUrlUtil {
     assertThat(result, is("root/sub"));
   }
 
-
 }

@@ -245,7 +245,7 @@ public class TJsonDiff {
     pojo.getArray().add(1, new SimplePojo(103));
     pojo.getArray().get(3).setString("Hello");
     ObjectNode modifiedPojoJson = objectMapper.valueToTree(pojo);
-    
+
     return Triple.of(pojoJson, modifiedPojoJson, pojo);
   }
 
@@ -285,11 +285,11 @@ public class TJsonDiff {
 
     private SimplePojo recursive;
     private SimplePojo removed;
-    private int        integer;
-    private String     string;
+    private int integer;
+    private String string;
 
     private List<SimplePojo> array;
-    
+
     public SimplePojo() {
     }
 
@@ -382,6 +382,6 @@ public class TJsonDiff {
         return false;
       return true;
     }
-    
+
   }
 }

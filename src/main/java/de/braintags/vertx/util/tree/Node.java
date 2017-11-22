@@ -28,9 +28,9 @@ import io.vertx.core.json.JsonObject;
  *          the value type of containig leafs
  */
 public class Node<T> extends Child<T> {
-  private Tree<T>       tree;
-  private String        name;
-  private List<Leaf<T>> values     = new ArrayList<>();
+  private Tree<T> tree;
+  private String name;
+  private List<Leaf<T>> values = new ArrayList<>();
   private List<Node<T>> childNodes = new ArrayList<>();
 
   /**

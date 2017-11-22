@@ -8,10 +8,10 @@ public class JWTOptions {
       "Can only set expiresIn to seconds or minutes");
 
   private JsonObject header;
-  private String     algorithm   = "HS256";
-  private boolean    noTimestamp = false;
-  private long       expiresInMinutes;
-  private long       expiresInSeconds;
+  private String algorithm = "HS256";
+  private boolean noTimestamp = false;
+  private long expiresInMinutes;
+  private long expiresInSeconds;
   private JsonObject audience;
   private JsonObject issuer;
   private JsonObject subject;

@@ -50,7 +50,6 @@ public class TDefaultingTypeResolver {
     assertEquals(dog, decodedDefaultedDog);
   }
 
-
   @JsonTypeInfo(include = As.PROPERTY, property = "@class", use = Id.CLASS)
   @JsonTypeResolver(DefaultingTypeResolver.class)
   public static class Animal {

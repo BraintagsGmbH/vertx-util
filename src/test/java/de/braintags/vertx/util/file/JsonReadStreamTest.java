@@ -86,9 +86,8 @@ public class JsonReadStreamTest extends BtVertxTestBase {
     execute(context, jr, true, count, 0, true, false);
   }
 
-  private void execute(final TestContext context, final JsonReadStream<TestClass> qr,
-      final boolean expectBufferWritten, final int succeededCount, final int failedCount,
-      final boolean pretty, final boolean jsonConform) {
+  private void execute(final TestContext context, final JsonReadStream<TestClass> qr, final boolean expectBufferWritten,
+      final int succeededCount, final int failedCount, final boolean pretty, final boolean jsonConform) {
     BufferWriteStream ws = new BufferWriteStream();
     execute(context, qr, ws);
     if (expectBufferWritten) {

@@ -28,9 +28,9 @@ import io.vertx.core.logging.LoggerFactory;
  */
 public class AsyncReadWriteLock {
 
-  private static final Logger                    LOGGER = LoggerFactory.getLogger(AsyncReadWriteLock.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncReadWriteLock.class);
 
-  private StampedLock                            lock;
+  private StampedLock lock;
   private final ConcurrentLinkedQueue<AsyncLock> pending;
 
   public AsyncReadWriteLock() {

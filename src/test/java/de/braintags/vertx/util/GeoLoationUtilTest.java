@@ -35,9 +35,12 @@ public class GeoLoationUtilTest {
    */
   @Test
   public void testDistance() {
-    System.out.println(GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.MI) + " Miles\n");
-    System.out.println(GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.KM) + " Kilometers\n");
-    System.out.println(GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.NM) + " Nautical Miles\n");
+    System.out
+        .println(GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.MI) + " Miles\n");
+    System.out.println(
+        GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.KM) + " Kilometers\n");
+    System.out.println(
+        GeoLocationUtil.distance(32.9697, -96.80322, 29.46786, -98.53506, GeoLocationUtil.NM) + " Nautical Miles\n");
 
   }
 

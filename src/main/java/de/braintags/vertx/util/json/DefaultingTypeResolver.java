@@ -32,8 +32,8 @@ import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 public class DefaultingTypeResolver extends StdTypeResolverBuilder {
 
   @Override
-  public TypeDeserializer buildTypeDeserializer(
-      final DeserializationConfig config, final JavaType baseType, final Collection<NamedType> subtypes) {
+  public TypeDeserializer buildTypeDeserializer(final DeserializationConfig config, final JavaType baseType,
+      final Collection<NamedType> subtypes) {
     TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
     return new DefaultingTypeDeserializer(baseType, idRes, _typeProperty, _typeIdVisible);
   }

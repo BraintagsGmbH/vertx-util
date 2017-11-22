@@ -74,23 +74,25 @@ public class HttpTestClient implements Closeable {
 
   public final void testRequestWithContentType(TestContext context, HttpMethod method, String path, String contentType,
       int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), expectedStatusCode, expectedStatusMessage,
-        null);
+    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
   public final void testRequestWithAccepts(TestContext context, HttpMethod method, String path, String accepts,
       int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("accept", accepts), expectedStatusCode, expectedStatusMessage, null);
+    testRequest(context, method, path, req -> req.putHeader("accept", accepts), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
   public final void testRequestWithCookies(TestContext context, HttpMethod method, String path, String cookieHeader,
       int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), expectedStatusCode, expectedStatusMessage, null);
+    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
   public final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, int expectedStatusCode, String expectedStatusMessage, String responseBody)
-      throws Exception {
+      Consumer<HttpClientRequest> requestAction, int expectedStatusCode, String expectedStatusMessage,
+      String responseBody) throws Exception {
     testRequest(context, method, path, requestAction, null, expectedStatusCode, expectedStatusMessage, responseBody);
   }
 
@@ -104,8 +106,8 @@ public class HttpTestClient implements Closeable {
   public final void testRequestBuffer(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int expectedStatusCode,
       String expectedStatusMessage, Buffer responseBodyBuffer) throws Exception {
-    testRequestBuffer(context, client, method, port, path, requestAction, responseAction, expectedStatusCode, expectedStatusMessage,
-        responseBodyBuffer);
+    testRequestBuffer(context, client, method, port, path, requestAction, responseAction, expectedStatusCode,
+        expectedStatusMessage, responseBodyBuffer);
   }
 
   public final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port, String path,

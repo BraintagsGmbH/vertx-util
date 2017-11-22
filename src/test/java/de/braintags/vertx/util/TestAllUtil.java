@@ -38,10 +38,9 @@ import de.braintags.vertx.util.tree.TreeTest;
 @SuiteClasses({ AsyncReadWriteLockTest.class, TestObjectUtil.class, ClassUtilTest.class, CounterObjectTest.class,
     ResultObjectTest.class, ErrorObjectTest.class, ExceptionUtilTest.class, AbstractCollectionAsyncTest.class,
     CollectionAsyncTest.class, FileSystemUtilTest.class, InputOutputStreamTest.class, JsonReadStreamTest.class,
-    GeoLoationUtilTest.class,
-    AbstractPojoCodecTest.class, AssertTest.class, CRUDPermissionMapTest.class, StandardEncoderTest.class,
-    VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class, TJsonConverter.class,
-    THttpServerOptionsDeserializer.class })
+    GeoLoationUtilTest.class, AbstractPojoCodecTest.class, AssertTest.class, CRUDPermissionMapTest.class,
+    StandardEncoderTest.class, VertxAsyncTest.class, TreeTest.class, TestResourceUtil.class, EqUtilTest.class,
+    TJsonConverter.class, THttpServerOptionsDeserializer.class })
 public class TestAllUtil {
 
 }

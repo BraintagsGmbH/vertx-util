@@ -27,7 +27,6 @@ public interface CacheableResult<T> extends AsyncResult<T> {
     return new CacheableResultImpl<>(cause);
   }
 
-
   @Override
   default <U> CacheableResult<U> map(final Function<T, U> mapper) {
     if (mapper == null) {
