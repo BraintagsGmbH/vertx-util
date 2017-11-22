@@ -300,7 +300,6 @@ class ArrayMapNode extends ValueNode {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(32 + (size() << 4));
-    sb.append("FOOOO");
     sb.append("{\"");
     sb.append(ArrayMapSerializer.ARRAY_MAP);
     sb.append("\":[");

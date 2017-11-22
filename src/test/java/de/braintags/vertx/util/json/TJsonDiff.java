@@ -233,6 +233,7 @@ public class TJsonDiff {
     Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
+    System.out.println(Json.prettyMapper.writeValueAsString(diff));
 
     ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
@@ -241,8 +242,9 @@ public class TJsonDiff {
   }
 
   private Triple<ObjectNode, ObjectNode, SimplePojo> getDiffPojos(final ObjectMapper objectMapper) {
-    SimplePojo pojo = new SimplePojo();
+    // ######### BUILD_POJO ##############
 
+    SimplePojo pojo = new SimplePojo();
     SimplePojo recursive = new SimplePojo();
     recursive.setInteger(42);
     pojo.setRecursive(recursive);
@@ -251,7 +253,7 @@ public class TJsonDiff {
     pojo.setString("Hello");
     pojo.setArray(new ArrayList<>(Arrays.asList(new SimplePojo(41), new SimplePojo(42), new SimplePojo(43))));
     ArrayMap<ComplexKey, ArrayMap<ComplexKey, SimplePojo>> arrayMap = new ArrayMap<>();
-    ObjectNode pojoJson = objectMapper.valueToTree(pojo);
+    pojo.setArrayMap(arrayMap);
 
     ArrayMap<ComplexKey, SimplePojo> innerArrayMap1 = new ArrayMap<>();
     arrayMap.put(ARRAY_MAP_KEY_1, innerArrayMap1);
@@ -282,8 +284,9 @@ public class TJsonDiff {
     SimplePojo pojoRemoved = new SimplePojo("Pojo removed", 1);
     innerArrayMap1.put(ARRAY_MAP_KEY_REMOVED, pojoRemoved);
 
+    ObjectNode pojoJson = objectMapper.valueToTree(pojo);
 
-    pojo.setArrayMap(arrayMap);
+    // ######### MODIFY ##############
 
     pojo.setRemoved(null);
     recursive.setInteger(2);
