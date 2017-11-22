@@ -1,8 +1,11 @@
 package de.braintags.vertx.util.json;
 
+import java.util.Collections;
+
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -64,7 +67,10 @@ public class ArrayMapModule extends Module {
           final JsonSerializer<Object> keySerializer, final TypeSerializer elementTypeSerializer,
           final JsonSerializer<Object> elementValueSerializer) {
         if (beanDesc.getBeanClass().equals(ArrayMap.class)) {
-          return new ArrayMapSerializer();
+          JavaType valueType = type.getContentType();
+          boolean valueTypeStatic = valueType != null && valueType.isFinal();
+          return new ArrayMapSerializer(Collections.emptySet(), type.getKeyType(), valueType, valueTypeStatic,
+              elementTypeSerializer, keySerializer, elementValueSerializer);
         } else {
           return super.findMapSerializer(config, type, beanDesc, keySerializer, elementTypeSerializer,
               elementValueSerializer);

@@ -40,7 +40,9 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  * It can also construct {@link java.util.Map}s, but not with specific
  * POJO types, only other containers and primitives/wrappers.
  */
-public class ArrayMapDeserializer extends MapDeserializer implements ContextualDeserializer, ResolvableDeserializer {
+public class ArrayMapDeserializer
+    extends MapDeserializer
+    implements ContextualDeserializer, ResolvableDeserializer {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -57,8 +59,9 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    * /* Life-cycle
    * /**********************************************************
    */
-  public ArrayMapDeserializer(JavaType mapType, BeanDescription beanDesc, ValueInstantiator valueInstantiator,
-      JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser, TypeDeserializer valueTypeDeser) {
+  public ArrayMapDeserializer(final JavaType mapType, final BeanDescription beanDesc, final ValueInstantiator valueInstantiator,
+      final JsonDeserializer<?> keyDeser, final JsonDeserializer<Object> valueDeser,
+      final TypeDeserializer valueTypeDeser) {
     super(mapType, valueInstantiator, null, valueDeser, valueTypeDeser);
     this._beanDesc = beanDesc;
     this._objKeyDeserializer = keyDeser;
@@ -68,13 +71,15 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    * Copy-constructor that can be used by sub-classes to allow
    * copy-on-write styling copying of settings of an existing instance.
    */
-  protected ArrayMapDeserializer(ArrayMapDeserializer src) {
+  protected ArrayMapDeserializer(final ArrayMapDeserializer src) {
     super(src);
   }
 
-  protected ArrayMapDeserializer(ArrayMapDeserializer src, BeanDescription beanDesc,
-      ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser,
-      TypeDeserializer valueTypeDeser, Set<String> ignorable) {
+  protected ArrayMapDeserializer(final ArrayMapDeserializer src,
+      final BeanDescription beanDesc, final ValueInstantiator valueInstantiator, final JsonDeserializer<?> keyDeser,
+      final JsonDeserializer<Object> valueDeser,
+      final TypeDeserializer valueTypeDeser,
+      final Set<String> ignorable) {
     this(src._mapType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
     _propertyBasedCreator = src._propertyBasedCreator;
     _delegateDeserializer = src._delegateDeserializer;
@@ -85,8 +90,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
 
   @Override
   @Deprecated
-  protected MapDeserializer withResolved(KeyDeserializer keyDeser, TypeDeserializer valueTypeDeser,
-      JsonDeserializer<?> valueDeser, Set<String> ignorable) {
+  protected MapDeserializer withResolved(final KeyDeserializer keyDeser, final TypeDeserializer valueTypeDeser,
+      final JsonDeserializer<?> valueDeser, final Set<String> ignorable) {
     // do not use this! You need a JsonDeserializer as keyDeser
     throw new UnsupportedOperationException();
   }
@@ -96,15 +101,16 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    * different settings. When sub-classing, MUST be overridden.
    */
   @SuppressWarnings("unchecked")
-  protected ArrayMapDeserializer withResolved(ValueInstantiator valueInstatiator, JsonDeserializer<?> keyDeser,
-      TypeDeserializer valueTypeDeser, JsonDeserializer<?> valueDeser, Set<String> ignorable) {
+  protected ArrayMapDeserializer withResolved(final ValueInstantiator valueInstatiator, final JsonDeserializer<?> keyDeser,
+      final TypeDeserializer valueTypeDeser, final JsonDeserializer<?> valueDeser,
+      final Set<String> ignorable) {
 
     if ((_objKeyDeserializer == keyDeser) && (_valueDeserializer == valueDeser)
         && (_valueTypeDeserializer == valueTypeDeser) && (_ignorableProperties == ignorable)) {
       return this;
     }
-    return new ArrayMapDeserializer(this, _beanDesc, valueInstatiator, keyDeser, (JsonDeserializer<Object>) valueDeser,
-        valueTypeDeser, ignorable);
+    return new ArrayMapDeserializer(this, _beanDesc, valueInstatiator,
+        keyDeser, (JsonDeserializer<Object>) valueDeser, valueTypeDeser, ignorable);
   }
 
   /*
@@ -114,7 +120,7 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    */
 
   @Override
-  public void resolve(DeserializationContext ctxt) throws JsonMappingException {
+  public void resolve(final DeserializationContext ctxt) throws JsonMappingException {
     super.resolve(ctxt);
     _standardStringKey = false;
   }
@@ -124,8 +130,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    * when it is known for which property deserializer is needed for.
    */
   @Override
-  public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
-      throws JsonMappingException {
+  public JsonDeserializer<?> createContextual(final DeserializationContext ctxt,
+      final BeanProperty property) throws JsonMappingException {
     JsonDeserializer<?> kd = _objKeyDeserializer;
     if (kd == null) {
       kd = ctxt.findNonContextualValueDeserializer(_mapType.getKeyType());
@@ -179,7 +185,7 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
 
   @Override
   @SuppressWarnings("unchecked")
-  public Map<Object, Object> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public Map<Object, Object> deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
     if (_propertyBasedCreator != null) {
       return _deserializeUsingCreator(p, ctxt);
     }
@@ -188,7 +194,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
           _delegateDeserializer.deserialize(p, ctxt));
     }
     if (!_hasDefaultCreator) {
-      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), p, "no default constructor found");
+      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), p,
+          "no default constructor found");
     }
     // Ok: must point to START_OBJECT, FIELD_NAME or END_OBJECT
     final Map<Object, Object> result = (Map<Object, Object>) _valueInstantiator.createUsingDefault(ctxt);
@@ -201,7 +208,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
 
   @SuppressWarnings("unchecked")
   @Override
-  public Map<Object, Object> deserialize(JsonParser p, DeserializationContext ctxt, Map<Object, Object> result)
+  public Map<Object, Object> deserialize(final JsonParser p, final DeserializationContext ctxt,
+      final Map<Object, Object> result)
       throws IOException {
     // [databind#631]: Assign current value, to be accessible by custom serializers
     p.setCurrentValue(result);
@@ -215,7 +223,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
   }
 
   @Override
-  public Object deserializeWithType(JsonParser jp, DeserializationContext ctxt, TypeDeserializer typeDeserializer)
+  public Object deserializeWithType(final JsonParser jp, final DeserializationContext ctxt,
+      final TypeDeserializer typeDeserializer)
       throws IOException, JsonProcessingException {
     if (!jp.isExpectedStartObjectToken()) {
       return ctxt.handleUnexpectedToken(getMapClass(), jp);
@@ -229,8 +238,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
    * /**********************************************************
    */
 
-  protected final void _readAsArrayAndBind(JsonParser p, DeserializationContext ctxt, Map<Object, Object> result)
-      throws IOException {
+  protected final void _readAsArrayAndBind(final JsonParser p, final DeserializationContext ctxt,
+      final Map<Object, Object> result) throws IOException {
     final JsonDeserializer<?> keyDes = _objKeyDeserializer;
     final JsonDeserializer<Object> valueDes = _valueDeserializer;
     final TypeDeserializer typeDeser = _valueTypeDeserializer;
@@ -251,8 +260,7 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
       return;
     }
     // currently at START_ARRAY
-    p.nextToken();
-    while (p.getCurrentToken() != JsonToken.END_ARRAY) {
+    while (p.nextToken() != JsonToken.END_ARRAY) {
       if (p.isExpectedStartObjectToken()) {
         Object key = null;
         Object value = null;
@@ -261,11 +269,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
           if (fieldName == null) {
             if (p.getCurrentToken() != JsonToken.END_OBJECT) {
               ctxt.handleUnexpectedToken(getMapClass(), p);
-              return;
-            } else {
-              p.nextToken();
-              break;
             }
+            break;
           }
           switch (fieldName) {
             case ArrayMapSerializer.KEY:
@@ -297,19 +302,17 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
         break;
       }
     }
-
     if (p.nextToken() != JsonToken.END_OBJECT) {
       throw new JsonMappingException(p, "expected " + JsonToken.END_OBJECT, p.getCurrentLocation());
     }
   }
 
-  private Object deserialize(JsonParser p, DeserializationContext ctxt, final JsonDeserializer<?> valueDes,
+  private Object deserialize(final JsonParser p, final DeserializationContext ctxt, final JsonDeserializer<?> valueDes,
       final TypeDeserializer typeDeser) throws JsonMappingException, IOException, JsonProcessingException {
     // Note: must handle null explicitly here; value deserializers won't
     Object value;
     if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
       value = valueDes.getNullValue(ctxt);
-      p.nextToken();
     } else if (typeDeser == null) {
       value = valueDes.deserialize(p, ctxt);
     } else {
@@ -320,12 +323,13 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
 
   @Override
   @SuppressWarnings("unchecked")
-  public Map<Object, Object> _deserializeUsingCreator(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public Map<Object, Object> _deserializeUsingCreator(final JsonParser p, final DeserializationContext ctxt) throws IOException {
     throw new UnsupportedOperationException();
   }
 
-  private void handleUnresolvedReference(JsonParser jp, MapReferringAccumulator accumulator, Object key,
-      UnresolvedForwardReference reference) throws JsonMappingException {
+  private void handleUnresolvedReference(final JsonParser jp, final MapReferringAccumulator accumulator,
+      final Object key, final UnresolvedForwardReference reference)
+      throws JsonMappingException {
     if (accumulator == null) {
       throw JsonMappingException.from(jp, "Unresolved forward reference but no identity info.", reference);
     }
@@ -341,12 +345,12 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
      */
     private final List<MapReferring> _accumulator = new ArrayList<>();
 
-    public MapReferringAccumulator(Class<?> valueType, Map<Object, Object> result) {
+    public MapReferringAccumulator(final Class<?> valueType, final Map<Object, Object> result) {
       _valueType = valueType;
       _result = result;
     }
 
-    public void put(Object key, Object value) {
+    public void put(final Object key, final Object value) {
       if (_accumulator.isEmpty()) {
         _result.put(key, value);
       } else {
@@ -355,13 +359,13 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
       }
     }
 
-    public Referring handleUnresolvedReference(UnresolvedForwardReference reference, Object key) {
+    public Referring handleUnresolvedReference(final UnresolvedForwardReference reference, final Object key) {
       MapReferring id = new MapReferring(this, reference, _valueType, key);
       _accumulator.add(id);
       return id;
     }
 
-    public void resolveForwardReference(Object id, Object value) throws IOException {
+    public void resolveForwardReference(final Object id, final Object value) throws IOException {
       Iterator<MapReferring> iterator = _accumulator.iterator();
       // Resolve ordering after resolution of an id. This means either:
       // 1- adding to the result map in case of the first unresolved id.
@@ -378,8 +382,8 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
         previous = ref.next;
       }
 
-      throw new IllegalArgumentException(
-          "Trying to resolve a forward reference with id [" + id + "] that wasn't previously seen as unresolved.");
+      throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + id
+          + "] that wasn't previously seen as unresolved.");
     }
   }
 
@@ -394,14 +398,15 @@ public class ArrayMapDeserializer extends MapDeserializer implements ContextualD
     public final Map<Object, Object> next = new LinkedHashMap<>();
     public final Object key;
 
-    MapReferring(MapReferringAccumulator parent, UnresolvedForwardReference ref, Class<?> valueType, Object key) {
+    MapReferring(final MapReferringAccumulator parent, final UnresolvedForwardReference ref,
+        final Class<?> valueType, final Object key) {
       super(ref, valueType);
       _parent = parent;
       this.key = key;
     }
 
     @Override
-    public void handleResolvedForwardReference(Object id, Object value) throws IOException {
+    public void handleResolvedForwardReference(final Object id, final Object value) throws IOException {
       _parent.resolveForwardReference(id, value);
     }
   }
