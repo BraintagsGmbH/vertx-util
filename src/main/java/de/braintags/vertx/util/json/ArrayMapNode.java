@@ -55,7 +55,6 @@ class ArrayMapNode extends ValueNode {
     }
   }
 
-
   private static JsonNode convertArrayNode(final ArrayNode node) {
     ArrayNode modified = null;
     for (int i = node.size() - 1; i >= 0; i--) {
@@ -88,8 +87,7 @@ class ArrayMapNode extends ValueNode {
     return modified != null ? modified : node;
   }
 
-  private static ArrayMapNode convertToArrayNode(final JsonNode node,
-      final Entry<String, JsonNode> arrayMapField) {
+  private static ArrayMapNode convertToArrayNode(final JsonNode node, final Entry<String, JsonNode> arrayMapField) {
     Map<JsonNode, JsonNode> children = new LinkedHashMap<>();
     ArrayNode entries = (ArrayNode) arrayMapField.getValue();
     for (JsonNode e : entries) {
@@ -194,8 +192,7 @@ class ArrayMapNode extends ValueNode {
    * all of its descendants using specified JSON generator.
    */
   @Override
-  public void serialize(final JsonGenerator g, final SerializerProvider provider)
-      throws IOException {
+  public void serialize(final JsonGenerator g, final SerializerProvider provider) throws IOException {
     g.writeStartObject();
     innerSerialize(g, provider);
     g.writeEndObject();
@@ -216,8 +213,7 @@ class ArrayMapNode extends ValueNode {
   }
 
   @Override
-  public void serializeWithType(final JsonGenerator g, final SerializerProvider provider,
-      final TypeSerializer typeSer)
+  public void serializeWithType(final JsonGenerator g, final SerializerProvider provider, final TypeSerializer typeSer)
       throws IOException {
     typeSer.writeTypePrefixForObject(this, g);
     innerSerialize(g, provider);
@@ -340,6 +336,5 @@ class ArrayMapNode extends ValueNode {
   public String asText() {
     return "";
   }
-
 
 }
