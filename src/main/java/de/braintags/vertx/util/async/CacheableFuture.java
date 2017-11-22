@@ -8,7 +8,7 @@ import io.vertx.core.Handler;
 /**
  * Future of an asynchronous process whose result can be cached.
  * This results specifies how long it can be cached via the expires field.
- * 
+ *
  * @author mpluecker
  *
  * @param <T>
@@ -57,5 +57,16 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
 
   @Override
   <V> CacheableFuture<V> mapEmpty();
+
+  public static <T> CacheableFuture<T> wrap(final long expires, final Future<T> future) {
+    CacheableFuture<T> f = CacheableFuture.future();
+    future.setHandler(res -> {
+      if (res.succeeded())
+        f.complete(expires, res.result());
+      else
+        f.fail(res.cause());
+    });
+    return f;
+  }
 
 }

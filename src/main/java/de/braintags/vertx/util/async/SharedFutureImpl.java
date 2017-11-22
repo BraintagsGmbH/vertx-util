@@ -315,4 +315,27 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     return ret;
   }
 
+  @Override
+  public SharedFuture<T> otherwise(final Function<Throwable, T> mapper) {
+    if (mapper == null) {
+      throw new NullPointerException();
+    }
+    SharedFuture<T> ret = SharedFuture.future();
+    setHandler(ar -> {
+      if (ar.succeeded()) {
+        ret.complete(result());
+      } else {
+        T value;
+        try {
+          value = mapper.apply(ar.cause());
+        } catch (Throwable e) {
+          ret.fail(e);
+          return;
+        }
+        ret.complete(value);
+      }
+    });
+    return ret;
+  }
+
 }
