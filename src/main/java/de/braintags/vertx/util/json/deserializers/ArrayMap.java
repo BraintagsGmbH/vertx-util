@@ -27,4 +27,11 @@ public final class ArrayMap<K, V> extends LinkedHashMap<K, V> {
     super(source);
   }
 
+  @Override
+  public V put(final K key, final V value) {
+    if (value == null) {
+      return remove(key);
+    }
+    return super.put(key, value);
+  }
 }

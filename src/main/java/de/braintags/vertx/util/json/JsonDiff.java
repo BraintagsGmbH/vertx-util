@@ -502,12 +502,12 @@ public class JsonDiff {
   private static JsonNode internalRetainDiffTree(final JsonNode base, final JsonNode retainedFields,
       final JsonNode diff,
       final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
-    JsonNodeType nodeType = base.getNodeType();
+    JsonNodeType nodeType = diff.getNodeType();
     if (nodeType == null) {
-      if (base instanceof ArrayMapNode && diff instanceof ArrayMapNode) {
-        ArrayMapNode arrayBase = (ArrayMapNode) base;
+      if (diff instanceof ArrayMapNode) {
+        ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
         ArrayMapNode retainedArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
-        ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
+        ArrayMapNode arrayDiff = (ArrayMapNode) diff;
         retainDiffTreeArrayMapDiff(arrayBase, retainedArrayDiff, arrayDiff, nodeFactory, true);
         return arrayDiff;
       } else {
@@ -517,23 +517,22 @@ public class JsonDiff {
 
     switch (nodeType) {
       case OBJECT:
-        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
+        if (!arrayMapsConverted && (ArrayMapNode.isArrayMapNode(retainedFields) || ArrayMapNode.isArrayMapNode(diff))) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode retainedArrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(retainedFields);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
           retainDiffTreeArrayMapDiff(arrayBase, retainedArrayDiff, arrayDiff, nodeFactory, true);
           return ArrayMapNode.toRegularNode(arrayDiff, nodeFactory);
-        } else if (diff.isObject()) {
-          retainDiffTreeObjectDiff((ObjectNode) base, (ObjectNode) retainedFields, (ObjectNode) diff, nodeFactory,
+        } else if (retainedFields.isObject()) {
+          retainDiffTreeObjectDiff(base.isNull() ? nodeFactory.objectNode() : (ObjectNode) base,
+              (ObjectNode) retainedFields, (ObjectNode) diff, nodeFactory,
               arrayMapsConverted);
           return diff;
         } else {
-          return diff.deepCopy();
+          return diff;
         }
       case ARRAY:
-        retainDiffTreeArrayDiff((ArrayNode) base, (ArrayNode) retainedFields, (ArrayNode) diff, nodeFactory,
-            arrayMapsConverted);
-        return diff;
+        throw new UnsupportedOperationException("this operation is not supported for arrays");
       case BINARY:
       case BOOLEAN:
       case NULL:
@@ -594,7 +593,7 @@ public class JsonDiff {
         baseFieldValue = nodeFactory.nullNode();
       }
       if (!diffChildren.containsKey(key)) {
-        if (baseFieldValue instanceof ArrayMapNode) {
+        if (baseFieldValue instanceof ArrayMapNode || retainedEntry.getValue() instanceof ArrayMapNode) {
           diffChildren.put(key, internalRetainDiffTree(baseFieldValue, retainedEntry.getValue(), new ArrayMapNode(),
               nodeFactory, arrayMapsConverted));
         } else if (baseFieldValue.isObject()) {
@@ -611,12 +610,6 @@ public class JsonDiff {
             arrayMapsConverted));
       }
     }
-  }
-
-  private static void retainDiffTreeArrayDiff(final ArrayNode base, final ArrayNode retainedFields,
-      final ArrayNode diff,
-      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
-    throw new UnsupportedOperationException("this operation is not supported for arrays");
   }
 
   public static JsonNode getEmptyDiff(final JsonNodeFactory nodeFactory) {
