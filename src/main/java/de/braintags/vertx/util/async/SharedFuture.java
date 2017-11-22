@@ -9,7 +9,7 @@ import io.vertx.core.Handler;
 /**
  * Future of an asynchronous process whose result can be cached.
  * This results specifies how long it can be cached via the expires field.
- * 
+ *
  * @author mpluecker
  *
  * @param <T>
@@ -34,6 +34,10 @@ public interface SharedFuture<T> extends Future<T> {
     return new SharedFutureImpl<>(result);
   }
 
+  public static <T> SharedFuture<T> succeededFuture() {
+    return new SharedFutureImpl<>(null);
+  }
+
   public static <T> SharedFuture<T> failedFuture(final Throwable cause) {
     return new SharedFutureImpl<>(cause);
   }
@@ -49,6 +53,9 @@ public interface SharedFuture<T> extends Future<T> {
 
   @Override
   SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper);
+
+  @Override
+  SharedFuture<T> otherwise(Function<Throwable, T> mapper);
 
   @Override
   <V> SharedFuture<V> mapEmpty();
