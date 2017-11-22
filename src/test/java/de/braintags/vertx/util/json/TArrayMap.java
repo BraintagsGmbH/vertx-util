@@ -78,7 +78,6 @@ public class TArrayMap {
     JsonNode valueTreeData = Json.mapper.valueToTree(testData);
 
     JsonNode diff = JsonDiff.getDiff(valueTreeBase, valueTreeData);
-    System.out.println(diff);
 
     JsonNode diffApplied = JsonDiff.applyDiff(valueTreeBase, diff);
     Assert.assertEquals(valueTreeData, diffApplied);
