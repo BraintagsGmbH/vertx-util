@@ -46,8 +46,9 @@ public class ArrayMapModule extends Module {
     context.addDeserializers(new Deserializers.Base() {
       @Override
       public JsonDeserializer<?> findMapDeserializer(final MapType type, final DeserializationConfig config,
-          final BeanDescription beanDesc, final KeyDeserializer keyDeserializer, final TypeDeserializer elementTypeDeserializer,
-          final JsonDeserializer<?> elementDeserializer) throws JsonMappingException {
+          final BeanDescription beanDesc, final KeyDeserializer keyDeserializer,
+          final TypeDeserializer elementTypeDeserializer, final JsonDeserializer<?> elementDeserializer)
+          throws JsonMappingException {
 
         if (beanDesc.getClassInfo().getRawType().equals(ArrayMap.class)) {
           return new ArrayMapDeserializer(type, beanDesc, new ValueInstantiator.Base(ArrayMap.class), null,
@@ -63,9 +64,9 @@ public class ArrayMapModule extends Module {
     context.addSerializers(new Serializers.Base() {
 
       @Override
-      public JsonSerializer<?> findMapSerializer(final SerializationConfig config, final MapType type, final BeanDescription beanDesc,
-          final JsonSerializer<Object> keySerializer, final TypeSerializer elementTypeSerializer,
-          final JsonSerializer<Object> elementValueSerializer) {
+      public JsonSerializer<?> findMapSerializer(final SerializationConfig config, final MapType type,
+          final BeanDescription beanDesc, final JsonSerializer<Object> keySerializer,
+          final TypeSerializer elementTypeSerializer, final JsonSerializer<Object> elementValueSerializer) {
         if (beanDesc.getBeanClass().equals(ArrayMap.class)) {
           JavaType valueType = type.getContentType();
           boolean valueTypeStatic = valueType != null && valueType.isFinal();

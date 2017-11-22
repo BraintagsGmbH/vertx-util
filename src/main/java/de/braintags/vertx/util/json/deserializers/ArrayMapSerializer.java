@@ -39,9 +39,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  * Serializer implementation for serializing {link {@link ArrayMap}} types.
  * <p>
  */
-public class ArrayMapSerializer
-    extends ContainerSerializer<Map<?, ?>>
-    implements ContextualSerializer {
+public class ArrayMapSerializer extends ContainerSerializer<Map<?, ?>> implements ContextualSerializer {
 
   public static final String VALUE = "value";
   public static final String KEY = "key";
@@ -138,14 +136,11 @@ public class ArrayMapSerializer
    * @since 2.5
    */
   @SuppressWarnings("unchecked")
-  public ArrayMapSerializer(final Set<String> ignoredEntries,
-      final JavaType keyType, final JavaType valueType, final boolean valueTypeIsStatic,
-      final TypeSerializer vts,
-      final JsonSerializer<?> keySerializer, final JsonSerializer<?> valueSerializer) {
+  public ArrayMapSerializer(final Set<String> ignoredEntries, final JavaType keyType, final JavaType valueType,
+      final boolean valueTypeIsStatic, final TypeSerializer vts, final JsonSerializer<?> keySerializer,
+      final JsonSerializer<?> valueSerializer) {
     super(ArrayMap.class, false);
-    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty())
-        ? null
-        : ignoredEntries;
+    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty()) ? null : ignoredEntries;
     _keyType = keyType;
     _valueType = valueType;
     _valueTypeIsStatic = valueTypeIsStatic;
@@ -173,9 +168,7 @@ public class ArrayMapSerializer
       final JsonSerializer<?> keySerializer, final JsonSerializer<?> valueSerializer,
       final Set<String> ignoredEntries) {
     super(Map.class, false);
-    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty())
-        ? null
-        : ignoredEntries;
+    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty()) ? null : ignoredEntries;
     _keyType = src._keyType;
     _valueType = src._valueType;
     _valueTypeIsStatic = src._valueTypeIsStatic;
@@ -192,8 +185,7 @@ public class ArrayMapSerializer
   /**
    * @since 2.5
    */
-  protected ArrayMapSerializer(final ArrayMapSerializer src, final TypeSerializer vts,
-      Object suppressableValue) {
+  protected ArrayMapSerializer(final ArrayMapSerializer src, final TypeSerializer vts, Object suppressableValue) {
     super(Map.class, false);
     _ignoredEntries = src._ignoredEntries;
     _keyType = src._keyType;
@@ -230,11 +222,10 @@ public class ArrayMapSerializer
   }
 
   public ArrayMapSerializer(final ArrayMapSerializer src, final JavaType keyType, final JavaType valueType,
-      final boolean valueTypeIsStatic, final JsonSerializer<?> keySer, final JsonSerializer<?> valueSer, final Set<String> ignoredEntries) {
+      final boolean valueTypeIsStatic, final JsonSerializer<?> keySer, final JsonSerializer<?> valueSer,
+      final Set<String> ignoredEntries) {
     super(ArrayMap.class, false);
-    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty())
-        ? null
-        : ignoredEntries;
+    _ignoredEntries = ((ignoredEntries == null) || ignoredEntries.isEmpty()) ? null : ignoredEntries;
     _keyType = keyType;
     _valueType = valueType;
     _valueTypeIsStatic = valueTypeIsStatic;
@@ -260,9 +251,8 @@ public class ArrayMapSerializer
   /**
    * @since 2.4
    */
-  public ArrayMapSerializer withResolved(final BeanProperty property,
-      final JsonSerializer<?> keySerializer, final JsonSerializer<?> valueSerializer,
-      final Set<String> ignored, final boolean sortKeys) {
+  public ArrayMapSerializer withResolved(final BeanProperty property, final JsonSerializer<?> keySerializer,
+      final JsonSerializer<?> valueSerializer, final Set<String> ignored, final boolean sortKeys) {
     _ensureOverride();
     ArrayMapSerializer ser = new ArrayMapSerializer(this, property, keySerializer, valueSerializer, ignored);
     if (sortKeys != ser._sortKeys) {
@@ -271,8 +261,9 @@ public class ArrayMapSerializer
     return ser;
   }
 
-  private ArrayMapSerializer withResolved(final JavaType keyType, final JavaType valueType, final boolean staticValueType,
-      final JsonSerializer<?> keySer, final JsonSerializer<?> valueSer, final Set<String> ignored) {
+  private ArrayMapSerializer withResolved(final JavaType keyType, final JavaType valueType,
+      final boolean staticValueType, final JsonSerializer<?> keySer, final JsonSerializer<?> valueSer,
+      final Set<String> ignored) {
     ArrayMapSerializer result = new ArrayMapSerializer(this, keyType, valueType, staticValueType, keySer, valueSer,
         ignored);
     return result;
@@ -308,8 +299,7 @@ public class ArrayMapSerializer
    */
 
   @Override
-  public JsonSerializer<?> createContextual(final SerializerProvider provider,
-      final BeanProperty property)
+  public JsonSerializer<?> createContextual(final SerializerProvider provider, final BeanProperty property)
       throws JsonMappingException {
     JsonSerializer<?> ser = null;
     JsonSerializer<?> keySer = null;
@@ -555,8 +545,7 @@ public class ArrayMapSerializer
 
   @Override
   public void serializeWithType(Map<?, ?> value, final JsonGenerator gen, final SerializerProvider provider,
-      final TypeSerializer typeSer)
-      throws IOException {
+      final TypeSerializer typeSer) throws IOException {
     typeSer.writeTypePrefixForObject(value, gen);
     // [databind#631]: Assign current value, to be accessible by custom serializers
     gen.setCurrentValue(value);
@@ -637,8 +626,7 @@ public class ArrayMapSerializer
         serializer = serializers.serializerFor(cc);
         if (serializer == null) {
           if (_valueType.hasGenericTypes()) {
-            serializer = _findAndAddDynamic(serializers,
-                provider.constructSpecializedType(_valueType, cc), provider);
+            serializer = _findAndAddDynamic(serializers, provider.constructSpecializedType(_valueType, cc), provider);
           } else {
             serializer = _findAndAddDynamic(serializers, cc, provider);
           }
@@ -661,8 +649,7 @@ public class ArrayMapSerializer
    * Serialization method called when exclusion filtering needs to be applied.
    */
   public void serializeOptionalFields(final Map<?, ?> value, final JsonGenerator gen, final SerializerProvider provider,
-      final Object suppressableValue)
-      throws IOException {
+      final Object suppressableValue) throws IOException {
     // If value type needs polymorphic type handling, some more work needed:
     if (_valueTypeSerializer != null) {
       serializeTypedFields(value, gen, provider, suppressableValue);
@@ -690,8 +677,7 @@ public class ArrayMapSerializer
           valueSer = serializers.serializerFor(cc);
           if (valueSer == null) {
             if (_valueType.hasGenericTypes()) {
-              valueSer = _findAndAddDynamic(serializers,
-                  provider.constructSpecializedType(_valueType, cc), provider);
+              valueSer = _findAndAddDynamic(serializers, provider.constructSpecializedType(_valueType, cc), provider);
             } else {
               valueSer = _findAndAddDynamic(serializers, cc, provider);
             }
@@ -699,8 +685,7 @@ public class ArrayMapSerializer
           }
         }
         // also may need to skip non-empty values:
-        if ((suppressableValue == JsonInclude.Include.NON_EMPTY)
-            && valueSer.isEmpty(provider, valueElem)) {
+        if ((suppressableValue == JsonInclude.Include.NON_EMPTY) && valueSer.isEmpty(provider, valueElem)) {
           continue;
         }
       }
@@ -733,8 +718,7 @@ public class ArrayMapSerializer
    * provider.
    */
   public void serializeFieldsUsing(final Map<?, ?> value, final JsonGenerator gen, final SerializerProvider provider,
-      final JsonSerializer<Object> keySerializer, final JsonSerializer<Object> ser)
-      throws IOException {
+      final JsonSerializer<Object> keySerializer, final JsonSerializer<Object> ser) throws IOException {
     final Set<String> ignored = _ignoredEntries;
     final TypeSerializer typeSer = _valueTypeSerializer;
 
@@ -778,8 +762,7 @@ public class ArrayMapSerializer
    * @since 2.5
    */
   public void serializeFilteredFields(final Map<?, ?> value, final JsonGenerator gen, final SerializerProvider provider,
-      final PropertyFilter filter,
-      final Object suppressableValue) // since 2.5
+      final PropertyFilter filter, final Object suppressableValue) // since 2.5
       throws IOException {
     final Set<String> ignored = _ignoredEntries;
 
@@ -815,8 +798,7 @@ public class ArrayMapSerializer
           valueSer = serializers.serializerFor(cc);
           if (valueSer == null) {
             if (_valueType.hasGenericTypes()) {
-              valueSer = _findAndAddDynamic(serializers,
-                  provider.constructSpecializedType(_valueType, cc), provider);
+              valueSer = _findAndAddDynamic(serializers, provider.constructSpecializedType(_valueType, cc), provider);
             } else {
               valueSer = _findAndAddDynamic(serializers, cc, provider);
             }
@@ -824,8 +806,7 @@ public class ArrayMapSerializer
           }
         }
         // also may need to skip non-empty values:
-        if ((suppressableValue == JsonInclude.Include.NON_EMPTY)
-            && valueSer.isEmpty(provider, valueElem)) {
+        if ((suppressableValue == JsonInclude.Include.NON_EMPTY) && valueSer.isEmpty(provider, valueElem)) {
           continue;
         }
       }
@@ -875,16 +856,14 @@ public class ArrayMapSerializer
         valueSer = serializers.serializerFor(cc);
         if (valueSer == null) {
           if (_valueType.hasGenericTypes()) {
-            valueSer = _findAndAddDynamic(serializers,
-                provider.constructSpecializedType(_valueType, cc), provider);
+            valueSer = _findAndAddDynamic(serializers, provider.constructSpecializedType(_valueType, cc), provider);
           } else {
             valueSer = _findAndAddDynamic(serializers, cc, provider);
           }
           serializers = _dynamicValueSerializers;
         }
         // also may need to skip non-empty values:
-        if ((suppressableValue == JsonInclude.Include.NON_EMPTY)
-            && valueSer.isEmpty(provider, valueElem)) {
+        if ((suppressableValue == JsonInclude.Include.NON_EMPTY) && valueSer.isEmpty(provider, valueElem)) {
           continue;
         }
       }
@@ -929,8 +908,7 @@ public class ArrayMapSerializer
 
       JsonSerializer<?> valueSer = _valueSerializer;
       if (valueSer == null) {
-        valueSer = _findAndAddDynamic(_dynamicValueSerializers,
-            _valueType, visitor.getProvider());
+        valueSer = _findAndAddDynamic(_dynamicValueSerializers, _valueType, visitor.getProvider());
       }
       objectVisitor.property(VALUE, valueSer, _valueType);
     }
@@ -942,8 +920,8 @@ public class ArrayMapSerializer
    * /**********************************************************
    */
 
-  protected final JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map,
-      final Class<?> type, final SerializerProvider provider) throws JsonMappingException {
+  protected final JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map, final Class<?> type,
+      final SerializerProvider provider) throws JsonMappingException {
     PropertySerializerMap.SerializerAndMapResult result = map.findAndAddSecondarySerializer(type, provider, _property);
     // did we get a new map of serializers? If so, start using it
     if (map != result.map) {
@@ -952,8 +930,8 @@ public class ArrayMapSerializer
     return result.serializer;
   }
 
-  protected final JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map,
-      final JavaType type, final SerializerProvider provider) throws JsonMappingException {
+  protected final JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map, final JavaType type,
+      final SerializerProvider provider) throws JsonMappingException {
     PropertySerializerMap.SerializerAndMapResult result = map.findAndAddSecondarySerializer(type, provider, _property);
     if (map != result.map) {
       _dynamicValueSerializers = result.map;
@@ -1018,16 +996,15 @@ public class ArrayMapSerializer
         valueSer = _dynamicValueSerializers.serializerFor(cc);
         if (valueSer == null) {
           if (_valueType.hasGenericTypes()) {
-            valueSer = _findAndAddDynamic(_dynamicValueSerializers,
-                provider.constructSpecializedType(_valueType, cc), provider);
+            valueSer = _findAndAddDynamic(_dynamicValueSerializers, provider.constructSpecializedType(_valueType, cc),
+                provider);
           } else {
             valueSer = _findAndAddDynamic(_dynamicValueSerializers, cc, provider);
           }
         }
       }
       // also may need to skip non-empty values:
-      if ((suppressableValue == JsonInclude.Include.NON_EMPTY)
-          && valueSer.isEmpty(provider, value)) {
+      if ((suppressableValue == JsonInclude.Include.NON_EMPTY) && valueSer.isEmpty(provider, value)) {
         return;
       }
     }
@@ -1083,8 +1060,8 @@ public class ArrayMapSerializer
       visitStringFormat(visitor, typeHint);
     }
 
-    protected JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map,
-        final Class<?> type, final SerializerProvider provider) throws JsonMappingException {
+    protected JsonSerializer<Object> _findAndAddDynamic(final PropertySerializerMap map, final Class<?> type,
+        final SerializerProvider provider) throws JsonMappingException {
       PropertySerializerMap.SerializerAndMapResult result =
           // null -> for now we won't keep ref or pass BeanProperty; could change
           map.findAndAddSecondarySerializer(type, provider, property);

@@ -500,8 +500,7 @@ public class JsonDiff {
   }
 
   private static JsonNode internalRetainDiffTree(final JsonNode base, final JsonNode retainedFields,
-      final JsonNode diff,
-      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
+      final JsonNode diff, final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     JsonNodeType nodeType = diff.getNodeType();
     if (nodeType == null) {
       if (diff instanceof ArrayMapNode) {
@@ -525,8 +524,7 @@ public class JsonDiff {
           return ArrayMapNode.toRegularNode(arrayDiff, nodeFactory);
         } else if (retainedFields.isObject()) {
           retainDiffTreeObjectDiff(base.isNull() ? nodeFactory.objectNode() : (ObjectNode) base,
-              (ObjectNode) retainedFields, (ObjectNode) diff, nodeFactory,
-              arrayMapsConverted);
+              (ObjectNode) retainedFields, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
           return diff;
         } else {
           return diff;
@@ -547,8 +545,7 @@ public class JsonDiff {
   }
 
   private static void retainDiffTreeObjectDiff(final ObjectNode base, final ObjectNode retainedFields,
-      final ObjectNode diff,
-      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
+      final ObjectNode diff, final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     Iterator<Entry<String, JsonNode>> retainedFieldsIterator = retainedFields.fields();
     while (retainedFieldsIterator.hasNext()) {
       Entry<String, JsonNode> retainedField = retainedFieldsIterator.next();
@@ -579,8 +576,7 @@ public class JsonDiff {
   }
 
   private static void retainDiffTreeArrayMapDiff(final ArrayMapNode base, final ArrayMapNode retainedFields,
-      final ArrayMapNode diff,
-      final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
+      final ArrayMapNode diff, final JsonNodeFactory nodeFactory, final boolean arrayMapsConverted) {
     if (diff == null) {
       return;
     }
