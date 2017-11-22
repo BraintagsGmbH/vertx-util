@@ -34,8 +34,9 @@ public interface SharedFuture<T> extends Future<T> {
     return new SharedFutureImpl<>(result);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> SharedFuture<T> succeededFuture() {
-    return new SharedFutureImpl<>(null);
+    return (SharedFuture<T>) new SharedFutureImpl<>((Void) null);
   }
 
   public static <T> SharedFuture<T> failedFuture(final Throwable cause) {
