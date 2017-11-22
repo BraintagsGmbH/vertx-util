@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AsyncLock {
 
-  final boolean         readLock;
+  final boolean readLock;
   final LockedExecution execution;
-  final AtomicLong      lockStamp;
+  final AtomicLong lockStamp;
 
   AsyncLock(boolean readLock, LockedExecution execution) {
     this.readLock = readLock;

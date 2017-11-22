@@ -39,8 +39,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
    * Initialization method that needs to be called before passing
    * property to filter.
    */
-  public void reset(Object key,
-      JsonSerializer<Object> keySer, JsonSerializer<Object> valueSer) {
+  public void reset(Object key, JsonSerializer<Object> keySer, JsonSerializer<Object> valueSer) {
     _key = key;
     _keySerializer = keySer;
     _valueSerializer = valueSer;
@@ -70,8 +69,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public void serializeAsField(Object value, JsonGenerator gen,
-      SerializerProvider provider) throws IOException {
+  public void serializeAsField(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
     gen.writeStartObject();
     gen.writeFieldName(ArrayMapSerializer.KEY);
@@ -87,16 +85,14 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public void serializeAsOmittedField(Object value, JsonGenerator gen,
-      SerializerProvider provider) throws Exception {
+  public void serializeAsOmittedField(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
     if (!gen.canOmitFields()) {
       gen.writeOmittedField(getName());
     }
   }
 
   @Override
-  public void serializeAsElement(Object value, JsonGenerator gen,
-      SerializerProvider provider) throws Exception {
+  public void serializeAsElement(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
     if (_typeSerializer == null) {
       _valueSerializer.serialize(value, gen, provider);
     } else {
@@ -105,8 +101,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public void serializeAsPlaceholder(Object value, JsonGenerator gen,
-      SerializerProvider provider) throws Exception {
+  public void serializeAsPlaceholder(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
     gen.writeNull();
   }
 
@@ -117,8 +112,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
    */
 
   @Override
-  public void depositSchemaProperty(JsonObjectFormatVisitor objectVisitor,
-      SerializerProvider provider)
+  public void depositSchemaProperty(JsonObjectFormatVisitor objectVisitor, SerializerProvider provider)
       throws JsonMappingException {
     if (_property != null) {
       _property.depositSchemaProperty(objectVisitor, provider);
@@ -127,8 +121,8 @@ public class MapPropertyAsEntry extends PropertyWriter {
 
   @Override
   @Deprecated
-  public void depositSchemaProperty(ObjectNode propertiesNode,
-      SerializerProvider provider) throws JsonMappingException {
+  public void depositSchemaProperty(ObjectNode propertiesNode, SerializerProvider provider)
+      throws JsonMappingException {
     // nothing to do here
   }
 

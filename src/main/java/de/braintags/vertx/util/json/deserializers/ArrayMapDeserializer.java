@@ -40,9 +40,7 @@ import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
  * It can also construct {@link java.util.Map}s, but not with specific
  * POJO types, only other containers and primitives/wrappers.
  */
-public class ArrayMapDeserializer
-    extends MapDeserializer
-    implements ContextualDeserializer, ResolvableDeserializer {
+public class ArrayMapDeserializer extends MapDeserializer implements ContextualDeserializer, ResolvableDeserializer {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -60,8 +58,7 @@ public class ArrayMapDeserializer
    * /**********************************************************
    */
   public ArrayMapDeserializer(JavaType mapType, BeanDescription beanDesc, ValueInstantiator valueInstantiator,
-      JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser,
-      TypeDeserializer valueTypeDeser) {
+      JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser, TypeDeserializer valueTypeDeser) {
     super(mapType, valueInstantiator, null, valueDeser, valueTypeDeser);
     this._beanDesc = beanDesc;
     this._objKeyDeserializer = keyDeser;
@@ -75,11 +72,9 @@ public class ArrayMapDeserializer
     super(src);
   }
 
-  protected ArrayMapDeserializer(ArrayMapDeserializer src,
-      BeanDescription beanDesc, ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser,
-      JsonDeserializer<Object> valueDeser,
-      TypeDeserializer valueTypeDeser,
-      Set<String> ignorable) {
+  protected ArrayMapDeserializer(ArrayMapDeserializer src, BeanDescription beanDesc,
+      ValueInstantiator valueInstantiator, JsonDeserializer<?> keyDeser, JsonDeserializer<Object> valueDeser,
+      TypeDeserializer valueTypeDeser, Set<String> ignorable) {
     this(src._mapType, src._beanDesc, valueInstantiator, keyDeser, valueDeser, valueTypeDeser);
     _propertyBasedCreator = src._propertyBasedCreator;
     _delegateDeserializer = src._delegateDeserializer;
@@ -102,15 +97,14 @@ public class ArrayMapDeserializer
    */
   @SuppressWarnings("unchecked")
   protected ArrayMapDeserializer withResolved(ValueInstantiator valueInstatiator, JsonDeserializer<?> keyDeser,
-      TypeDeserializer valueTypeDeser, JsonDeserializer<?> valueDeser,
-      Set<String> ignorable) {
+      TypeDeserializer valueTypeDeser, JsonDeserializer<?> valueDeser, Set<String> ignorable) {
 
     if ((_objKeyDeserializer == keyDeser) && (_valueDeserializer == valueDeser)
         && (_valueTypeDeserializer == valueTypeDeser) && (_ignorableProperties == ignorable)) {
       return this;
     }
-    return new ArrayMapDeserializer(this, _beanDesc, valueInstatiator,
-        keyDeser, (JsonDeserializer<Object>) valueDeser, valueTypeDeser, ignorable);
+    return new ArrayMapDeserializer(this, _beanDesc, valueInstatiator, keyDeser, (JsonDeserializer<Object>) valueDeser,
+        valueTypeDeser, ignorable);
   }
 
   /*
@@ -130,8 +124,8 @@ public class ArrayMapDeserializer
    * when it is known for which property deserializer is needed for.
    */
   @Override
-  public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
-      BeanProperty property) throws JsonMappingException {
+  public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+      throws JsonMappingException {
     JsonDeserializer<?> kd = _objKeyDeserializer;
     if (kd == null) {
       kd = ctxt.findNonContextualValueDeserializer(_mapType.getKeyType());
@@ -194,8 +188,7 @@ public class ArrayMapDeserializer
           _delegateDeserializer.deserialize(p, ctxt));
     }
     if (!_hasDefaultCreator) {
-      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), p,
-          "no default constructor found");
+      return (Map<Object, Object>) ctxt.handleMissingInstantiator(getMapClass(), p, "no default constructor found");
     }
     // Ok: must point to START_OBJECT, FIELD_NAME or END_OBJECT
     final Map<Object, Object> result = (Map<Object, Object>) _valueInstantiator.createUsingDefault(ctxt);
@@ -208,8 +201,7 @@ public class ArrayMapDeserializer
 
   @SuppressWarnings("unchecked")
   @Override
-  public Map<Object, Object> deserialize(JsonParser p, DeserializationContext ctxt,
-      Map<Object, Object> result)
+  public Map<Object, Object> deserialize(JsonParser p, DeserializationContext ctxt, Map<Object, Object> result)
       throws IOException {
     // [databind#631]: Assign current value, to be accessible by custom serializers
     p.setCurrentValue(result);
@@ -223,8 +215,7 @@ public class ArrayMapDeserializer
   }
 
   @Override
-  public Object deserializeWithType(JsonParser jp, DeserializationContext ctxt,
-      TypeDeserializer typeDeserializer)
+  public Object deserializeWithType(JsonParser jp, DeserializationContext ctxt, TypeDeserializer typeDeserializer)
       throws IOException, JsonProcessingException {
     if (!jp.isExpectedStartObjectToken()) {
       return ctxt.handleUnexpectedToken(getMapClass(), jp);
@@ -238,8 +229,8 @@ public class ArrayMapDeserializer
    * /**********************************************************
    */
 
-  protected final void _readAsArrayAndBind(JsonParser p, DeserializationContext ctxt,
-      Map<Object, Object> result) throws IOException {
+  protected final void _readAsArrayAndBind(JsonParser p, DeserializationContext ctxt, Map<Object, Object> result)
+      throws IOException {
     final JsonDeserializer<?> keyDes = _objKeyDeserializer;
     final JsonDeserializer<Object> valueDes = _valueDeserializer;
     final TypeDeserializer typeDeser = _valueTypeDeserializer;
@@ -333,9 +324,8 @@ public class ArrayMapDeserializer
     throw new UnsupportedOperationException();
   }
 
-  private void handleUnresolvedReference(JsonParser jp, MapReferringAccumulator accumulator,
-      Object key, UnresolvedForwardReference reference)
-      throws JsonMappingException {
+  private void handleUnresolvedReference(JsonParser jp, MapReferringAccumulator accumulator, Object key,
+      UnresolvedForwardReference reference) throws JsonMappingException {
     if (accumulator == null) {
       throw JsonMappingException.from(jp, "Unresolved forward reference but no identity info.", reference);
     }
@@ -388,8 +378,8 @@ public class ArrayMapDeserializer
         previous = ref.next;
       }
 
-      throw new IllegalArgumentException("Trying to resolve a forward reference with id [" + id
-          + "] that wasn't previously seen as unresolved.");
+      throw new IllegalArgumentException(
+          "Trying to resolve a forward reference with id [" + id + "] that wasn't previously seen as unresolved.");
     }
   }
 
@@ -404,8 +394,7 @@ public class ArrayMapDeserializer
     public final Map<Object, Object> next = new LinkedHashMap<>();
     public final Object key;
 
-    MapReferring(MapReferringAccumulator parent, UnresolvedForwardReference ref,
-        Class<?> valueType, Object key) {
+    MapReferring(MapReferringAccumulator parent, UnresolvedForwardReference ref, Class<?> valueType, Object key) {
       super(ref, valueType);
       _parent = parent;
       this.key = key;

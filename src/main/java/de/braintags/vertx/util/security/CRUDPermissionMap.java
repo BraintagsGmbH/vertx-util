@@ -143,35 +143,35 @@ public class CRUDPermissionMap {
 
   private boolean hasPermission(BitSet set, char action) {
     switch (action) {
-    case 'C':
-      return set.get(0);
-    case 'R':
-      return set.get(1);
-    case 'U':
-      return set.get(2);
-    case 'D':
-      return set.get(3);
-    default:
-      throw new UnsupportedOperationException("action is not supported: '" + action + "'");
+      case 'C':
+        return set.get(0);
+      case 'R':
+        return set.get(1);
+      case 'U':
+        return set.get(2);
+      case 'D':
+        return set.get(3);
+      default:
+        throw new UnsupportedOperationException("action is not supported: '" + action + "'");
     }
   }
 
   private void setAction(BitSet set, char action, boolean activate) {
     switch (action) {
-    case 'C':
-      set.set(0, activate);
-      break;
-    case 'R':
-      set.set(1, activate);
-      break;
-    case 'U':
-      set.set(2, activate);
-      break;
-    case 'D':
-      set.set(3, activate);
-      break;
-    default:
-      throw new UnsupportedOperationException("action is not supported: " + action);
+      case 'C':
+        set.set(0, activate);
+        break;
+      case 'R':
+        set.set(1, activate);
+        break;
+      case 'U':
+        set.set(2, activate);
+        break;
+      case 'D':
+        set.set(3, activate);
+        break;
+      default:
+        throw new UnsupportedOperationException("action is not supported: " + action);
     }
   }
 

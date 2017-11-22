@@ -34,33 +34,29 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
  */
 public class DefaultingTypeDeserializer extends AsPropertyTypeDeserializer {
 
-  public DefaultingTypeDeserializer(
-      final JavaType bt, final TypeIdResolver idRes,
-      final String typePropertyName, final boolean typeIdVisible) {
+  public DefaultingTypeDeserializer(final JavaType bt, final TypeIdResolver idRes, final String typePropertyName,
+      final boolean typeIdVisible) {
     super(bt, idRes, typePropertyName, typeIdVisible, null);
   }
 
-  public DefaultingTypeDeserializer(
-      final AsPropertyTypeDeserializer src, final BeanProperty property) {
+  public DefaultingTypeDeserializer(final AsPropertyTypeDeserializer src, final BeanProperty property) {
     super(src, property);
   }
 
   @Override
-  public TypeDeserializer forProperty(
-      final BeanProperty prop) {
+  public TypeDeserializer forProperty(final BeanProperty prop) {
     return (prop == _property) ? this : new DefaultingTypeDeserializer(this, prop);
   }
 
   @Override
   protected Object _deserializeTypedUsingDefaultImpl(JsonParser p, final DeserializationContext ctxt,
-      final TokenBuffer tb)
-      throws IOException {
+      final TokenBuffer tb) throws IOException {
 
     JavaType targetType = _baseType;
-    
+
     Class<?> raw = targetType.getRawClass();
     if (ClassUtil.isBogusClass(raw)) {
-        return NullifyingDeserializer.instance;
+      return NullifyingDeserializer.instance;
     }
 
     synchronized (this) {

@@ -62,7 +62,6 @@ public class TJsonConverter {
     return array;
   }
 
-
   private void assertJsonArray(final JsonArray jsonArray, final ArrayNode expected) throws IOException {
     assertThat(jsonArray.size(), is(expected.size()));
     for (int i = 0; i < jsonArray.size(); i++) {
