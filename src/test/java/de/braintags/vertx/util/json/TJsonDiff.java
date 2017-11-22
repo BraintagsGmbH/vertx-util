@@ -233,7 +233,6 @@ public class TJsonDiff {
     Triple<ObjectNode, ObjectNode, SimplePojo> pojos = getDiffPojos(objectMapper);
 
     JsonNode diff = JsonDiff.getDiff(pojos.getLeft().deepCopy(), pojos.getMiddle(), objectMapper.getNodeFactory());
-    System.out.println(Json.prettyMapper.writeValueAsString(diff));
 
     ObjectNode pojoJson = (ObjectNode) JsonDiff.applyDiff(pojos.getLeft().deepCopy(), diff);
     Object decodedPojo = objectMapper.treeToValue(pojoJson, SimplePojo.class);
