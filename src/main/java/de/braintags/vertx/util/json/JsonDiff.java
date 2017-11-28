@@ -559,10 +559,10 @@ public class JsonDiff {
         if (baseFieldValue instanceof ArrayMapNode || retainedFieldValue instanceof ArrayMapNode) {
           diff.set(fieldName, internalRetainDiffTree(baseFieldValue, retainedFieldValue, new ArrayMapNode(),
               nodeFactory, arrayMapsConverted));
-        } else if (retainedFieldValue.isObject()) {
+        } else if (baseFieldValue.isObject()) {
           diff.set(fieldName, internalRetainDiffTree(baseFieldValue, retainedFieldValue, nodeFactory.objectNode(),
               nodeFactory, arrayMapsConverted));
-        } else if (retainedFieldValue.isNull() || retainedFieldValue.isValueNode()) {
+        } else if (baseFieldValue.isNull() || baseFieldValue.isValueNode()) {
           diff.set(fieldName, baseFieldValue.deepCopy());
         } else {
           throw new IllegalStateException("changes in the diff would by lost by merging: " + fieldName);
