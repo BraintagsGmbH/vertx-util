@@ -21,9 +21,12 @@ public class RetryingFuture<F extends Future<?>> extends SharedFutureImpl<F> {
   private final Function<Integer, Boolean> retryDecider;
 
   /**
-   * 
+   * @param retryDecider
+   *          Function that decides if another retry is made. The function is called with the current number of retries
+   *          (first retry is called with 0).
    * @param retryDelayMs
-   *          function from retry to delay - first retry is called with 0
+   *          Function from retry to delay. The function is called with the current number of retries (first retry is
+   *          called with 0).
    */
   public RetryingFuture(final Vertx vertx, final Callable<F> execution, final Function<Integer, Boolean> retryDecider,
       final Function<Integer, Integer> retryDelayMs) {
