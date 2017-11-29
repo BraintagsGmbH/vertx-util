@@ -60,6 +60,5 @@ public class RetryingFuture<F extends Future<?>> extends SharedFutureImpl<F> {
       fail(cause);
     }
   }
-  
-  
+
 }
