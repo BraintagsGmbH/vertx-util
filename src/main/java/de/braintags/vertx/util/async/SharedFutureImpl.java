@@ -300,4 +300,9 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     return ret;
   }
 
+  @Override
+  public SharedFuture<T> otherwiseEmpty() {
+    return otherwise(err -> null);
+  }
+
 }

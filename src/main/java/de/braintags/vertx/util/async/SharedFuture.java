@@ -61,6 +61,9 @@ public interface SharedFuture<T> extends Future<T> {
   @Override
   <V> SharedFuture<V> mapEmpty();
 
+  @Override
+  SharedFuture<T> otherwiseEmpty();
+
   public static <T> SharedFuture<T> wrap(final Future<T> future) {
     SharedFuture<T> f = new SharedFutureImpl<>();
     future.setHandler(f);
