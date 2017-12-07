@@ -233,22 +233,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     if (mapper == null) {
       throw new NullPointerException();
     }
-    SharedFuture<U> ret = SharedFuture.future();
-    setHandler(ar -> {
-      if (ar.succeeded()) {
-        Future<U> apply;
-        try {
-          apply = mapper.apply(ar.result());
-        } catch (Throwable e) {
-          ret.fail(e);
-          return;
-        }
-        apply.setHandler(ret);
-      } else {
-        ret.fail(ar.cause());
-      }
-    });
-    return ret;
+    return new ComposedSharedFuture<>(this, mapper);
   }
 
   @Override
@@ -256,35 +241,12 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     if (mapper == null) {
       throw new NullPointerException();
     }
-    SharedFuture<U> ret = SharedFuture.future();
-    setHandler(ar -> {
-      if (ar.succeeded()) {
-        U mapped;
-        try {
-          mapped = mapper.apply(ar.result());
-        } catch (Throwable e) {
-          ret.fail(e);
-          return;
-        }
-        ret.complete(mapped);
-      } else {
-        ret.fail(ar.cause());
-      }
-    });
-    return ret;
+    return new MappedSharedFuture<>(this, mapper);
   }
 
   @Override
   public <V> SharedFuture<V> map(final V value) {
-    SharedFuture<V> ret = SharedFuture.future();
-    setHandler(ar -> {
-      if (ar.succeeded()) {
-        ret.complete(value);
-      } else {
-        ret.fail(ar.cause());
-      }
-    });
-    return ret;
+    return new MappedValueSharedFuture<>(this, value);
   }
 
   @Override
