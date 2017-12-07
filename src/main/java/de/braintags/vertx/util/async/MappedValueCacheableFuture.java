@@ -3,7 +3,7 @@ package de.braintags.vertx.util.async;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-public class MappedValueCacheableFuture<U, T> extends CacheableFutureImpl<U> implements CacheableFuture<U> {
+class MappedValueCacheableFuture<U, T> extends CacheableFutureImpl<U> implements CacheableFuture<U> {
 
   private final U value;
 

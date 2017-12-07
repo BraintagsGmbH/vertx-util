@@ -5,7 +5,7 @@ import java.util.function.Function;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-public class ComposedSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFuture<U> {
+class ComposedSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFuture<U> {
 
   private final Function<T, Future<U>> mapper;
 

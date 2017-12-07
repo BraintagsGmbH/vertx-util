@@ -3,7 +3,7 @@ package de.braintags.vertx.util.async;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-public class MappedValueSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFuture<U> {
+class MappedValueSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFuture<U> {
 
   private final U value;
 

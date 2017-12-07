@@ -5,7 +5,7 @@ import java.util.function.Function;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-public class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements CacheableFuture<U> {
+class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements CacheableFuture<U> {
 
   private final Function<T, U> mapper;
 
