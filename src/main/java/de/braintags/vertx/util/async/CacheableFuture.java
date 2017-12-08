@@ -13,7 +13,7 @@ import io.vertx.core.Handler;
  *
  * @param <T>
  */
-public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T>, OneTimeFuture<CacheableFuture<T>> {
+public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T>, OneTimeFutureCallable<CacheableFuture<T>> {
 
   public static <T> CacheableFuture<T> toCacheable(final Future<T> future) {
     if (future instanceof CacheableFuture) {
