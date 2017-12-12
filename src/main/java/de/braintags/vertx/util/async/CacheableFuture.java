@@ -13,7 +13,7 @@ import io.vertx.core.Handler;
  *
  * @param <T>
  */
-public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T>, OneTimeFutureCallable<CacheableFuture<T>> {
+public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> {
 
   public static <T> CacheableFuture<T> toCacheable(final Future<T> future) {
     if (future instanceof CacheableFuture) {
@@ -71,11 +71,6 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T>,
         f.fail(res.cause());
     });
     return f;
-  }
-
-  @Override
-  default CacheableFuture<T> get() {
-    return this;
   }
 
 }
