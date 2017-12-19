@@ -29,6 +29,10 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
     return new CacheableFutureImpl<>();
   }
 
+  public static <T> CacheableFuture<T> succeededFuture(final long expires) {
+    return succeededFuture(expires, null);
+  }
+
   public static <T> CacheableFuture<T> succeededFuture(final long expires, final T result) {
     return new CacheableFutureImpl<>(expires, result);
   }
