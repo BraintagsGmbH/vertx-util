@@ -87,7 +87,7 @@ public class FutureTimeoutMonitor {
         generations.add(gen);
 
         long timeout = System.currentTimeMillis() - timeoutMs;
-        while (generations.peek().getCreationTime() < timeout) {
+        while (!generations.isEmpty() && generations.peek().getCreationTime() < timeout) {
           TimeoutGeneration timoutGen = generations.peek();
           for (FutureWithContext f : timoutGen) {
             if (!f.getFuture().isComplete()) {
