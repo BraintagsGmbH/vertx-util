@@ -135,7 +135,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
    */
   @Override
   public void complete(final T result) {
-    if (!tryComplete(result))
+    if (!tryComplete(result) && (cause() == null || !(cause() instanceof AsyncTimeoutException)))
       throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
 
@@ -149,7 +149,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
    */
   @Override
   public void fail(final Throwable throwable) {
-    if (!tryFail(throwable))
+    if (!tryFail(throwable) && (cause() == null || !(cause() instanceof AsyncTimeoutException)))
       throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
 
