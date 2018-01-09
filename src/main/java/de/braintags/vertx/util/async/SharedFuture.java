@@ -1,3 +1,15 @@
+/*-
+ * #%L
+ * Vert.x utilities from Braintags
+ * %%
+ * Copyright (C) 2017 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
 package de.braintags.vertx.util.async;
 
 import java.util.function.Function;
@@ -7,8 +19,9 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * Future of an asynchronous process whose result can be cached.
- * This results specifies how long it can be cached via the expires field.
+ * Future of an asynchronous process which can have multiple handlers.
+ * All methods that complete the future (e.g., {@link SharedFuture#complete()}) may not
+ * throw an exception if the future has been failed with an {@link AsyncTimeoutException}.
  *
  * @author mpluecker
  *
