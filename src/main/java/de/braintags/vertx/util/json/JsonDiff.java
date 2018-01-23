@@ -336,7 +336,13 @@ public class JsonDiff {
           newValues[i] = internalApplyDiff(baseNode.get(obj.get(INDEX).intValue()).deepCopy(), valueDiff, nodeFactory,
               arrayMapsConverted);
         } else {
-          newValues[i] = obj.get(VALUE);
+          JsonNode value = obj.get(VALUE);
+          if (value == null) {
+            throw new IllegalStateException(
+                "array node diff does not contain " + DIFF + " or " + VALUE + " property at entry " + i + ": "
+                    + diff);
+          }
+          newValues[i] = value;
         }
       }
     }
