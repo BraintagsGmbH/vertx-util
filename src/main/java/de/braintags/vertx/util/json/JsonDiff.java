@@ -336,12 +336,7 @@ public class JsonDiff {
           newValues[i] = internalApplyDiff(baseNode.get(obj.get(INDEX).intValue()).deepCopy(), valueDiff, nodeFactory,
               arrayMapsConverted);
         } else {
-          JsonNode value = obj.get(VALUE);
-          if (value == null) {
-            throw new IllegalStateException(
-                "array node diff does not contain " + DIFF + " or " + VALUE + " property at entry " + i + ": "
-                    + diff);
-          }
+          JsonNode value = getArrayDiffValue(diff, i, obj);
           newValues[i] = value;
         }
       }
@@ -349,6 +344,16 @@ public class JsonDiff {
 
     baseNode.removeAll();
     baseNode.addAll(Arrays.asList(newValues));
+  }
+
+  private static JsonNode getArrayDiffValue(final ArrayNode diff, final int index, final ObjectNode obj) {
+    JsonNode value = obj.get(VALUE);
+    if (value == null) {
+      throw new IllegalStateException(
+          "array node diff does not contain " + DIFF + " or " + VALUE + " property at entry " + index + ": "
+              + diff);
+    }
+    return value;
   }
 
   /**
@@ -475,12 +480,14 @@ public class JsonDiff {
             } else {
               ObjectNode newValue = nodeFactory.objectNode();
               newValue.set(VALUE,
-                  internalApplyDiff(baseNode.get(VALUE).deepCopy(), valueDiff, nodeFactory, arrayMapsConverted));
+                  internalApplyDiff(getArrayDiffValue(diff, i, (ObjectNode) baseNode).deepCopy(), valueDiff,
+                      nodeFactory,
+                      arrayMapsConverted));
               newValues[i] = newValue;
             }
           }
         } else {
-          newValues[i] = obj.get(VALUE);
+          newValues[i] = obj;
         }
       }
     }
