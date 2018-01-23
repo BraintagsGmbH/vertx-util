@@ -69,10 +69,16 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
   <V> CacheableFuture<V> map(final V value);
 
   @Override
+  <V> CacheableFuture<V> mapEmpty();
+
+  @Override
   CacheableFuture<T> recover(final Function<Throwable, Future<T>> mapper);
 
   @Override
-  <V> CacheableFuture<V> mapEmpty();
+  CacheableFuture<T> otherwise(Function<Throwable, T> mapper);
+
+  @Override
+  CacheableFuture<T> otherwiseEmpty();
 
   public static <T> CacheableFuture<T> wrap(final long expires, final Future<T> future) {
     CacheableFuture<T> f = CacheableFuture.future();

@@ -21,7 +21,7 @@ import io.vertx.core.Handler;
 /**
  * Result of an Service invocation that can be cached.
  * This results specifies how long it can be cached via the expires field.
- * 
+ *
  * @author mpluecker
  *
  * @param <T>
@@ -155,6 +155,34 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
   @Override
   public <V> CacheableFuture<V> mapEmpty() {
     return map((V) null);
+  }
+
+  @Override
+  public CacheableFuture<T> otherwise(final Function<Throwable, T> mapper) {
+    if (mapper == null) {
+      throw new NullPointerException();
+    }
+    CacheableFuture<T> ret = CacheableFuture.future();
+    setHandler(ar -> {
+      if (ar.succeeded()) {
+        ret.complete(result());
+      } else {
+        T value;
+        try {
+          value = mapper.apply(ar.cause());
+        } catch (Throwable e) {
+          ret.fail(e);
+          return;
+        }
+        ret.complete(value);
+      }
+    });
+    return ret;
+  }
+
+  @Override
+  public CacheableFuture<T> otherwiseEmpty() {
+    return otherwise(err -> null);
   }
 
 }

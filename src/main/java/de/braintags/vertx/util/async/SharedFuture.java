@@ -66,13 +66,13 @@ public interface SharedFuture<T> extends Future<T> {
   <V> SharedFuture<V> map(final V value);
 
   @Override
+  <V> SharedFuture<V> mapEmpty();
+
+  @Override
   SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper);
 
   @Override
   SharedFuture<T> otherwise(Function<Throwable, T> mapper);
-
-  @Override
-  <V> SharedFuture<V> mapEmpty();
 
   @Override
   SharedFuture<T> otherwiseEmpty();
