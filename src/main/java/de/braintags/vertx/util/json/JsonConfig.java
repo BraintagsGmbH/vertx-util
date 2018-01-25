@@ -27,10 +27,12 @@ import io.vertx.core.json.Json;
 
 public class JsonConfig {
 
-  private static final List<WeakReference<ObjectMapper>> objectMappers = new ArrayList<>();
-  private static final List<Config> configs = new ArrayList<>();
+  private static final List<WeakReference<ObjectMapper>> objectMappers;
+  private static final List<Config> configs;
 
   static {
+    objectMappers = new ArrayList<>();
+    configs = new ArrayList<>();
     // add default configuration for all mappers
     addConfig(mapper -> {
       mapper.registerModule(new ParameterNamesModule(Mode.DELEGATING));
@@ -55,7 +57,7 @@ public class JsonConfig {
       }
 
       objectMappers.add(new WeakReference<>(mapper));
-      for (Config config : configs) {
+      for (Config config : new ArrayList<>(configs)) {
         config.configure(mapper);
       }
     }
@@ -67,7 +69,7 @@ public class JsonConfig {
         return;
       }
 
-      ListIterator<WeakReference<ObjectMapper>> iter = objectMappers.listIterator();
+      ListIterator<WeakReference<ObjectMapper>> iter = new ArrayList<>(objectMappers).listIterator();
       while (iter.hasNext()) {
         WeakReference<ObjectMapper> objectMapperRef = iter.next();
         ObjectMapper objectMapper = objectMapperRef.get();
