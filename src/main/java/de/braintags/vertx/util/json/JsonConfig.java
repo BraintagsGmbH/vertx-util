@@ -46,35 +46,39 @@ public class JsonConfig {
 
   }
 
-  public static synchronized void configureObjectMapper(final ObjectMapper mapper) {
-    for (WeakReference<ObjectMapper> objectMapper : objectMappers) {
-      if (objectMapper.get() == mapper) {
-        return;
+  public static void configureObjectMapper(final ObjectMapper mapper) {
+    synchronized (configs) {
+      for (WeakReference<ObjectMapper> objectMapper : objectMappers) {
+        if (objectMapper.get() == mapper) {
+          return;
+        }
       }
-    }
 
-    objectMappers.add(new WeakReference<>(mapper));
-    for (Config config : configs) {
-      config.configure(mapper);
+      objectMappers.add(new WeakReference<>(mapper));
+      for (Config config : configs) {
+        config.configure(mapper);
+      }
     }
   }
 
-  public static synchronized void addConfig(final Config config) {
-    if (configs.contains(config)) {
-      return;
-    }
-
-    ListIterator<WeakReference<ObjectMapper>> iter = objectMappers.listIterator();
-    while (iter.hasNext()) {
-      WeakReference<ObjectMapper> objectMapperRef = iter.next();
-      ObjectMapper objectMapper = objectMapperRef.get();
-      if (objectMapper == null) {
-        iter.remove();
-      } else {
-        config.configure(objectMapper);
+  public static void addConfig(final Config config) {
+    synchronized (configs) {
+      if (configs.contains(config)) {
+        return;
       }
+
+      ListIterator<WeakReference<ObjectMapper>> iter = objectMappers.listIterator();
+      while (iter.hasNext()) {
+        WeakReference<ObjectMapper> objectMapperRef = iter.next();
+        ObjectMapper objectMapper = objectMapperRef.get();
+        if (objectMapper == null) {
+          iter.remove();
+        } else {
+          config.configure(objectMapper);
+        }
+      }
+      configs.add(config);
     }
-    configs.add(config);
   }
 
   @FunctionalInterface
