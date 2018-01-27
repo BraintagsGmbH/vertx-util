@@ -1,5 +1,8 @@
 package de.braintags.vertx.util.url;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class UrlUtil {
@@ -40,4 +43,24 @@ public class UrlUtil {
     return result.toString();
   }
 
+  public static URI appendQuery(final String uri, final String appendQuery) throws URISyntaxException {
+    URI oldUri = new URI(uri);
+    return appendQuery(oldUri, appendQuery);
+  }
+
+  public static URI appendQuery(final URI uri, final String paramName, final String paramValue)
+      throws URISyntaxException {
+    return appendQuery(uri, paramName + "=" + paramValue);
+  }
+
+  public static URI appendQuery(final URI uri, final String appendQuery) throws URISyntaxException {
+    String newQuery = uri.getQuery();
+    if (newQuery == null) {
+      newQuery = appendQuery;
+    } else {
+      newQuery += "&" + appendQuery;
+    }
+
+    return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment());
+  }
 }
