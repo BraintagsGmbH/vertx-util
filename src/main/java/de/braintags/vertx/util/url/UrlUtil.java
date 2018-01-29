@@ -48,19 +48,21 @@ public class UrlUtil {
     return appendQuery(oldUri, appendQuery);
   }
 
-  public static URI appendQuery(final URI uri, final String paramName, final String paramValue)
-      throws URISyntaxException {
+  public static URI appendQuery(final URI uri, final String paramName, final String paramValue) {
     return appendQuery(uri, paramName + "=" + paramValue);
   }
 
-  public static URI appendQuery(final URI uri, final String appendQuery) throws URISyntaxException {
+  public static URI appendQuery(final URI uri, final String appendQuery) {
     String newQuery = uri.getQuery();
     if (newQuery == null) {
       newQuery = appendQuery;
     } else {
       newQuery += "&" + appendQuery;
     }
-
-    return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment());
+    try {
+      return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment());
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
