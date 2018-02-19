@@ -65,4 +65,25 @@ public class UrlUtil {
       throw new RuntimeException(e);
     }
   }
+
+  public static URI appendPath(final URI uri, final String appendPath) {
+    String newPath = uri.getPath();
+    if (newPath == null) {
+      newPath = appendPath;
+    } else {
+      boolean endSlash = newPath.endsWith("/");
+      boolean startSlash = appendPath.startsWith("/");
+      if (endSlash && startSlash && appendPath.length() > 1)
+        newPath += appendPath.substring(1);
+      else if (!endSlash && !startSlash)
+        newPath += "/" + appendPath;
+      else
+        newPath += appendPath;
+    }
+    try {
+      return new URI(uri.getScheme(), uri.getAuthority(), newPath, uri.getQuery(), uri.getFragment());
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
