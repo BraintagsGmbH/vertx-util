@@ -255,6 +255,30 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   }
 
   @Override
+  public <V> SharedFuture<V> chain(final Function<Void, Future<V>> mapper) {
+    if (mapper == null) {
+      throw new NullPointerException();
+    }
+    SharedFuture<V> ret = SharedFuture.future();
+    setHandler(ar -> {
+      Future<V> mapped;
+      try {
+        mapped = mapper.apply(null);
+      } catch (Throwable e) {
+        ret.fail(e);
+        return;
+      }
+      mapped.setHandler(res -> {
+        if (ar.failed()) {
+          ret.fail(ar.cause());
+        }
+        ret.handle(res);
+      });
+    });
+    return ret;
+  }
+
+  @Override
   public SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper) {
     if (mapper == null) {
       throw new NullPointerException();
