@@ -1,3 +1,15 @@
+/*-
+ * #%L
+ * Vert.x utilities from Braintags
+ * %%
+ * Copyright (C) 2017 Braintags GmbH
+ * %%
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * #L%
+ */
 package de.braintags.vertx;
 
 import java.io.Closeable;
@@ -18,10 +30,10 @@ import io.vertx.ext.unit.TestContext;
 
 /**
  * A helper class for testing HTTP requests.
- * 
+ *
  * Copyright: Copyright (c) 02.02.2017 <br>
  * Company: Braintags GmbH <br>
- * 
+ *
  * @author mpluecker
  *
  */
@@ -31,85 +43,86 @@ public class HttpTestClient implements Closeable {
       .getLogger(HttpTestClient.class);
 
   public HttpClient client;
-  private String hostName;
-  private int port;
+  private final String hostName;
+  private final int port;
 
-  public HttpTestClient(Vertx vertx, String hostName, int port) {
+  public HttpTestClient(final Vertx vertx, final String hostName, final int port) {
     this.hostName = hostName;
     this.port = port;
     client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(port));
   }
 
+  @Override
   public void close() {
     client.close();
     client = null;
   }
 
-  public final void testRequest(TestContext context, HttpMethod method, String path, int expectedStatusCode,
-      String expectedStatusMessage) throws Exception {
+  public final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final int expectedStatusCode, final String expectedStatusMessage) throws Exception {
     testRequest(context, method, path, null, expectedStatusCode, expectedStatusMessage, null);
   }
 
-  public final void testRequest(TestContext context, HttpMethod method, String path, int expectedStatusCode,
-      String expectedStatusMessage, String responseBody) throws Exception {
+  public final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final int expectedStatusCode, final String expectedStatusMessage, final String responseBody) throws Exception {
     testRequest(context, method, path, null, expectedStatusCode, expectedStatusMessage, responseBody);
   }
 
-  public final void testRequest(TestContext context, HttpMethod method, String path, int expectedStatusCode,
-      String expectedStatusMessage, Buffer responseBody) throws Exception {
+  public final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final int expectedStatusCode, final String expectedStatusMessage, final Buffer responseBody) throws Exception {
     testRequestBuffer(context, method, path, null, null, expectedStatusCode, expectedStatusMessage, responseBody);
   }
 
-  public final void testRequestWithContentType(TestContext context, HttpMethod method, String path, String contentType,
-      int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), expectedStatusCode, expectedStatusMessage,
-        null);
+  public final void testRequestWithContentType(final TestContext context, final HttpMethod method, final String path,
+      final String contentType, final int expectedStatusCode, final String expectedStatusMessage) throws Exception {
+    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
-  public final void testRequestWithAccepts(TestContext context, HttpMethod method, String path, String accepts,
-      int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("accept", accepts), expectedStatusCode, expectedStatusMessage, null);
+  public final void testRequestWithAccepts(final TestContext context, final HttpMethod method, final String path,
+      final String accepts, final int expectedStatusCode, final String expectedStatusMessage) throws Exception {
+    testRequest(context, method, path, req -> req.putHeader("accept", accepts), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
-  public final void testRequestWithCookies(TestContext context, HttpMethod method, String path, String cookieHeader,
-      int expectedStatusCode, String expectedStatusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), expectedStatusCode, expectedStatusMessage, null);
+  public final void testRequestWithCookies(final TestContext context, final HttpMethod method, final String path,
+      final String cookieHeader, final int expectedStatusCode, final String expectedStatusMessage) throws Exception {
+    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), expectedStatusCode,
+        expectedStatusMessage, null);
   }
 
-  public final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, int expectedStatusCode, String expectedStatusMessage, String responseBody)
-      throws Exception {
+  public final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final Consumer<HttpClientRequest> requestAction, final int expectedStatusCode, final String expectedStatusMessage,
+      final String responseBody) throws Exception {
     testRequest(context, method, path, requestAction, null, expectedStatusCode, expectedStatusMessage, responseBody);
   }
 
-  public final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int expectedStatusCode,
-      String expectedStatusMessage, String responseBody) throws Exception {
+  public final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction,
+      final int expectedStatusCode, final String expectedStatusMessage, final String responseBody) throws Exception {
     testRequestBuffer(context, method, path, requestAction, responseAction, expectedStatusCode, expectedStatusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
-  public final void testRequestBuffer(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int expectedStatusCode,
-      String expectedStatusMessage, Buffer responseBodyBuffer) throws Exception {
-    testRequestBuffer(context, client, method, port, path, requestAction, responseAction, expectedStatusCode, expectedStatusMessage,
-        responseBodyBuffer);
+  public final void testRequestBuffer(final TestContext context, final HttpMethod method, final String path,
+      final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction,
+      final int expectedStatusCode, final String expectedStatusMessage, final Buffer responseBodyBuffer)
+      throws Exception {
+    testRequestBuffer(context, client, method, port, path, requestAction, responseAction, expectedStatusCode,
+        expectedStatusMessage, responseBodyBuffer);
   }
 
-  public final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int expectedStatusCode,
-      String expectedStatusMessage, Buffer responseBodyBuffer) throws Exception {
+  public final void testRequestBuffer(final TestContext context, final HttpClient client, final HttpMethod method,
+      final int port, final String path, final Consumer<HttpClientRequest> requestAction,
+      final Consumer<ResponseCopy> responseAction, final int expectedStatusCode, final String expectedStatusMessage,
+      final Buffer responseBodyBuffer) throws Exception {
     LOGGER.info("calling URL " + path);
     Async async = context.async();
     ResultObject<ResponseCopy> resultObject = new ResultObject<>(null);
 
-    Handler<Throwable> exceptionHandler = new Handler<Throwable>() {
-
-      @Override
-      public void handle(Throwable ex) {
-        LOGGER.error("", ex);
-        async.complete();
-      }
+    Handler<Throwable> exceptionHandler = ex -> {
+      LOGGER.error("", ex);
+      async.complete();
     };
 
     HttpClientRequest req = client.request(method, port, hostName, path, resp -> {
