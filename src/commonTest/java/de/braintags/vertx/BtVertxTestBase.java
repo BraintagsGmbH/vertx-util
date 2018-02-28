@@ -30,9 +30,9 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
  * BAsic Class which is activating an instance of Vertx
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 @RunWith(VertxUnitRunner.class)
 public class BtVertxTestBase {
@@ -48,33 +48,33 @@ public class BtVertxTestBase {
   public TestName name = new TestName();
 
   @Before
-  public final void initBeforeTest(TestContext context) {
+  public final void initBeforeTest(final TestContext context) {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initTest(context);
   }
 
-  public void initTest(TestContext context) {
+  public void initTest(final TestContext context) {
 
   }
 
   @After
-  public final void afterTest(TestContext context) {
+  public final void afterTest(final TestContext context) {
     LOGGER.info("Stopping test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     stopTest(context);
   }
 
-  protected void stopTest(TestContext context) {
+  protected void stopTest(final TestContext context) {
 
   }
 
   @BeforeClass
-  public static void startup(TestContext context) throws Exception {
+  public static void startup(final TestContext context) throws Exception {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
   }
 
   @AfterClass
-  public static void shutdown(TestContext context) throws Exception {
+  public static void shutdown(final TestContext context) throws Exception {
     LOGGER.debug("performing shutdown");
 
     if (vertx != null) {
@@ -89,7 +89,7 @@ public class BtVertxTestBase {
     }
   }
 
-  protected void undeployVerticle(TestContext context, AbstractVerticle verticle) {
+  protected void undeployVerticle(final TestContext context, final AbstractVerticle verticle) {
     LOGGER.debug("undeploying verticle " + verticle.deploymentID());
     Async async = context.async();
     vertx.undeploy(verticle.deploymentID(), result -> {
@@ -126,11 +126,11 @@ public class BtVertxTestBase {
 
   /**
    * Examines the given Throwable and creates an AssertionError from it or rethrows, if already one
-   * 
+   *
    * @param e
    *          the Throwable to examine
    */
-  public void createAssertionError(Throwable e) {
+  public void createAssertionError(final Throwable e) {
     if (e instanceof AssertionError) {
       throw (AssertionError) e;
     } else {
