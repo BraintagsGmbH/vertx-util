@@ -43,7 +43,7 @@ public class UrlUtil {
     return result.toString();
   }
 
-  public static URI appendQuery(final String uri, final String appendQuery) throws URISyntaxException {
+  public static URI appendQuery(final String uri, final String... appendQuery) throws URISyntaxException {
     URI oldUri = new URI(uri);
     return appendQuery(oldUri, appendQuery);
   }
@@ -52,12 +52,14 @@ public class UrlUtil {
     return appendQuery(uri, paramName + "=" + paramValue);
   }
 
-  public static URI appendQuery(final URI uri, final String appendQuery) {
+  public static URI appendQuery(final URI uri, final String... appendQueries) {
     String newQuery = uri.getQuery();
-    if (newQuery == null) {
-      newQuery = appendQuery;
-    } else {
-      newQuery += "&" + appendQuery;
+    for (String appendQuery : appendQueries) {
+      if (newQuery == null) {
+        newQuery = appendQuery;
+      } else {
+        newQuery += "&" + appendQuery;
+      }
     }
     try {
       return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment());
