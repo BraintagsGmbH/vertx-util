@@ -67,4 +67,18 @@ public class UrlUtil {
       throw new RuntimeException(e);
     }
   }
+
+  public static URI ensureFolder(final URI uri) {
+    String path = uri.getPath();
+    if (!path.isEmpty() && path.charAt(path.length() - 1) == '/') {
+      return uri;
+    } else {
+      try {
+        return new URI(uri.getScheme(), uri.getAuthority(), path + "/", uri.getQuery(), uri.getFragment());
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
 }
