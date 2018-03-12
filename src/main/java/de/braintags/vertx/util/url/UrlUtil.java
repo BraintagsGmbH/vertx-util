@@ -62,7 +62,8 @@ public class UrlUtil {
       }
     }
     try {
-      return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), newQuery, uri.getFragment());
+      return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), newQuery,
+          uri.getFragment());
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -74,7 +75,8 @@ public class UrlUtil {
       return uri;
     } else {
       try {
-        return new URI(uri.getScheme(), uri.getAuthority(), path + "/", uri.getQuery(), uri.getFragment());
+        return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path + "/", uri.getQuery(),
+            uri.getFragment());
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);
       }
