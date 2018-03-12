@@ -279,6 +279,11 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   }
 
   @Override
+  public <V> SharedFuture<V> then(final Function<AsyncResult<T>, Future<V>> mapper) {
+    return new SharedFutureThen<>(this, mapper);
+  }
+
+  @Override
   public SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper) {
     if (mapper == null) {
       throw new NullPointerException();
