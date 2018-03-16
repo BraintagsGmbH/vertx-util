@@ -20,6 +20,9 @@ public class CrossSum {
    * @return
    */
   public static long getCrossSum(Long source) {
+    if (source < 0) {
+      throw new IllegalArgumentException("need positive value");
+    }
     long summe = 0;
     while (0 != source) {
       summe = summe + (source % 10);
