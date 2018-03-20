@@ -70,6 +70,8 @@ public interface SharedFuture<T> extends Future<T> {
 
   <V> SharedFuture<V> chain(final Function<Void, Future<V>> mapper);
 
+  <V> SharedFuture<V> then(final Function<AsyncResult<T>, Future<V>> mapper);
+
   @Override
   SharedFuture<T> recover(final Function<Throwable, Future<T>> mapper);
 
