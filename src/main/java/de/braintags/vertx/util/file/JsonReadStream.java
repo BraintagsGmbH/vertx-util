@@ -40,10 +40,10 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
   private Handler<Throwable> exceptionHandler = new DefaultExceptionHandler();
   private Handler<Buffer> contentHandler;
   private Handler<Void> endHandler;
-  protected final Iterator<T> instances;
-  protected boolean pretty = false;
-  protected boolean array = true;
-  protected final AtomicBoolean firstElementWritten = new AtomicBoolean(false);
+  private final Iterator<T> instances;
+  private boolean pretty = false;
+  private boolean array = true;
+  private final AtomicBoolean firstElementWritten = new AtomicBoolean(false);
 
   /**
    * the same as this( instances, false, true )
@@ -193,6 +193,38 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
       throw ExceptionUtil.createRuntimeException(t);
     }
 
+  }
+
+  /**
+   * Shall the output be pretty printed?
+   * 
+   * @return the pretty
+   */
+  public boolean isPretty() {
+    return pretty;
+  }
+
+  /**
+   * Shall the output be written as json array?
+   * 
+   * @return the array
+   */
+  public boolean isArray() {
+    return array;
+  }
+
+  /**
+   * @return the instances
+   */
+  public Iterator<T> getInstances() {
+    return instances;
+  }
+
+  /**
+   * @return the firstElementWritten
+   */
+  public AtomicBoolean getFirstElementWritten() {
+    return firstElementWritten;
   }
 
 }
