@@ -53,10 +53,15 @@ public interface JWTHandler {
 
         // synchronize on the class to avoid the case where multiple file accesses will overlap
         synchronized (JWTHandler.class) {
-          final Buffer keystore = vertx.fileSystem().readFileBlocking(keyStore.getPath());
-
-          try (InputStream in = new ByteArrayInputStream(keystore.getBytes())) {
-            ks.load(in, keyStorePassword);
+          try {
+            final Buffer keystore = vertx.fileSystem().readFileBlocking(keyStore.getPath());
+            try (InputStream in = new ByteArrayInputStream(keystore.getBytes())) {
+              ks.load(in, keyStorePassword);
+            }
+          } catch (NoSuchFileException e) {
+            try (keyStoreStream = JWTHandler.class.getClassLoader().getResourceAsStream(keyStore.getPath())) {
+              
+            }
           }
         }
 
