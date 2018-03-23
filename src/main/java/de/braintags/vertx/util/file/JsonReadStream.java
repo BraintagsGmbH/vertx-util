@@ -85,7 +85,10 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
   private void next() {
     if (!paused.get()) {
       if (instances.hasNext()) {
-        contentHandler.handle(createContent(instances.next()));
+        Buffer buffer = createContent(instances.next());
+        if (buffer != null && buffer.length() > 0) {
+          contentHandler.handle(buffer);
+        }
         next();
       } else {
         // mark as ended if the handler was registered too late
@@ -97,7 +100,7 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
     }
   }
 
-  private Buffer createContent(final T instance) {
+  protected Buffer createContent(final T instance) {
     try {
       boolean fst = firstElementWritten.getAndSet(true);
       Buffer b = Buffer.buffer();
@@ -112,7 +115,9 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
         }
       }
 
+
       b.appendString(pretty ? encodeInstancePretty(instance) : encodeInstance(instance));
+
       if (!instances.hasNext()) {
         if (array) {
           b.appendString(" ]");
@@ -145,7 +150,7 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
     return Json.encode(instance);
   }
 
-  private RuntimeException handleException(final Exception e) {
+  protected RuntimeException handleException(final Exception e) {
     if (exceptionHandler != null) {
       exceptionHandler.handle(e);
     }
@@ -188,6 +193,38 @@ public class JsonReadStream<T> implements ReadStream<Buffer> {
       throw ExceptionUtil.createRuntimeException(t);
     }
 
+  }
+
+  /**
+   * Shall the output be pretty printed?
+   * 
+   * @return the pretty
+   */
+  public boolean isPretty() {
+    return pretty;
+  }
+
+  /**
+   * Shall the output be written as json array?
+   * 
+   * @return the array
+   */
+  public boolean isArray() {
+    return array;
+  }
+
+  /**
+   * @return the instances
+   */
+  public Iterator<T> getInstances() {
+    return instances;
+  }
+
+  /**
+   * @return the firstElementWritten
+   */
+  public AtomicBoolean getFirstElementWritten() {
+    return firstElementWritten;
   }
 
 }
