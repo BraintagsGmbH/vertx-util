@@ -46,6 +46,7 @@ public class HttpContentType {
   private final String mainType;
   private final String subType;
   private final Map<String, String> parameters;
+  private final String parameterlessValue;
 
   HttpContentType(final String mainType, final String subType) {
     this(mainType, subType, Collections.emptyMap());
@@ -55,8 +56,8 @@ public class HttpContentType {
     this.mainType = mainType;
     this.subType = subType;
     this.parameters = parameters;
-    this.value = mainType + "/" + subType
-        + (parameters.isEmpty() ? ""
+    parameterlessValue = mainType + "/" + subType;
+    this.value = parameterlessValue + (parameters.isEmpty() ? ""
             : ";" + Joiner.on(';').join(parameters.entrySet().stream()
                 .map(param -> param.getKey() + "=" + param.getValue()).collect(toList())));
   }
@@ -64,6 +65,10 @@ public class HttpContentType {
   @Override
   public String toString() {
     return value;
+  }
+
+  public String getParameterlessValue() {
+    return parameterlessValue;
   }
 
   public String getValue() {
