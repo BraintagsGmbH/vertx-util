@@ -51,6 +51,10 @@ public class StreamUtil {
     return t -> seen.add(keyExtractor.apply(t));
   }
 
+  /**
+   * Like {@link Collectors#toMap(Function, Function, java.util.function.BinaryOperator, Supplier)} but with a default
+   * merge function
+   */
   public static <T, K, U, M extends Map<K, U>> Collector<T, ?, M> toMap(
       final Function<? super T, ? extends K> keyMapper, final Function<? super T, ? extends U> valueMapper,
       final Supplier<M> mapSupplier) {
