@@ -23,11 +23,16 @@ public class HttpContentType {
 
   public static final String MAIN_TYPE_APPLICATION = "application";
   public static final String MAIN_TYPE_TEXT = "text";
+  public static final String MAIN_TYPE_IMAGE = "image";
 
   public static final String SUB_TYPE_JSON = "json";
   public static final String SUB_TYPE_JAVASCRIPT = "javascript";
   public static final String SUB_TYPE_HTML = "html";
   public static final String SUB_TYPE_CSS = "css";
+
+  public static final String SUB_TYPE_PNG = "png";
+  public static final String SUB_TYPE_SVG = "svg+xml";
+  public static final String SUB_TYPE_JPEG = "jpeg";
 
   private static final String PARAM_CHARSET = "charset";
 
@@ -36,11 +41,15 @@ public class HttpContentType {
   public static HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML);
   public static HttpContentType TEXT_CSS = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_CSS);
 
-  public static HttpContentType JAVASCRIPT = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JAVASCRIPT);
+  public static HttpContentType APPLICATION_JAVASCRIPT = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JAVASCRIPT);
 
   public static HttpContentType JSON = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON);
   public static HttpContentType JSON_UTF8 = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON,
       Collections.singletonMap(PARAM_CHARSET, CHARSET_UTF8));
+
+  public static HttpContentType IMAGE_PNG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_PNG);
+  public static HttpContentType IMAGE_SVG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_SVG);
+  public static HttpContentType IMAGE_JPEG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_JPEG);
 
   private final String value;
   private final String mainType;
