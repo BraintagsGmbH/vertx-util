@@ -76,4 +76,31 @@ public class UrlUtil {
     }
   }
 
+  public static URI appendPath(final URI uri, final String path) {
+    String oldPath = uri.getPath();
+    String newPath;
+    if (oldPath != null && !oldPath.isEmpty()) {
+      boolean oldEnd = oldPath.charAt(oldPath.length() - 1) == '/';
+      boolean pathStart = path.charAt(0) == '/';
+      if (oldEnd) {
+        if (pathStart)
+          newPath = oldPath + path.substring(1);
+        else
+          newPath = oldPath + path;
+      } else {
+        if (pathStart)
+          newPath = oldPath + path;
+        else
+          newPath = oldPath + '/' + path;
+      }
+    } else
+      newPath = path;
+    try {
+      return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, uri.getQuery(),
+          uri.getFragment());
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 }
