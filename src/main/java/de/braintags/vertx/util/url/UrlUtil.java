@@ -2,8 +2,11 @@ package de.braintags.vertx.util.url;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 
 public class UrlUtil {
 
@@ -43,29 +46,19 @@ public class UrlUtil {
     return result.toString();
   }
 
-  public static URI appendQuery(final String uri, final String... appendQuery) throws URISyntaxException {
-    URI oldUri = new URI(uri);
-    return appendQuery(oldUri, appendQuery);
-  }
-
   public static URI appendQuery(final URI uri, final String paramName, final String paramValue) {
-    return appendQuery(uri, paramName + "=" + paramValue);
+    try {
+      return new URIBuilder(uri).addParameter(paramName, paramValue).build();
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException("unable to append query: " + paramName + "=" + paramValue, e);
+    }
   }
 
-  public static URI appendQuery(final URI uri, final String... appendQueries) {
-    String newQuery = uri.getQuery();
-    for (String appendQuery : appendQueries) {
-      if (newQuery == null) {
-        newQuery = appendQuery;
-      } else {
-        newQuery += "&" + appendQuery;
-      }
-    }
+  public static URI appendQuery(final URI uri, final NameValuePair... appendQueries) {
     try {
-      return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), newQuery,
-          uri.getFragment());
+      return new URIBuilder(uri).addParameters(Arrays.asList(appendQueries)).build();
     } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException("unable to append query", e);
     }
   }
 
