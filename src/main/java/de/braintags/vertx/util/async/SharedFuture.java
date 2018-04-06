@@ -56,6 +56,12 @@ public interface SharedFuture<T> extends Future<T> {
     return new SharedFutureImpl<>(cause);
   }
 
+  public static <T> SharedFuture<T> forResult(final AsyncResult<T> res) {
+    SharedFuture<T> f = future();
+    f.handle(res);
+    return f;
+  }
+
   @Override
   <U> SharedFuture<U> compose(final Function<T, Future<U>> mapper);
 
