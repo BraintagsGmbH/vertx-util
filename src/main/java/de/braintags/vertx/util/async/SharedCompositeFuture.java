@@ -25,8 +25,13 @@ public class SharedCompositeFuture {
         .wrap(CompositeFuture.all((List) futures).map(v -> futures.stream().map(Future::result).collect(toList())));
   }
 
-  public static SharedFuture<CompositeFuture> join(final List<? extends SharedFuture<?>> futures) {
-    return SharedFuture.wrap(CompositeFuture.join((List) futures));
+  public static SharedFuture<Void> joinVoid(final Collection<? extends Future<?>> futures) {
+    return SharedFuture.wrap(CompositeFuture.join(new ArrayList(futures))).mapEmpty();
+  }
+
+  public static <T> SharedFuture<List<T>> join(final List<? extends Future<T>> futures) {
+    return SharedFuture
+        .wrap(CompositeFuture.join((List) futures).map(v -> futures.stream().map(Future::result).collect(toList())));
   }
 
 }
