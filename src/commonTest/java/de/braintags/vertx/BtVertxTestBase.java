@@ -17,7 +17,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import io.vertx.core.AbstractVerticle;
@@ -39,10 +41,12 @@ public class BtVertxTestBase {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(BtVertxTestBase.class);
 
+  public static final String TEMP_DIR = "build/tmp/tests/";
+
   protected static Vertx vertx;
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
+  public TestRule rule = new DisableOnDebug(Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20"))));
 
   @Rule
   public TestName name = new TestName();
@@ -54,8 +58,8 @@ public class BtVertxTestBase {
   }
 
   public void initTest(final TestContext context) {
-
   }
+  
 
   @After
   public final void afterTest(final TestContext context) {
@@ -137,4 +141,5 @@ public class BtVertxTestBase {
       throw new AssertionError(e);
     }
   }
+
 }
