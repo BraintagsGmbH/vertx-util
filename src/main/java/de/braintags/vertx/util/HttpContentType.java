@@ -38,18 +38,19 @@ public class HttpContentType {
 
   private static final String CHARSET_UTF8 = "utf-8";
 
-  public static HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML);
-  public static HttpContentType TEXT_CSS = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_CSS);
+  public static final HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML);
+  public static final HttpContentType TEXT_CSS = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_CSS);
 
-  public static HttpContentType APPLICATION_JAVASCRIPT = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JAVASCRIPT);
+  public static final HttpContentType APPLICATION_JAVASCRIPT = new HttpContentType(MAIN_TYPE_APPLICATION,
+      SUB_TYPE_JAVASCRIPT);
 
-  public static HttpContentType JSON = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON);
-  public static HttpContentType JSON_UTF8 = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON,
+  public static final HttpContentType JSON = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON);
+  public static final HttpContentType JSON_UTF8 = new HttpContentType(MAIN_TYPE_APPLICATION, SUB_TYPE_JSON,
       Collections.singletonMap(PARAM_CHARSET, CHARSET_UTF8));
 
-  public static HttpContentType IMAGE_PNG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_PNG);
-  public static HttpContentType IMAGE_SVG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_SVG);
-  public static HttpContentType IMAGE_JPEG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_JPEG);
+  public static final HttpContentType IMAGE_PNG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_PNG);
+  public static final HttpContentType IMAGE_SVG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_SVG);
+  public static final HttpContentType IMAGE_JPEG = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_JPEG);
 
   private final String value;
   private final String mainType;
@@ -67,8 +68,8 @@ public class HttpContentType {
     this.parameters = parameters;
     parameterlessValue = mainType + "/" + subType;
     this.value = parameterlessValue + (parameters.isEmpty() ? ""
-            : ";" + Joiner.on(';').join(parameters.entrySet().stream()
-                .map(param -> param.getKey() + "=" + param.getValue()).collect(toList())));
+        : ";" + Joiner.on(';').join(
+            parameters.entrySet().stream().map(param -> param.getKey() + "=" + param.getValue()).collect(toList())));
   }
 
   @Override
@@ -132,5 +133,5 @@ public class HttpContentType {
       return false;
     return true;
   }
-  
+
 }
