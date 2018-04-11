@@ -1,5 +1,7 @@
 package de.braintags.vertx.util.security;
 
+import java.util.List;
+
 import io.vertx.core.json.JsonObject;
 
 public class JWTOptions {
@@ -10,17 +12,17 @@ public class JWTOptions {
   private JsonObject header;
   private String algorithm = "HS256";
   private boolean noTimestamp = false;
-  private long expiresInMinutes;
-  private long expiresInSeconds;
-  private JsonObject audience;
-  private JsonObject issuer;
-  private JsonObject subject;
+  private int expiresInMinutes;
+  private int expiresInSeconds;
+  private List<String> audience;
+  private String issuer;
+  private String subject;
 
   public JsonObject getHeader() {
     return header;
   }
 
-  public JWTOptions setHeader(JsonObject header) {
+  public JWTOptions setHeader(final JsonObject header) {
     this.header = header;
     return this;
   }
@@ -29,7 +31,7 @@ public class JWTOptions {
     return algorithm;
   }
 
-  public JWTOptions setAlgorithm(String algorithm) {
+  public JWTOptions setAlgorithm(final String algorithm) {
     this.algorithm = algorithm;
     return this;
   }
@@ -38,7 +40,7 @@ public class JWTOptions {
     return noTimestamp;
   }
 
-  public JWTOptions setNoTimestamp(boolean noTimestamp) {
+  public JWTOptions setNoTimestamp(final boolean noTimestamp) {
     this.noTimestamp = noTimestamp;
     return this;
   }
@@ -47,7 +49,7 @@ public class JWTOptions {
     return expiresInMinutes;
   }
 
-  public JWTOptions setExpiresInMinutes(long expiresInMinutes) {
+  public JWTOptions setExpiresInMinutes(final int expiresInMinutes) {
     if (expiresInSeconds != 0) {
       throw INCOMPATIBLE_CONFIG;
     }
@@ -59,7 +61,7 @@ public class JWTOptions {
     return expiresInSeconds;
   }
 
-  public JWTOptions setExpiresInSeconds(long expiresInSeconds) {
+  public JWTOptions setExpiresInSeconds(final int expiresInSeconds) {
     if (expiresInMinutes != 0) {
       throw INCOMPATIBLE_CONFIG;
     }
@@ -67,56 +69,56 @@ public class JWTOptions {
     return this;
   }
 
-  public JsonObject getAudience() {
+  public List<String> getAudience() {
     return audience;
   }
 
-  public JWTOptions setAudience(JsonObject audience) {
+  public JWTOptions setAudience(final List<String> audience) {
     this.audience = audience;
     return this;
   }
 
-  public JsonObject getIssuer() {
+  public String getIssuer() {
     return issuer;
   }
 
-  public JWTOptions setIssuer(JsonObject issuer) {
+  public JWTOptions setIssuer(final String issuer) {
     this.issuer = issuer;
     return this;
   }
 
-  public JsonObject getSubject() {
+  public String getSubject() {
     return subject;
   }
 
-  public JWTOptions setSubject(JsonObject subject) {
+  public JWTOptions setSubject(final String subject) {
     this.subject = subject;
     return this;
   }
 
-  public JsonObject asJsonObject() {
-    JsonObject json = new JsonObject();
-    json.put("algorithm", algorithm);
-    json.put("noTimestamp", noTimestamp);
+  public io.vertx.ext.jwt.JWTOptions asNativeOptions() {
+    io.vertx.ext.jwt.JWTOptions options = new io.vertx.ext.jwt.JWTOptions();
+    options.setAlgorithm(algorithm);
+    options.setNoTimestamp(noTimestamp);
     if (header != null) {
-      json.put("header", header);
+      options.setHeader(header);
     }
     if (audience != null) {
-      json.put("audience", audience);
+      options.setAudience(audience);
     }
     if (issuer != null) {
-      json.put("issuer", issuer);
+      options.setIssuer(issuer);
     }
     if (subject != null) {
-      json.put("subject", subject);
+      options.setSubject(subject);
     }
     if (expiresInMinutes != 0) {
-      json.put("expiresInMinutes", expiresInMinutes);
+      options.setExpiresInMinutes(expiresInMinutes);
     }
     if (expiresInSeconds != 0) {
-      json.put("expiresInSeconds", expiresInSeconds);
+      options.setExpiresInSeconds(expiresInSeconds);
     }
 
-    return json;
+    return options;
   }
 }
