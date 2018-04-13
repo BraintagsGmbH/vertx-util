@@ -232,14 +232,16 @@ public class JsonDiff {
 
   private static JsonNode internalApplyDiff(final JsonNode base, final JsonNode diff, final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
-    if (base.isNull()) {
+    JsonNodeType nodeType = base.isNull() ? diff.getNodeType() : base.getNodeType();
+
+    if (nodeType != diff.getNodeType()) {
       return diff.deepCopy();
     }
-    JsonNodeType nodeType = base.getNodeType();
+
     if (nodeType == null) {
-      if (base instanceof ArrayMapNode || diff instanceof ArrayMapNode) {
+      if (diff instanceof ArrayMapNode) {
         ArrayMapNode b = base.isNull() ? new ArrayMapNode() : (ArrayMapNode) base;
-        ArrayMapNode d = diff.isNull() ? new ArrayMapNode() : (ArrayMapNode) diff;
+        ArrayMapNode d = (ArrayMapNode) diff;
         applyArrayMapDiff(b, d, nodeFactory, true);
         return b;
       } else {
@@ -247,27 +249,26 @@ public class JsonDiff {
       }
     }
 
-    if (nodeType != diff.getNodeType()) {
-      return diff.deepCopy();
-    }
-
     switch (nodeType) {
       case ARRAY:
         if (diff.isArray()) {
-          applyArrayDiff((ArrayNode) base, (ArrayNode) diff, nodeFactory, arrayMapsConverted);
-          return base;
+          ArrayNode baseNode = base.isNull() ? nodeFactory.arrayNode() : (ArrayNode) base;
+          applyArrayDiff(baseNode, (ArrayNode) diff, nodeFactory, arrayMapsConverted);
+          return baseNode;
         } else {
           return diff.deepCopy();
         }
       case OBJECT:
-        if (!arrayMapsConverted && (ArrayMapNode.isArrayMapNode(base) || ArrayMapNode.isArrayMapNode(diff))) {
-          ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
+        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(diff)) {
+          ArrayMapNode arrayBase = base.isNull() ? new ArrayMapNode()
+              : (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
           applyArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
           return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
         } else if (diff.isObject()) {
-          applyObjectDiff((ObjectNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
-          return base;
+          ObjectNode baseNode = base.isNull() ? nodeFactory.objectNode() : (ObjectNode) base;
+          applyObjectDiff(baseNode, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
+          return baseNode;
         } else {
           return diff.deepCopy();
         }
@@ -293,11 +294,10 @@ public class JsonDiff {
       String fieldName = diffField.getKey();
       JsonNode baseNode = base.get(fieldName);
       JsonNode diffNode = diffField.getValue();
-      if (baseNode != null) {
-        base.set(fieldName, internalApplyDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
-      } else {
-        base.set(fieldName, diffNode.deepCopy());
+      if (baseNode == null) {
+        baseNode = nodeFactory.nullNode();
       }
+      base.set(fieldName, internalApplyDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
     }
   }
 
@@ -389,7 +389,7 @@ public class JsonDiff {
 
     switch (nodeType) {
       case OBJECT:
-        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(base)) {
+        if (!arrayMapsConverted && ArrayMapNode.isArrayMapNode(diff)) {
           ArrayMapNode arrayBase = (ArrayMapNode) ArrayMapNode.deepConvertNode(base);
           ArrayMapNode arrayDiff = (ArrayMapNode) ArrayMapNode.deepConvertNode(diff);
           squashArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
@@ -424,11 +424,10 @@ public class JsonDiff {
       String fieldName = diffField.getKey();
       JsonNode baseNode = base.get(fieldName);
       JsonNode diffNode = diffField.getValue();
-      if (baseNode != null) {
-        base.set(fieldName, internalSquashDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
-      } else {
-        base.set(fieldName, diffNode.deepCopy());
+      if (baseNode == null) {
+        baseNode = nodeFactory.nullNode();
       }
+      base.set(fieldName, internalSquashDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
     }
   }
 
