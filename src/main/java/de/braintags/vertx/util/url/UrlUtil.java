@@ -67,12 +67,7 @@ public class UrlUtil {
     if (!path.isEmpty() && path.charAt(path.length() - 1) == '/') {
       return uri;
     } else {
-      try {
-        return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), path + "/", uri.getQuery(),
-            uri.getFragment());
-      } catch (URISyntaxException e) {
-        throw new RuntimeException(e);
-      }
+      return replacePath(uri, path + "/");
     }
   }
 
@@ -95,6 +90,10 @@ public class UrlUtil {
       }
     } else
       newPath = path;
+    return replacePath(uri, newPath);
+  }
+
+  public static URI replacePath(final URI uri, final String newPath) {
     try {
       return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), newPath, uri.getQuery(),
           uri.getFragment());
