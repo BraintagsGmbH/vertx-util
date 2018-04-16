@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.DisableOnDebug;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
@@ -42,6 +43,10 @@ public class BtVertxTestBase {
       .getLogger(BtVertxTestBase.class);
 
   public static final String TEMP_DIR = "build/tmp/tests/";
+
+  public static TemporaryFolder createTempFolder() {
+    return new TemporaryFolder(new java.io.File(TEMP_DIR));
+  }
 
   protected static Vertx vertx;
 
