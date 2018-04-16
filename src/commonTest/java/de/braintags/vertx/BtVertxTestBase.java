@@ -43,9 +43,14 @@ public class BtVertxTestBase {
       .getLogger(BtVertxTestBase.class);
 
   public static final String TEMP_DIR = "build/tmp/tests/";
+  private static java.io.File parentFolder;
 
-  public static TemporaryFolder createTempFolder() {
-    return new TemporaryFolder(new java.io.File(TEMP_DIR));
+  public static synchronized TemporaryFolder createTempFolder() {
+    if (parentFolder == null) {
+      parentFolder = new java.io.File(TEMP_DIR);
+      parentFolder.mkdirs();
+    }
+    return new TemporaryFolder(parentFolder);
   }
 
   protected static Vertx vertx;
@@ -55,6 +60,7 @@ public class BtVertxTestBase {
 
   @Rule
   public TestName name = new TestName();
+
 
   @Before
   public final void initBeforeTest(final TestContext context) {
