@@ -15,7 +15,13 @@ package de.braintags.vertx.util;
 import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParameterList;
+import javax.activation.MimeTypeParseException;
 
 import com.google.common.base.Joiner;
 
@@ -56,6 +62,25 @@ public class HttpContentType {
   private final String subType;
   private final Map<String, String> parameters;
   private final String parameterlessValue;
+
+  public static HttpContentType parse(final String string) {
+    try {
+      MimeType mimeType = new MimeType(string);
+      return new HttpContentType(mimeType.getPrimaryType(), mimeType.getSubType(), toMap(mimeType.getParameters()));
+    } catch (MimeTypeParseException e) {
+      throw new IllegalArgumentException("unable to parse_ " + string, e);
+    }
+  }
+
+  private static Map<String, String> toMap(final MimeTypeParameterList parameters) {
+    LinkedHashMap<String, String> result = new LinkedHashMap<>();
+    Enumeration names = parameters.getNames();
+    while (names.hasMoreElements()) {
+      String name = names.nextElement().toString();
+      result.put(name, parameters.get(name));
+    }
+    return result;
+  }
 
   HttpContentType(final String mainType, final String subType) {
     this(mainType, subType, Collections.emptyMap());
