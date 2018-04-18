@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -63,9 +64,9 @@ public class CompositeUtil {
   }
 
   public static <T, U> Future<List<Future<U>>> executeChunked(final Iterator<T> iterator, final int chunkSize,
-      final BiConsumer<T, Handler<AsyncResult<U>>> biConsumer) {
+      final Function<T, Future<U>> biConsumer) {
     Future<List<Future<U>>> f = Future.future();
-    executeChunked(iterator, chunkSize, 0, null, biConsumer, f);
+    executeChunked(iterator, chunkSize, 0, null, (a, h) -> biConsumer.apply(a).setHandler(h), f);
     return f;
   }
 
