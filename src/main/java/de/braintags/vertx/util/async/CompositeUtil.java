@@ -63,7 +63,7 @@ public class CompositeUtil {
     executeChunked(iterator, chunkSize, 0, null, biConsumer, handler);
   }
 
-  public static <T, U> Future<List<Future<U>>> executeChunked(final Iterator<T> iterator, final int chunkSize,
+  public static <T, U> Future<List<Future<U>>> executesChunked(final Iterator<T> iterator, final int chunkSize,
       final Function<T, Future<U>> biConsumer) {
     Future<List<Future<U>>> f = Future.future();
     executeChunked(iterator, chunkSize, 0, null, (a, h) -> biConsumer.apply(a).setHandler(h), f);
