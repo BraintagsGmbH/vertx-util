@@ -27,13 +27,7 @@ public class SucceededCacheableFuture<T> extends SucceededSharedFuture<T> implem
 
   @Override
   public Handler<CacheableResult<T>> cacheHandler() {
-    return res -> {
-      if (res.succeeded()) {
-        complete(res.expires(), res.result());
-      } else {
-        super.handle(res);
-      }
-    };
+    return res -> handle(res);
   }
 
   @Override
