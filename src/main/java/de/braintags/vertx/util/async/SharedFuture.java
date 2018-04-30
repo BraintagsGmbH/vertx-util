@@ -44,12 +44,11 @@ public interface SharedFuture<T> extends Future<T> {
   }
 
   public static <T> SharedFuture<T> succeededFuture(final T result) {
-    return new SharedFutureImpl<>(result);
+    return new SucceededSharedFuture<>(result);
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> SharedFuture<T> succeededFuture() {
-    return (SharedFuture<T>) new SharedFutureImpl<>((Void) null);
+    return new SucceededSharedFuture<>(null);
   }
 
   public static <T> SharedFuture<T> failedFuture(final Throwable cause) {
@@ -57,9 +56,11 @@ public interface SharedFuture<T> extends Future<T> {
   }
 
   public static <T> SharedFuture<T> forResult(final AsyncResult<T> res) {
-    SharedFuture<T> f = future();
-    f.handle(res);
-    return f;
+    if (res.succeeded()) {
+      return succeededFuture(res.result());
+    } else {
+      return failedFuture(res.cause());
+    }
   }
 
   @Override
@@ -96,6 +97,6 @@ public interface SharedFuture<T> extends Future<T> {
   @Override
   SharedFuture<T> setHandler(Handler<AsyncResult<T>> handler);
 
-  SharedFuture<T> addHandler(Handler<AsyncResult<T>> asyncAssertSuccess);
+  SharedFuture<T> addHandler(Handler<AsyncResult<T>> handler);
 
 }
