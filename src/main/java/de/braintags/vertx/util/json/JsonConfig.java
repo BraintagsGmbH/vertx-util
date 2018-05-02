@@ -13,17 +13,25 @@
 package de.braintags.vertx.util.json;
 
 import java.lang.ref.WeakReference;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ByteArraySerializer;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
+import de.braintags.vertx.util.json.VertxCodecs.InstantSerializer;
+import de.braintags.vertx.util.json.VertxCodecs.JsonArraySerializer;
+import de.braintags.vertx.util.json.VertxCodecs.JsonObjectSerializer;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class JsonConfig {
 
@@ -35,11 +43,25 @@ public class JsonConfig {
     configs = new ArrayList<>();
     // add default configuration for all mappers
     addConfig(mapper -> {
+      if (mapper != Json.mapper && mapper != Json.prettyMapper) {
+        SimpleModule module = new SimpleModule();
+
+        // custom types
+        module.addSerializer(JsonObject.class, new JsonObjectSerializer());
+        module.addSerializer(JsonArray.class, new JsonArraySerializer());
+        // he have 2 extensions: RFC-7493
+        module.addSerializer(Instant.class, new InstantSerializer());
+        module.addSerializer(byte[].class, new ByteArraySerializer());
+
+        mapper.registerModule(module);
+      }
+
       mapper.registerModule(new ParameterNamesModule(Mode.DELEGATING));
       mapper.registerModule(new JodaModule());
       mapper.registerModule(new GuavaModule());
       mapper.registerModule(new ArrayMapModule());
     });
+
     configureObjectMapper(Json.mapper);
     configureObjectMapper(Json.prettyMapper);
   }
