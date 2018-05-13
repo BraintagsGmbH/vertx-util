@@ -1,10 +1,12 @@
 package de.braintags.vertx.util.json.deserializers;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import de.braintags.vertx.util.freezable.FreezableMapImpl;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
@@ -17,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  * @param <V>
  */
 @JsonAutoDetect(creatorVisibility = Visibility.ANY)
-public final class ArrayMap<K, V> extends LinkedHashMap<K, V> {
+public final class ArrayMap<K, V> extends FreezableMapImpl<K, V> {
 
   @JsonCreator
   public ArrayMap() {

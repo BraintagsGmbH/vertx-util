@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import de.braintags.vertx.util.freezable.ArrayMapSerializer;
+
 public class MapPropertyAsEntry extends PropertyWriter {
   private static final long serialVersionUID = 1L;
 

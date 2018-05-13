@@ -12,6 +12,6 @@
  */
 package de.braintags.vertx.util.interfaces;
 
-public interface Immutable {
+public interface SimpleImmutable {
 
 }
