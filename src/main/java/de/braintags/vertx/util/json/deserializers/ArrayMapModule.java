@@ -1,4 +1,4 @@
-package de.braintags.vertx.util.json;
+package de.braintags.vertx.util.json.deserializers;
 
 import java.util.Collections;
 
@@ -19,9 +19,8 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.Serializers;
 import com.fasterxml.jackson.databind.type.MapType;
 
-import de.braintags.vertx.util.freezable.ArrayMap;
-import de.braintags.vertx.util.freezable.ArrayMapDeserializer;
-import de.braintags.vertx.util.freezable.ArrayMapSerializer;
+import de.braintags.vertx.util.json.ArrayMapSerializer;
+
 
 /**
  * This module enables the usage of {@link ArrayMap} encoding.

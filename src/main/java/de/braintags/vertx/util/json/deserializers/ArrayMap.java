@@ -4,10 +4,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import de.braintags.vertx.util.freezable.FreezableMapImpl;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 /**
  * Just a marker class that is used in annotations.
@@ -19,14 +19,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
  * @param <V>
  */
 @JsonAutoDetect(creatorVisibility = Visibility.ANY)
+@JsonDeserialize(as = ArrayMap.class)
 public final class ArrayMap<K, V> extends FreezableMapImpl<K, V> {
 
   @JsonCreator
   public ArrayMap() {
   }
 
-  public ArrayMap(final Map<? extends K, ? extends V> source) {
-    super(source);
+  public ArrayMap(final Map<K, V> source) {
+    super(source, null);
   }
 
   @Override

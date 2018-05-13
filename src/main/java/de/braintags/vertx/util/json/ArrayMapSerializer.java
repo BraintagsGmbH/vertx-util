@@ -1,4 +1,4 @@
-package de.braintags.vertx.util.json.deserializers;
+package de.braintags.vertx.util.json;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -34,6 +34,9 @@ import com.fasterxml.jackson.databind.ser.impl.PropertySerializerMap;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+
+import de.braintags.vertx.util.json.deserializers.ArrayMap;
+import de.braintags.vertx.util.json.deserializers.MapPropertyAsEntry;
 
 /**
  * Serializer implementation for serializing {link {@link ArrayMap}} types.
@@ -943,7 +946,7 @@ public class ArrayMapSerializer extends ContainerSerializer<Map<?, ?>> implement
       final SerializerProvider provider, final Object suppressableValue) throws IOException {
     // minor optimization: may already be sorted?
     if (input instanceof SortedMap<?, ?>) {
-      return new ArrayMap<Object, Object>(input);
+      return new ArrayMap(input);
     }
     // [databind#1411]: TreeMap does not like null key... (although note that
     // check above should prevent this code from being called in that case)
