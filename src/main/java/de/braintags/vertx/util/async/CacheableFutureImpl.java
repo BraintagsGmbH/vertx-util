@@ -137,11 +137,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     }
     if (isComplete()) {
       if (succeeded()) {
-        try {
-          return CacheableFuture.succeededFuture(expires(), mapper.apply(this.result()));
-        } catch (Exception e) {
-          return CacheableFuture.failedFuture(e);
-        }
+        return CacheableFuture.succeededFuture(expires(), mapper.apply(this.result()));
       } else {
         return (CacheableFuture<U>) this;
       }

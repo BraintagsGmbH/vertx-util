@@ -28,11 +28,6 @@ class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements Cach
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
-      if (res instanceof CacheableResult) {
-        reduceExpire(((CacheableResult) res).expires());
-      } else {
-        reduceExpire(CacheableResult.EXPIRED);
-      }
       U result;
       try {
         result = mapper.apply(res.result());
@@ -40,7 +35,11 @@ class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements Cach
         fail(e);
         return;
       }
-      complete(result);
+      if (res instanceof CacheableResult) {
+        complete(((CacheableResult) res).expires(), result);
+      } else {
+        complete(result);
+      }
     } else {
       fail(res.cause());
     }
