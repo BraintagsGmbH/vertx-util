@@ -255,7 +255,11 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     }
     if (isComplete()) {
       if (succeeded()) {
-        return SharedFuture.succeededFuture(mapper.apply(this.result()));
+        try {
+          return SharedFuture.succeededFuture(mapper.apply(this.result()));
+        } catch (Exception e) {
+          return SharedFuture.failedFuture(e);
+        }
       } else {
         return (SharedFuture<U>) this;
       }
@@ -268,11 +272,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   public <V> SharedFuture<V> map(final V value) {
     if (isComplete()) {
       if (succeeded()) {
-        try {
-          return SharedFuture.succeededFuture(value);
-        } catch (Exception e) {
-          return SharedFuture.failedFuture(e);
-        }
+        return SharedFuture.succeededFuture(value);
       } else {
         return (SharedFuture<V>) this;
       }
