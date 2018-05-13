@@ -78,6 +78,14 @@ public final class Freezables {
     return freezableSet;
   }
 
+  public static <T> FreezableList<T> singletonList(final T value) {
+    return singletonList(false, value);
+  }
+
+  public static <T> FreezableList<T> singletonList(final boolean frozen, final T value) {
+    return freezableList(frozen, Collections.singletonList(value));
+  }
+
   public static <T> FreezableSet<T> singletonSet(final T value) {
     return singletonSet(false, value);
   }
