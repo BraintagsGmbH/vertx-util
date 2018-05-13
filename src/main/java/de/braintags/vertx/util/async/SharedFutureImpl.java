@@ -255,11 +255,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     }
     if (isComplete()) {
       if (succeeded()) {
-        try {
-          return SharedFuture.succeededFuture(mapper.apply(this.result()));
-        } catch (Exception e) {
-          return SharedFuture.failedFuture(e);
-        }
+        return SharedFuture.succeededFuture(mapper.apply(this.result()));
       } else {
         return (SharedFuture<U>) this;
       }
