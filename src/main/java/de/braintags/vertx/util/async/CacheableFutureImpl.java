@@ -112,7 +112,22 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     if (mapper == null) {
       throw new NullPointerException();
     }
-    return new ComposedCacheableFuture<>(this, mapper);
+    if (isComplete()) {
+      if (succeeded()) {
+        try {
+          CacheableFuture<U> res = CacheableFuture.toCacheable(mapper.apply(this.result()));
+          res.reduceExpire(expires());
+          return res;
+        } catch (Exception e) {
+          return CacheableFuture.failedFuture(e);
+        }
+      } else {
+        return (CacheableFuture<U>) this;
+      }
+    } else {
+      return new ComposedCacheableFuture<>(this, mapper);
+    }
+
   }
 
   @Override
@@ -120,12 +135,36 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     if (mapper == null) {
       throw new NullPointerException();
     }
-    return new MappedCacheableFuture<>(this, mapper);
+    if (isComplete()) {
+      if (succeeded()) {
+        try {
+          return CacheableFuture.succeededFuture(expires(), mapper.apply(this.result()));
+        } catch (Exception e) {
+          return CacheableFuture.failedFuture(e);
+        }
+      } else {
+        return (CacheableFuture<U>) this;
+      }
+    } else {
+      return new MappedCacheableFuture<>(this, mapper);
+    }
   }
 
   @Override
   public <V> CacheableFuture<V> map(final V value) {
-    return new MappedValueCacheableFuture<>(this, value);
+    if (isComplete()) {
+      if (succeeded()) {
+        try {
+          return CacheableFuture.succeededFuture(expires(), value);
+        } catch (Exception e) {
+          return CacheableFuture.failedFuture(e);
+        }
+      } else {
+        return (CacheableFuture<V>) this;
+      }
+    } else {
+      return new MappedValueCacheableFuture<>(this, value);
+    }
   }
 
   @Override
@@ -133,23 +172,19 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     if (mapper == null) {
       throw new NullPointerException();
     }
-    CacheableFuture<T> ret = CacheableFuture.future();
-    setHandler(ar -> {
-      ret.reduceExpire(this.expires());
-      if (ar.succeeded()) {
-        ret.complete(result());
+    if (isComplete()) {
+      if (succeeded()) {
+        return this;
       } else {
-        Future<T> mapped;
         try {
-          mapped = mapper.apply(ar.cause());
-        } catch (Throwable e) {
-          ret.fail(e);
-          return;
+          return CacheableFuture.toCacheable(mapper.apply(cause()));
+        } catch (Exception e) {
+          return CacheableFuture.failedFuture(e);
         }
-        mapped.setHandler(ret);
       }
-    });
-    return ret;
+    } else {
+      return new RecoverCacheableFuture<>(this, mapper);
+    }
   }
 
   @Override
@@ -162,22 +197,19 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     if (mapper == null) {
       throw new NullPointerException();
     }
-    CacheableFuture<T> ret = CacheableFuture.future();
-    setHandler(ar -> {
-      if (ar.succeeded()) {
-        ret.complete(result());
+    if (isComplete()) {
+      if (succeeded()) {
+        return this;
       } else {
-        T value;
         try {
-          value = mapper.apply(ar.cause());
-        } catch (Throwable e) {
-          ret.fail(e);
-          return;
+          return CacheableFuture.succeededFuture(expires(), mapper.apply(cause()));
+        } catch (Exception e) {
+          return CacheableFuture.failedFuture(e);
         }
-        ret.complete(value);
       }
-    });
-    return ret;
+    } else {
+      return new OtherwiseCacheableFuture<>(this, mapper);
+    }
   }
 
   @Override

@@ -17,32 +17,27 @@ import java.util.function.Function;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements CacheableFuture<U> {
+class RecoverSharedFuture<T> extends SharedFutureImpl<T> implements SharedFuture<T> {
 
-  private final Function<T, U> mapper;
+  private final Function<Throwable, Future<T>> mapper;
 
-  public MappedCacheableFuture(final Future<T> src, final Function<T, U> mapper) {
+  public RecoverSharedFuture(final Future<T> src, final Function<Throwable, Future<T>> mapper) {
     this.mapper = mapper;
     src.setHandler(this::chainFuture);
   }
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
-      if (res instanceof CacheableResult) {
-        reduceExpire(((CacheableResult) res).expires());
-      } else {
-        reduceExpire(CacheableResult.EXPIRED);
-      }
-      U result;
+      complete(result());
+    } else {
+      Future<T> mapped;
       try {
-        result = mapper.apply(res.result());
-      } catch (Exception e) {
+        mapped = mapper.apply(res.cause());
+      } catch (Throwable e) {
         fail(e);
         return;
       }
-      complete(result);
-    } else {
-      fail(res.cause());
+      mapped.setHandler(this);
     }
   }
 
