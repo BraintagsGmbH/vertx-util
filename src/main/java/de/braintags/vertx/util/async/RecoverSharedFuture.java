@@ -28,7 +28,7 @@ class RecoverSharedFuture<T> extends SharedFutureImpl<T> implements SharedFuture
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
-      complete(result());
+      complete(res.result());
     } else {
       Future<T> mapped;
       try {
