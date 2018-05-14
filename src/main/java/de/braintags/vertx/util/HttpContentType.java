@@ -82,11 +82,11 @@ public class HttpContentType {
     return result;
   }
 
-  HttpContentType(final String mainType, final String subType) {
+  public HttpContentType(final String mainType, final String subType) {
     this(mainType, subType, Collections.emptyMap());
   }
 
-  HttpContentType(final String mainType, final String subType, final Map<String, String> parameters) {
+  public HttpContentType(final String mainType, final String subType, final Map<String, String> parameters) {
     this.mainType = mainType;
     this.subType = subType;
     this.parameters = parameters;
