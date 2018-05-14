@@ -351,7 +351,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
         }
       }
     } else {
-      return new OtherwiseSharedFutur<>(this, mapper);
+      return new OtherwiseSharedFuture<>(this, mapper);
     }
   }
 

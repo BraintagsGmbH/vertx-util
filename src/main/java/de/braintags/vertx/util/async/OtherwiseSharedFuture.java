@@ -17,11 +17,11 @@ import java.util.function.Function;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
-class OtherwiseSharedFutur<T> extends SharedFutureImpl<T> implements SharedFuture<T> {
+class OtherwiseSharedFuture<T> extends SharedFutureImpl<T> implements SharedFuture<T> {
 
   private final Function<Throwable, T> mapper;
 
-  public OtherwiseSharedFutur(final Future<T> src, final Function<Throwable, T> mapper) {
+  public OtherwiseSharedFuture(final Future<T> src, final Function<Throwable, T> mapper) {
     this.mapper = mapper;
     src.setHandler(this::chainFuture);
   }
