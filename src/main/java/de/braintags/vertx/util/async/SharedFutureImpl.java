@@ -166,6 +166,8 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   @Override
   public synchronized boolean tryComplete(final T result) {
     if (isComplete())
+
+      
       return false;
     this.result = result;
     succeeded = true;
