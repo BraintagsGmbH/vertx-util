@@ -1,6 +1,8 @@
 package de.braintags.vertx.util.freezable;
 
-public interface Immutable<F extends Freezable<?>> extends Freezable<F> {
+import de.braintags.vertx.util.interfaces.SimpleImmutable;
+
+public interface Immutable<F extends Freezable<?>> extends Freezable<F>, SimpleImmutable {
 
   @Override
   default F copy() {
@@ -16,7 +18,7 @@ public interface Immutable<F extends Freezable<?>> extends Freezable<F> {
   default void copyFrom(final F source) {
     throw new UnsupportedOperationException("object is immutable");
   }
-  
+
   @Override
   default F unfreeze() {
     throw new UnsupportedOperationException("object is immutable");
