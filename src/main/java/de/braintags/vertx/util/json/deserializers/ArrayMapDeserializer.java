@@ -31,6 +31,8 @@ import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
 import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
 
+import de.braintags.vertx.util.json.ArrayMapSerializer;
+
 /**
  * Custom serializer that can take a special {@link ArrayMapNode} structure and
  * construct a {@link java.util.Map} instance, with typed contents.

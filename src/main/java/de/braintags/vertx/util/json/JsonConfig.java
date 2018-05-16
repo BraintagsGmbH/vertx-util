@@ -29,6 +29,7 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import de.braintags.vertx.util.json.VertxCodecs.InstantSerializer;
 import de.braintags.vertx.util.json.VertxCodecs.JsonArraySerializer;
 import de.braintags.vertx.util.json.VertxCodecs.JsonObjectSerializer;
+import de.braintags.vertx.util.json.deserializers.ArrayMapModule;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

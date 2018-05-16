@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import de.braintags.vertx.util.json.ArrayMapSerializer;
+
 public class MapPropertyAsEntry extends PropertyWriter {
   private static final long serialVersionUID = 1L;
 
@@ -29,7 +31,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
 
   protected JsonSerializer<Object> _keySerializer, _valueSerializer;
 
-  public MapPropertyAsEntry(TypeSerializer typeSer, BeanProperty prop) {
+  public MapPropertyAsEntry(final TypeSerializer typeSer, final BeanProperty prop) {
     super((prop == null) ? PropertyMetadata.STD_REQUIRED_OR_OPTIONAL : prop.getMetadata());
     _typeSerializer = typeSer;
     _property = prop;
@@ -39,7 +41,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
    * Initialization method that needs to be called before passing
    * property to filter.
    */
-  public void reset(Object key, JsonSerializer<Object> keySer, JsonSerializer<Object> valueSer) {
+  public void reset(final Object key, final JsonSerializer<Object> keySer, final JsonSerializer<Object> valueSer) {
     _key = key;
     _keySerializer = keySer;
     _valueSerializer = valueSer;
@@ -59,17 +61,17 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public <A extends Annotation> A getAnnotation(Class<A> acls) {
+  public <A extends Annotation> A getAnnotation(final Class<A> acls) {
     return (_property == null) ? null : _property.getAnnotation(acls);
   }
 
   @Override
-  public <A extends Annotation> A getContextAnnotation(Class<A> acls) {
+  public <A extends Annotation> A getContextAnnotation(final Class<A> acls) {
     return (_property == null) ? null : _property.getContextAnnotation(acls);
   }
 
   @Override
-  public void serializeAsField(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serializeAsField(final Object value, final JsonGenerator gen, final SerializerProvider provider) throws IOException {
 
     gen.writeStartObject();
     gen.writeFieldName(ArrayMapSerializer.KEY);
@@ -85,14 +87,14 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public void serializeAsOmittedField(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
+  public void serializeAsOmittedField(final Object value, final JsonGenerator gen, final SerializerProvider provider) throws Exception {
     if (!gen.canOmitFields()) {
       gen.writeOmittedField(getName());
     }
   }
 
   @Override
-  public void serializeAsElement(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
+  public void serializeAsElement(final Object value, final JsonGenerator gen, final SerializerProvider provider) throws Exception {
     if (_typeSerializer == null) {
       _valueSerializer.serialize(value, gen, provider);
     } else {
@@ -101,7 +103,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
   }
 
   @Override
-  public void serializeAsPlaceholder(Object value, JsonGenerator gen, SerializerProvider provider) throws Exception {
+  public void serializeAsPlaceholder(final Object value, final JsonGenerator gen, final SerializerProvider provider) throws Exception {
     gen.writeNull();
   }
 
@@ -112,7 +114,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
    */
 
   @Override
-  public void depositSchemaProperty(JsonObjectFormatVisitor objectVisitor, SerializerProvider provider)
+  public void depositSchemaProperty(final JsonObjectFormatVisitor objectVisitor, final SerializerProvider provider)
       throws JsonMappingException {
     if (_property != null) {
       _property.depositSchemaProperty(objectVisitor, provider);
@@ -121,7 +123,7 @@ public class MapPropertyAsEntry extends PropertyWriter {
 
   @Override
   @Deprecated
-  public void depositSchemaProperty(ObjectNode propertiesNode, SerializerProvider provider)
+  public void depositSchemaProperty(final ObjectNode propertiesNode, final SerializerProvider provider)
       throws JsonMappingException {
     // nothing to do here
   }

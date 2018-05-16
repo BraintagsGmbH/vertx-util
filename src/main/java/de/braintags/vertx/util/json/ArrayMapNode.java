@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 
 import de.braintags.vertx.util.json.deserializers.ArrayMap;
-import de.braintags.vertx.util.json.deserializers.ArrayMapSerializer;
+
 
 /**
  * Internal intermediate {@link JsonNode} for dealing with {@link ArrayMap} encoding.

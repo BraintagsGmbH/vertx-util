@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import de.braintags.vertx.util.json.deserializers.ArrayMap;
-import de.braintags.vertx.util.json.deserializers.ArrayMapSerializer;
+import de.braintags.vertx.util.json.deserializers.ArrayMapModule;
 import de.braintags.vertx.util.json.deserializers.ComplexKey;
 import io.vertx.core.json.Json;
 
