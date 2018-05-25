@@ -72,6 +72,18 @@ public interface Freezable<F extends Freezable<?>> {
     public void copyFrom(final F source) {
       checkFrozen();
     }
+
+    // important for ProxyCache checks
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    // important for ProxyCache checks
+    @Override
+    public boolean equals(final Object obj) {
+      return super.equals(obj);
+    }
   }
 
   public abstract static class Wrapper<F extends Freezable<?>> implements Freezable<F> {
@@ -104,6 +116,32 @@ public interface Freezable<F extends Freezable<?>> {
     public void copyFrom(final F source) {
       checkFrozen();
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((wrapped == null) ? 0 : wrapped.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      Wrapper other = (Wrapper) obj;
+      if (wrapped == null) {
+        if (other.wrapped != null)
+          return false;
+      } else if (!wrapped.equals(other.wrapped))
+        return false;
+      return true;
+    }
+
   }
 
   public static <F> F instantiateProtected(final Class<F> cls) throws InstantiationException {
