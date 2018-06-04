@@ -82,7 +82,7 @@ public interface CacheableResult<T> extends AsyncResult<T> {
           return CacheableResult.this.expires();
         }
       };
-    } catch (Exception e) {
+    } catch (Throwable e) {
       return CacheableResult.failedResult(e);
     }
   }

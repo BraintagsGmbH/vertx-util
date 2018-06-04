@@ -96,7 +96,7 @@ public class FutureTimeoutMonitor {
                   Future<?> future = f.getFuture();
                   Exception exception = timeoutException.apply(future);
                   future.tryFail(exception);
-                } catch (Exception e2) {
+                } catch (Throwable e2) {
                   LOGGER.error(e2);
                 }
               });
@@ -108,7 +108,7 @@ public class FutureTimeoutMonitor {
       } catch (InterruptedException e) {
         LOGGER.error(e);
         return;
-      } catch (Exception e) {
+      } catch (Throwable e) {
         LOGGER.error(e);
       }
     }

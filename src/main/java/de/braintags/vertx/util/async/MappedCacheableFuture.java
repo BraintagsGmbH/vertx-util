@@ -31,7 +31,7 @@ class MappedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements Cach
       U result;
       try {
         result = mapper.apply(res.result());
-      } catch (Exception e) {
+      } catch (Throwable e) {
         fail(e);
         return;
       }

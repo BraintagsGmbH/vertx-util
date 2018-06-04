@@ -60,7 +60,7 @@ public class RetryingFuture<F extends Future<?>> extends SharedFutureImpl<F> {
           retry(res.cause());
         }
       });
-    } catch (Exception e) {
+    } catch (Throwable e) {
       fail(e);
     }
   }

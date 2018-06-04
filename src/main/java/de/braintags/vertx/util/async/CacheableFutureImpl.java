@@ -118,7 +118,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
           CacheableFuture<U> res = CacheableFuture.toCacheable(mapper.apply(this.result()));
           res.reduceExpire(expires());
           return res;
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return CacheableFuture.failedFuture(e);
         }
       } else {
@@ -139,7 +139,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
       if (succeeded()) {
         try {
           return CacheableFuture.succeededFuture(expires(), mapper.apply(this.result()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return CacheableFuture.failedFuture(e);
         }
       } else {
@@ -174,7 +174,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
       } else {
         try {
           return CacheableFuture.toCacheable(mapper.apply(cause()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return CacheableFuture.failedFuture(e);
         }
       }
@@ -199,7 +199,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
       } else {
         try {
           return CacheableFuture.succeededFuture(expires(), mapper.apply(cause()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return CacheableFuture.failedFuture(e);
         }
       }
