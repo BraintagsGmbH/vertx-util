@@ -20,6 +20,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.impl.NoStackTraceThrowable;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 /**
  * Implementation of future which is thread safe and supports multiple handlers (set handler is add handler);
@@ -29,6 +31,8 @@ import io.vertx.core.impl.NoStackTraceThrowable;
  * @param <T>
  */
 public class SharedFutureImpl<T> implements SharedFuture<T> {
+
+  private static final Logger logger = LoggerFactory.getLogger(SharedFutureImpl.class);
 
   protected boolean failed;
   protected boolean succeeded;
@@ -149,8 +153,13 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
    */
   @Override
   public void fail(final Throwable throwable) {
-    if (!tryFail(throwable) && (cause() == null || !(cause() instanceof AsyncTimeoutException)))
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+    if (!tryFail(throwable)) {
+      if (cause() != null && (cause() instanceof AsyncTimeoutException)) {
+        logger.error("error in timeouted future", cause());
+      } else {
+        throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+      }
+    }
   }
 
   @Override
@@ -239,7 +248,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
       if (succeeded()) {
         try {
           return SharedFuture.toCacheable(mapper.apply(this.result()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return SharedFuture.failedFuture(e);
         }
       } else {
@@ -259,7 +268,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
       if (succeeded()) {
         try {
           return SharedFuture.succeededFuture(mapper.apply(this.result()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return SharedFuture.failedFuture(e);
         }
       } else {
@@ -328,7 +337,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
       } else {
         try {
           return SharedFuture.toCacheable(mapper.apply(cause()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return SharedFuture.failedFuture(e);
         }
       }
@@ -348,7 +357,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
       } else {
         try {
           return SharedFuture.succeededFuture(mapper.apply(cause()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
           return SharedFuture.failedFuture(e);
         }
       }

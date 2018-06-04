@@ -30,7 +30,7 @@ class SharedFutureThen<U, T> extends SharedFutureImpl<U> implements SharedFuture
     Future<U> result;
     try {
       result = mapper.apply(res);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       fail(e);
       return;
     }

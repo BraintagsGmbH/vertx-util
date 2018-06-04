@@ -31,7 +31,7 @@ class ComposedCacheableFuture<U, T> extends CacheableFutureImpl<U> implements Ca
       Future<U> result;
       try {
         result = mapper.apply(res.result());
-      } catch (Exception e) {
+      } catch (Throwable e) {
         fail(e);
         return;
       }

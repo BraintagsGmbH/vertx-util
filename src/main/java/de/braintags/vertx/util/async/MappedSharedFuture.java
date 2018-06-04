@@ -31,7 +31,7 @@ class MappedSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFutu
       U result;
       try {
         result = mapper.apply(res.result());
-      } catch (Exception e) {
+      } catch (Throwable e) {
         fail(e);
         return;
       }

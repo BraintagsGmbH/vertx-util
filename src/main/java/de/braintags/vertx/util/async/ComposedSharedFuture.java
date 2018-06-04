@@ -31,7 +31,7 @@ class ComposedSharedFuture<U, T> extends SharedFutureImpl<U> implements SharedFu
       Future<U> result;
       try {
         result = mapper.apply(res.result());
-      } catch (Exception e) {
+      } catch (Throwable e) {
         fail(e);
         return;
       }
