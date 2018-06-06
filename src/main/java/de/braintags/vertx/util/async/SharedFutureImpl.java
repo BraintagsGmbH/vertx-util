@@ -139,8 +139,15 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
    */
   @Override
   public void complete(final T result) {
-    if (!tryComplete(result) && (cause() == null || !(cause() instanceof AsyncTimeoutException)))
-      throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+    if (!tryComplete(result))
+      if (isTimeouted()) {
+        logger.error("Timeouted operation", new IllegalStateException("Result is already timeouted"));
+      } else
+        throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
+  }
+
+  protected boolean isTimeouted() {
+    return cause() != null && (cause() instanceof AsyncTimeoutException);
   }
 
   @Override
@@ -154,8 +161,8 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   @Override
   public void fail(final Throwable throwable) {
     if (!tryFail(throwable)) {
-      if (cause() != null && (cause() instanceof AsyncTimeoutException)) {
-        logger.error("error in timeouted future", cause());
+      if (isTimeouted()) {
+        logger.error("error in timeouted future", throwable);
       } else {
         throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
       }
@@ -175,8 +182,6 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   @Override
   public synchronized boolean tryComplete(final T result) {
     if (isComplete())
-
-      
       return false;
     this.result = result;
     succeeded = true;
@@ -244,7 +249,7 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
     if (mapper == null) {
       throw new NullPointerException();
     }
-    if (isComplete())  {
+    if (isComplete()) {
       if (succeeded()) {
         try {
           return SharedFuture.toCacheable(mapper.apply(this.result()));
