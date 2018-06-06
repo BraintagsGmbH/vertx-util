@@ -59,7 +59,7 @@ public class HttpContentType {
   private static final String PARAM_CHARSET = "charset";
 
   public static final HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_PLAIN, ISO_8859_1);
-  public static final HttpContentType TEXT_HTML_UTF8 = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_PLAIN, UTF_8);
+  public static final HttpContentType TEXT_HTML_UTF8 = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML, UTF_8);
   public static final HttpContentType TEXT_PLAIN = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML, ISO_8859_1);
   public static final HttpContentType TEXT_XML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_XML, ISO_8859_1);
   public static final HttpContentType TEXT_CSS = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_CSS);
