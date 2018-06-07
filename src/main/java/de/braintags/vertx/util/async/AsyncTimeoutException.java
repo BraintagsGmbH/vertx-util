@@ -20,6 +20,8 @@ public class AsyncTimeoutException extends RuntimeException {
 
   private static final long serialVersionUID = -6178852666496645693L;
 
+  private final long timeStamp = System.currentTimeMillis();
+
   public AsyncTimeoutException() {
     super();
   }
@@ -41,4 +43,7 @@ public class AsyncTimeoutException extends RuntimeException {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 
+  public long getTimeStamp() {
+    return timeStamp;
+  }
 }
