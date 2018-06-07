@@ -141,7 +141,9 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   public void complete(final T result) {
     if (!tryComplete(result))
       if (isTimeouted()) {
-        logger.error("Timeouted operation", new IllegalStateException("Result is already timeouted"));
+        logger.error("Timeouted operation, timeouted for "
+            + (System.currentTimeMillis() - ((AsyncTimeoutException) cause()).getTimeStamp()) + " ms",
+            new IllegalStateException("Result is already timeouted"));
       } else
         throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
@@ -162,7 +164,8 @@ public class SharedFutureImpl<T> implements SharedFuture<T> {
   public void fail(final Throwable throwable) {
     if (!tryFail(throwable)) {
       if (isTimeouted()) {
-        logger.error("error in timeouted future", throwable);
+        logger.error("error in timeouted future, timeouted for "
+            + (System.currentTimeMillis() - ((AsyncTimeoutException) cause()).getTimeStamp()) + " ms", throwable);
       } else {
         throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
       }
