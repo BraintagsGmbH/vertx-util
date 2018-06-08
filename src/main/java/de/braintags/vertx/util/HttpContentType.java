@@ -58,9 +58,9 @@ public class HttpContentType {
 
   private static final String PARAM_CHARSET = "charset";
 
-  public static final HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_PLAIN, ISO_8859_1);
+  public static final HttpContentType TEXT_HTML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML, ISO_8859_1);
   public static final HttpContentType TEXT_HTML_UTF8 = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML, UTF_8);
-  public static final HttpContentType TEXT_PLAIN = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_HTML, ISO_8859_1);
+  public static final HttpContentType TEXT_PLAIN = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_PLAIN, ISO_8859_1);
   public static final HttpContentType TEXT_XML = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_XML, ISO_8859_1);
   public static final HttpContentType TEXT_CSS = new HttpContentType(MAIN_TYPE_TEXT, SUB_TYPE_CSS);
 
@@ -87,9 +87,9 @@ public class HttpContentType {
   public static final HttpContentType IMAGE_WEBP = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_WEBP);
   public static final HttpContentType IMAGE_TIFF = new HttpContentType(MAIN_TYPE_IMAGE, SUB_TYPE_TIFF);
 
-  public static final HttpContentType MULTIPART_ALTERNATIVE = new HttpContentType(MAIN_TYPE_MULTIPART, SUB_TYPE_JPEG,
-      ISO_8859_1);
-  public static final HttpContentType MULTIPART_FORM_DATA = new HttpContentType(MAIN_TYPE_MULTIPART, SUB_TYPE_JPEG,
+  public static final HttpContentType MULTIPART_ALTERNATIVE = new HttpContentType(MAIN_TYPE_MULTIPART,
+      SUB_TYPE_ALTERNATIE, ISO_8859_1);
+  public static final HttpContentType MULTIPART_FORM_DATA = new HttpContentType(MAIN_TYPE_MULTIPART, SUB_TYPE_FORM_DATA,
       ISO_8859_1);
 
   private final String value;
