@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -56,9 +57,17 @@ public class CompositeUtil {
    *          returns all futures created during the execution. WILL ALWAYS RETURN SUCCESS! Check each future to
    *          determine if the operation really was successful
    */
-  public static <T, U> void executeChunked(Iterator<T> iterator, int chunkSize,
-      BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, Handler<AsyncResult<List<Future<U>>>> handler) {
+  @Deprecated
+  public static <T, U> void executeChunked(final Iterator<T> iterator, final int chunkSize,
+      final BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, final Handler<AsyncResult<List<Future<U>>>> handler) {
     executeChunked(iterator, chunkSize, 0, null, biConsumer, handler);
+  }
+
+  public static <T, U> Future<List<Future<U>>> executeChunkedWithFuture(final Iterator<T> iterator, final int chunkSize,
+      final Function<T, Future<U>> biConsumer) {
+    Future<List<Future<U>>> f = Future.future();
+    executeChunked(iterator, chunkSize, 0, null, (a, h) -> biConsumer.apply(a).setHandler(h), f);
+    return f;
   }
 
   /**
@@ -86,8 +95,8 @@ public class CompositeUtil {
    *          returns all futures created during the execution. WILL ALWAYS RETURN SUCCESS! Check each future to
    *          determine if the operation really was successful
    */
-  public static <T, U> void executeChunked(Iterator<T> iterator, int chunkSize, long waitDuration, Vertx vertx,
-      BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, Handler<AsyncResult<List<Future<U>>>> handler) {
+  public static <T, U> void executeChunked(final Iterator<T> iterator, final int chunkSize, final long waitDuration, final Vertx vertx,
+      final BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, final Handler<AsyncResult<List<Future<U>>>> handler) {
     List<Future<U>> totalFutures = new ArrayList<>();
     if (chunkSize <= 0) {
       throw new IllegalArgumentException("'chunkSize' must be > 0");
@@ -122,9 +131,9 @@ public class CompositeUtil {
    *          returns when the iterator is empty and all futures have completed
    */
   @SuppressWarnings("rawtypes")
-  private static <U, T> void executeChunk(Iterator<T> iterator, int chunkSize, long waitDuration, Vertx vertx,
-      BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, List<Future<U>> totalFutures,
-      Handler<AsyncResult<Void>> handler) {
+  private static <U, T> void executeChunk(final Iterator<T> iterator, final int chunkSize, final long waitDuration, final Vertx vertx,
+      final BiConsumer<T, Handler<AsyncResult<U>>> biConsumer, final List<Future<U>> totalFutures,
+      final Handler<AsyncResult<Void>> handler) {
     List<Future> futures = new ArrayList<>();
     while (iterator.hasNext()) {
       T object = iterator.next();
