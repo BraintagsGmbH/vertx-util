@@ -14,6 +14,7 @@ package de.braintags.vertx.util.async;
 
 import java.util.function.Function;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -67,6 +68,12 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
 
   @Override
   <V> CacheableFuture<V> map(final V value);
+
+  @Override
+  <V> CacheableFuture<V> then(Function<AsyncResult<T>, Future<V>> mapper);
+
+  @Override
+  <V> CacheableFuture<V> chain(Function<Void, Future<V>> mapper);
 
   @Override
   <V> CacheableFuture<V> mapEmpty();

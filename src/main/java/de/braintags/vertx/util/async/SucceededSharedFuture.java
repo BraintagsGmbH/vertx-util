@@ -30,12 +30,6 @@ public class SucceededSharedFuture<T> implements SharedFuture<T> {
   }
 
   @Override
-  public SharedFuture<T> addHandler(final Handler<AsyncResult<T>> handler) {
-    handler.handle(this);
-    return this;
-  }
-
-  @Override
   public void complete(final T result) {
     throw new IllegalStateException("Result is already complete: succeeded");
   }
