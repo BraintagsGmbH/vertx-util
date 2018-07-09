@@ -34,11 +34,6 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     super();
   }
 
-  public CacheableFutureImpl(final long expires, final T result) {
-    super(result);
-    this.expires = expires;
-  }
-
   public CacheableFutureImpl(final Throwable cause) {
     super(cause);
     this.expires = CacheableResult.EXPIRED;
@@ -186,6 +181,16 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
   @Override
   public <V> CacheableFuture<V> mapEmpty() {
     return map((V) null);
+  }
+
+  @Override
+  public <V> CacheableFuture<V> chain(final Function<Void, Future<V>> mapper) {
+    return new CacheableFutureChain<>(this, mapper);
+  }
+
+  @Override
+  public <V> CacheableFuture<V> then(final Function<AsyncResult<T>, Future<V>> mapper) {
+    return new CacheableFutureThen<>(this, mapper);
   }
 
   @Override

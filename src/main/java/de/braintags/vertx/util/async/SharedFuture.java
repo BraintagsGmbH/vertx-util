@@ -97,6 +97,5 @@ public interface SharedFuture<T> extends Future<T> {
   @Override
   SharedFuture<T> setHandler(Handler<AsyncResult<T>> handler);
 
-  SharedFuture<T> addHandler(Handler<AsyncResult<T>> handler);
 
 }
