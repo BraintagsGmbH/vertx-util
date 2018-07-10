@@ -154,7 +154,7 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   protected synchronized void callHandlers() {
     Context currentContext = Vertx.currentContext();
     for (Pair<Context, Handler<AsyncResult<T>>> handler : handlers) {
-      if (currentContext == handler.getKey()) {
+      if (handler.getKey() == null || currentContext == handler.getKey()) {
         handler.getValue().handle(this);
       } else {
         handler.getKey().runOnContext(v -> {
