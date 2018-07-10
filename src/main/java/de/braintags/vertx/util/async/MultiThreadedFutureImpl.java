@@ -19,12 +19,12 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   protected volatile T result;
   protected volatile Throwable throwable;
 
-  public MultiThreadedFutureImpl() {
+  MultiThreadedFutureImpl() {
     super();
     handlers = new ArrayList<>();
   }
 
-  public MultiThreadedFutureImpl(final Throwable cause) {
+  MultiThreadedFutureImpl(final Throwable cause) {
     handlers = new ArrayList<>();
     this.expires = CacheableResult.EXPIRED;
   }
