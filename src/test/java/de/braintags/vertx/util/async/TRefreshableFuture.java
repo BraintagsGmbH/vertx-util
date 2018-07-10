@@ -20,7 +20,8 @@ public class TRefreshableFuture extends BtVertxTestBase {
   @Test
   public void testNoRefresh(final TestContext context) {
     called1 = 0;
-    RefreshableFuture<Integer> refreshable = new RefreshableFuture<>(TimeUnit.SECONDS.toMillis(10), () -> {
+    RefreshableFuture<Integer, CacheableFuture<Integer>> refreshable = new RefreshableFuture<>(
+        TimeUnit.SECONDS.toMillis(10), () -> {
       CacheableFuture<Integer> cacheable = CacheableFuture
           .succeededFuture(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5), ++called1);
       return cacheable;
@@ -33,7 +34,8 @@ public class TRefreshableFuture extends BtVertxTestBase {
   @Test
   public void testSoftRefresh(final TestContext context) throws InterruptedException {
     called2 = 0;
-    RefreshableFuture<Integer> refreshable = new RefreshableFuture<>(TimeUnit.SECONDS.toMillis(10), () -> {
+    RefreshableFuture<Integer, CacheableFuture<Integer>> refreshable = new RefreshableFuture<>(
+        TimeUnit.SECONDS.toMillis(10), () -> {
       CacheableFuture<Integer> cacheable = CacheableFuture.future();
       cacheable.reduceExpire(System.currentTimeMillis() + 1);
       if (called2 > 0)
@@ -73,7 +75,7 @@ public class TRefreshableFuture extends BtVertxTestBase {
   @Test
   public void testHardRefresh(final TestContext context) throws InterruptedException {
     called3 = 0;
-    RefreshableFuture<Integer> refreshable = new RefreshableFuture<>(5, () -> {
+    RefreshableFuture<Integer, CacheableFuture<Integer>> refreshable = new RefreshableFuture<>(5, () -> {
       CacheableFuture<Integer> cacheable = CacheableFuture.future();
       cacheable.reduceExpire(System.currentTimeMillis() + 1);
       vertx.setTimer(30, id -> {

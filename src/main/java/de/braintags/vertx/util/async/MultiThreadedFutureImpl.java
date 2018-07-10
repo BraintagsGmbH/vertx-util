@@ -181,9 +181,9 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
           handlers.add(Pair.of(currentContext, handler));
         }
       }
-      if (handleImmediately) {
-        handler.handle(this);
-      }
+    }
+    if (handleImmediately) {
+      handler.handle(this);
     }
     return this;
   }

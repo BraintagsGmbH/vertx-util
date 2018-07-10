@@ -41,6 +41,10 @@ public interface MultiThreadedFuture<T> extends CacheableFuture<T> {
     return new MultiThreadedFutureImpl<>();
   }
 
+  public static <T> MultiThreadedFuture<T> succeededFuture() {
+    return succeededFuture(CacheableFuture.EXPIRED, null);
+  }
+
   public static <T> MultiThreadedFuture<T> succeededFuture(final long expires) {
     return succeededFuture(expires, null);
   }
