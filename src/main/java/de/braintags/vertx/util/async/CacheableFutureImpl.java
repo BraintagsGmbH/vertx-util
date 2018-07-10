@@ -51,7 +51,6 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
 
   @Override
   public void complete(final long expires, final T result) {
-    reduceExpire(expires);
     if (!tryComplete(expires, result))
       throw new IllegalStateException("Result is already complete: " + (succeeded ? "succeeded" : "failed"));
   }
