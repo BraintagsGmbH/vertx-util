@@ -14,8 +14,7 @@ import io.vertx.core.Vertx;
 
 public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements MultiThreadedFuture<T> {
 
-  private final List<Pair<Context, Handler<AsyncResult<T>>>> handlers;
-
+  private volatile List<Pair<Context, Handler<AsyncResult<T>>>> handlers;
   protected volatile FutureState state = FutureState.RUNNING;
   protected volatile T result;
   protected volatile Throwable throwable;
@@ -164,7 +163,7 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
         });
       }
     }
-    handlers.clear();
+    handlers = null;
   }
 
   @Override
