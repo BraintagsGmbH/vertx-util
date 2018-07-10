@@ -12,10 +12,13 @@
  */
 package de.braintags.vertx.util.async;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
+import de.braintags.vertx.util.DebugDetection;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
@@ -41,6 +44,7 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
   protected Throwable throwable;
 
   private Handler<AsyncResult<T>> handler;
+  private List<Handler<AsyncResult<T>>> additionalHandlers;
 
   private @Nullable Context context;
 
@@ -119,19 +123,18 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
       handler.handle(this);
     } else {
       if (this.handler != null) {
-        if (context == Vertx.currentContext()) {
-          Handler<AsyncResult<T>> hndl = this.handler;
-          this.handler = res -> {
-            hndl.handle(res);
-            handler.handle(res);
-          };
+        if (DebugDetection.isTest() || context == Vertx.currentContext()) {
+          if (additionalHandlers == null) {
+            additionalHandlers = new ArrayList<>(4);
+          }
+          additionalHandlers.add(handler);
         } else {
           handler.handle(Future.failedFuture(new IllegalStateException("handler already set")));
           throw new IllegalStateException("handler already set");
         }
       } else {
         this.handler = handler;
-        this.context = Vertx.currentContext();
+        this.context = DebugDetection.isTest() ? Vertx.currentContext() : null;
       }
     }
     return this;
@@ -170,10 +173,17 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
   protected void callHandlers() {
     if (handler != null) {
       handler.handle(this);
+      handler = null;
+    }
+
+    if (additionalHandlers != null) {
+      int size = additionalHandlers.size();
+      for (int i = 0; i < size; i++) {
+        additionalHandlers.get(i).handle(this);
+      }
+      additionalHandlers = null;
     }
   }
-
-
 
   @Override
   public <U> SharedFuture<U> compose(final Function<T, Future<U>> mapper) {
