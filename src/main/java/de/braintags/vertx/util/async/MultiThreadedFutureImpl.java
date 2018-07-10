@@ -88,7 +88,6 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
 
   @Override
   public void complete(final long expires, final T result) {
-    reduceExpire(expires);
     if (!tryComplete(expires, result))
       throw new IllegalStateException("Result is already complete: " + (succeeded() ? "succeeded" : "failed"));
   }
