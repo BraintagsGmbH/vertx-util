@@ -14,9 +14,13 @@ package de.braintags.vertx.util.async;
 
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -37,6 +41,8 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
   protected Throwable throwable;
 
   private Handler<AsyncResult<T>> handler;
+
+  private @Nullable Context context;
 
   /**
    * Create a FutureResult that hasn't completed yet
@@ -108,10 +114,26 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
 
   @Override
   public SharedFuture<T> setHandler(final Handler<AsyncResult<T>> handler) {
-    if (this.handler != null) {
-      handler.handle(Future.failedFuture(new IllegalStateException("handler already set")));
+    boolean callHandler = isComplete();
+    if (callHandler) {
+      handler.handle(this);
+    } else {
+      if (this.handler != null) {
+        if (context == Vertx.currentContext()) {
+          Handler<AsyncResult<T>> hndl = this.handler;
+          this.handler = res -> {
+            hndl.handle(res);
+            handler.handle(res);
+          };
+        } else {
+          handler.handle(Future.failedFuture(new IllegalStateException("handler already set")));
+          throw new IllegalStateException("handler already set");
+        }
+      } else {
+        this.handler = handler;
+        this.context = Vertx.currentContext();
+      }
     }
-    this.handler = handler;
     return this;
   }
 

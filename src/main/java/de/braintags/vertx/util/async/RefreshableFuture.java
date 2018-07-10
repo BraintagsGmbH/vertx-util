@@ -30,17 +30,17 @@ import io.vertx.core.logging.LoggerFactory;
  *
  * @param <T>
  */
-public class RefreshableFuture<T> {
+public class RefreshableFuture<T, F extends CacheableFuture<T>> {
 
   private static final Logger logger = LoggerFactory.getLogger(RefreshableFuture.class);
 
   private final long hardLimit;
   private final Function<T, Boolean> shouldRefreshFilter;
-  private final Supplier<CacheableFuture<T>> supplier;
+  private final Supplier<F> supplier;
   private final AtomicBoolean refreshing = new AtomicBoolean(false);
 
   private volatile long hardExpires;
-  private CacheableFuture<T> currentFuture;
+  private F currentFuture;
 
   /**
    * Create a new refreshable future
@@ -50,7 +50,7 @@ public class RefreshableFuture<T> {
    * @param supplier
    *          the supplier to create a new future, will be used to refresh the future repeatedly, when necessary
    */
-  public RefreshableFuture(final long hardLimit, final Supplier<CacheableFuture<T>> supplier) {
+  public RefreshableFuture(final long hardLimit, final Supplier<F> supplier) {
     this(hardLimit, supplier, null);
   }
 
@@ -65,7 +65,7 @@ public class RefreshableFuture<T> {
    *          an optional filter. If it returns false for the result of the current future, it will not be refreshed, no
    *          matter the expiration values. If it returns true, the normal expiration rules are applied to the future.
    */
-  public RefreshableFuture(final long hardLimit, final Supplier<CacheableFuture<T>> supplier,
+  public RefreshableFuture(final long hardLimit, final Supplier<F> supplier,
       final Function<T, Boolean> shouldRefreshFilter) {
     this.hardLimit = hardLimit;
     this.shouldRefreshFilter = shouldRefreshFilter;
@@ -84,7 +84,7 @@ public class RefreshableFuture<T> {
    * 
    * @return a valid future
    */
-  public CacheableFuture<T> get() {
+  public F get() {
     if (!currentFuture.isComplete() || (shouldRefreshFilter != null && currentFuture.succeeded()
         && !shouldRefreshFilter.apply(currentFuture.result())))
       return currentFuture;
@@ -100,7 +100,7 @@ public class RefreshableFuture<T> {
 
   private void softRefresh() {
     if (refreshing.compareAndSet(false, true)) {
-      CacheableFuture<T> newFuture = supplier.get();
+      F newFuture = supplier.get();
       newFuture.setHandler(res -> {
         if (res.succeeded()) {
           this.hardExpires = System.currentTimeMillis() + hardLimit;
@@ -115,7 +115,7 @@ public class RefreshableFuture<T> {
 
   private synchronized void hardRefresh() {
     if (System.currentTimeMillis() > hardExpires) {
-      CacheableFuture<T> newFuture = supplier.get();
+      F newFuture = supplier.get();
       this.hardExpires = System.currentTimeMillis() + hardLimit;
       this.currentFuture = newFuture;
       refreshing.set(false);
