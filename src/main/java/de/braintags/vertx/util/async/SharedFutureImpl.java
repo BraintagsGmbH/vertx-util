@@ -51,7 +51,7 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
   /**
    * Create a FutureResult that hasn't completed yet
    */
-  public SharedFutureImpl() {
+  SharedFutureImpl() {
   }
 
   /**
@@ -60,7 +60,7 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
    * @param result
    *          The result
    */
-  public SharedFutureImpl(final T result) {
+  SharedFutureImpl(final T result) {
     this();
     complete(result);
   }
@@ -71,7 +71,7 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
    * @param cause
    *          The cause
    */
-  public SharedFutureImpl(final Throwable cause) {
+  SharedFutureImpl(final Throwable cause) {
     this();
     fail(cause);
   }

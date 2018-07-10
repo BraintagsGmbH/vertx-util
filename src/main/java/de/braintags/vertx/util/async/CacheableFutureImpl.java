@@ -30,11 +30,11 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
 
   private long expires = CacheableFuture.INFINITE;
 
-  public CacheableFutureImpl() {
+  CacheableFutureImpl() {
     super();
   }
 
-  public CacheableFutureImpl(final Throwable cause) {
+  CacheableFutureImpl(final Throwable cause) {
     super(cause);
     this.expires = CacheableResult.EXPIRED;
   }
