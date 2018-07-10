@@ -172,9 +172,9 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
     if (handler == null) {
       throw new NullPointerException("null handler not allowed");
     }
-    Context currentContext = Vertx.currentContext();
     boolean handleImmediately = isComplete();
     if (!handleImmediately) {
+      Context currentContext = Vertx.currentContext();
       synchronized (this) {
         handleImmediately = isComplete();
         if (!handleImmediately) {
