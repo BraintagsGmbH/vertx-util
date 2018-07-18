@@ -129,8 +129,10 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
           }
           additionalHandlers.add(handler);
         } else {
-          handler.handle(Future.failedFuture(new IllegalStateException("handler already set")));
-          throw new IllegalStateException("handler already set");
+          IllegalStateException e = new IllegalStateException(
+              "handler already set on context " + context + " - unable to set on context " + Vertx.currentContext());
+          handler.handle(Future.failedFuture(e));
+          throw e;
         }
       } else {
         this.handler = handler;
