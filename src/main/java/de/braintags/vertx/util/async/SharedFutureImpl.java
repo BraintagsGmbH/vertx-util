@@ -123,7 +123,7 @@ public class SharedFutureImpl<T> extends AbstractFuture<T> implements SharedFutu
       handler.handle(this);
     } else {
       if (this.handler != null) {
-        if (DebugDetection.isTest() || context == Vertx.currentContext()) {
+        if (!DebugDetection.isTest() || context == Vertx.currentContext()) {
           if (additionalHandlers == null) {
             additionalHandlers = new ArrayList<>(4);
           }
