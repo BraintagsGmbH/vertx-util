@@ -56,7 +56,7 @@ public class DefaultingTypeDeserializer extends AsPropertyTypeDeserializer {
     JavaType targetType = _baseType;
     JsonTypeInfo typeInfo = _baseType.getRawClass().getAnnotation(JsonTypeInfo.class);
     if (typeInfo != null) {
-      if (typeInfo.defaultImpl() != null) {
+      if (typeInfo.defaultImpl() != null && typeInfo.defaultImpl() != JsonTypeInfo.class) {
         targetType = ctxt.getTypeFactory().constructType(typeInfo.defaultImpl());
       }
     }
