@@ -14,6 +14,7 @@ package de.braintags.vertx.util.json;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -27,7 +28,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 /**
  * Types are deserialized the usual way except that the behavior of the defaultImpl is changed. Whenever the data do not
- * specify a type, the base type is used.
+ * specify a type, the base type (or the default class from {@link JsonTypeInfo} is used.
  * 
  * @author mpluecker
  *
@@ -53,6 +54,12 @@ public class DefaultingTypeDeserializer extends AsPropertyTypeDeserializer {
       final TokenBuffer tb) throws IOException {
 
     JavaType targetType = _baseType;
+    JsonTypeInfo typeInfo = _baseType.getRawClass().getAnnotation(JsonTypeInfo.class);
+    if (typeInfo != null) {
+      if (typeInfo.defaultImpl() != null) {
+        targetType = ctxt.getTypeFactory().constructType(typeInfo.defaultImpl());
+      }
+    }
 
     Class<?> raw = targetType.getRawClass();
     if (ClassUtil.isBogusClass(raw)) {
