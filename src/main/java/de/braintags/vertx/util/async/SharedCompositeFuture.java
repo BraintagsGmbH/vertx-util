@@ -20,7 +20,7 @@ public class SharedCompositeFuture {
     return SharedFuture.wrap(CompositeFuture.all(new ArrayList(futures))).mapEmpty();
   }
 
-  public static <T> SharedFuture<List<T>> all(final List<? extends Future<T>> futures) {
+  public static <T> SharedFuture<List<T>> all(final List<? extends Future<? extends T>> futures) {
     return SharedFuture
         .wrap(CompositeFuture.all((List) futures).map(v -> futures.stream().map(Future::result).collect(toList())));
   }
