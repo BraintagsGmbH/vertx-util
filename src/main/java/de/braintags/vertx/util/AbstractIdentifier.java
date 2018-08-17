@@ -12,37 +12,39 @@
  */
 package de.braintags.vertx.util;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Abstract class for simple identifiers
- * 
+ *
  * @author sschmitt
  *
  */
 public abstract class AbstractIdentifier implements Comparable<AbstractIdentifier> {
 
-  private String identifier;
-  private int hashCode;
+  private final String identifier;
 
   /**
    * Create a new instance with an identifier. The identifier will be the only value used for serialization and
    * equality-check.
-   * 
+   *
    * @param identifier
    *          the unique identifier
    */
   @JsonCreator
   protected AbstractIdentifier(final String identifier) {
     super();
-    this.identifier = identifier;
-    this.hashCode = identifier.hashCode();
+    this.identifier = Objects.requireNonNull(identifier, "identifier can not be null");
+
+    // this.hashCode = identifier != null ? identifier.hashCode() : -1;
   }
 
   /**
    * Get the unique identifier
-   * 
+   *
    * @return the identifier
    */
   @JsonValue
@@ -57,7 +59,7 @@ public abstract class AbstractIdentifier implements Comparable<AbstractIdentifie
    */
   @Override
   public int hashCode() {
-    return hashCode;
+    return identifier.hashCode();
   }
 
   /*
@@ -66,7 +68,7 @@ public abstract class AbstractIdentifier implements Comparable<AbstractIdentifie
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
@@ -89,11 +91,11 @@ public abstract class AbstractIdentifier implements Comparable<AbstractIdentifie
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
-  public int compareTo(AbstractIdentifier o) {
+  public int compareTo(final AbstractIdentifier o) {
     return this.identifier.compareTo(o.identifier);
   }
 
