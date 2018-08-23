@@ -41,6 +41,7 @@ import io.vertx.core.json.Json;
  */
 public class JsonDiff {
 
+  private static final String JSON_DIFF_OVERRIDE = "@jsonDiffOverride";
   static final String VALUE = "value";
   static final String DIFF = "diff";
   static final String INDEX = "index";
@@ -267,8 +268,7 @@ public class JsonDiff {
           return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
         } else if (diff.isObject()) {
           ObjectNode baseNode = base.isNull() ? nodeFactory.objectNode() : (ObjectNode) base;
-          applyObjectDiff(baseNode, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
-          return baseNode;
+          return applyObjectDiff(baseNode, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
         } else {
           return diff.deepCopy();
         }
@@ -286,8 +286,15 @@ public class JsonDiff {
     }
   }
 
-  private static void applyObjectDiff(final ObjectNode base, final ObjectNode diff, final JsonNodeFactory nodeFactory,
+  private static JsonNode applyObjectDiff(final ObjectNode base, final ObjectNode diff,
+      final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
+    if (diff.has(JSON_DIFF_OVERRIDE)) {
+      ObjectNode res = diff.deepCopy();
+      res.remove(JSON_DIFF_OVERRIDE);
+      return res;
+    }
+
     Iterator<Entry<String, JsonNode>> diffFields = diff.fields();
     while (diffFields.hasNext()) {
       Entry<String, JsonNode> diffField = diffFields.next();
@@ -299,6 +306,7 @@ public class JsonDiff {
       }
       base.set(fieldName, internalApplyDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
     }
+    return base;
   }
 
   private static void applyArrayMapDiff(final ArrayMapNode base, final ArrayMapNode diff,
@@ -395,8 +403,7 @@ public class JsonDiff {
           squashArrayMapDiff(arrayBase, arrayDiff, nodeFactory, true);
           return ArrayMapNode.toRegularNode(arrayBase, nodeFactory);
         } else if (diff.isObject()) {
-          squashObjectDiff((ObjectNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
-          return base;
+          return squashObjectDiff((ObjectNode) base, (ObjectNode) diff, nodeFactory, arrayMapsConverted);
         } else {
           return diff.deepCopy();
         }
@@ -416,8 +423,13 @@ public class JsonDiff {
     }
   }
 
-  private static void squashObjectDiff(final ObjectNode base, final ObjectNode diff, final JsonNodeFactory nodeFactory,
+  private static ObjectNode squashObjectDiff(final ObjectNode base, final ObjectNode diff,
+      final JsonNodeFactory nodeFactory,
       final boolean arrayMapsConverted) {
+    if (diff.has(JSON_DIFF_OVERRIDE)) {
+      return diff.deepCopy();
+    }
+
     Iterator<Entry<String, JsonNode>> diffFields = diff.fields();
     while (diffFields.hasNext()) {
       Entry<String, JsonNode> diffField = diffFields.next();
@@ -429,6 +441,7 @@ public class JsonDiff {
       }
       base.set(fieldName, internalSquashDiff(baseNode, diffNode, nodeFactory, arrayMapsConverted));
     }
+    return base;
   }
 
   private static void squashArrayMapDiff(final ArrayMapNode base, final ArrayMapNode diff,
