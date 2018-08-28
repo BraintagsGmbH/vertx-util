@@ -49,24 +49,23 @@ public class CompositeUtil {
    * @param chunkSize
    *          the size of each individual chunk. A chunk may be smaller if there is not enough data to fill it
    *          completely
-   * @param biConsumer
-   *          the method that should be executed for each object of the iterator, combined with the completer of
-   *          the future for the object
+   * @param func
+   *          the function that should be executed for each object of the iterator
    * @param handler
    *          returns all futures created during the execution. WILL ALWAYS RETURN SUCCESS! Check each future to
    *          determine if the operation really was successful
    */
   @Deprecated
   public static <T, U, F extends Future<U>> void executeChunked(final Iterator<T> iterator, final int chunkSize,
-      final Function<T, F> biConsumer, final Handler<AsyncResult<List<F>>> handler) {
-    executeChunked(iterator, chunkSize, 0, null, biConsumer, handler);
+      final Function<T, F> func, final Handler<AsyncResult<List<F>>> handler) {
+    executeChunked(iterator, chunkSize, 0, null, func, handler);
   }
 
   public static <T, U, F extends Future<U>> SharedFuture<List<F>> executeChunkedWithFuture(final Iterator<T> iterator,
       final int chunkSize,
-      final Function<T, F> biConsumer) {
+      final Function<T, F> func) {
     SharedFuture<List<F>> f = SharedFuture.future();
-    executeChunked(iterator, chunkSize, 0, null, biConsumer, f);
+    executeChunked(iterator, chunkSize, 0, null, func, f);
     return f;
   }
 
@@ -88,16 +87,15 @@ public class CompositeUtil {
    *          the amount of time in MS to wait between chunks, if <= 0 the next chunk will start immediately
    * @param vertx
    *          a vertx instance, needed to set a timer to wait between chunks if waitDuration > 0
-   * @param biConsumer
-   *          the method that should be executed for each object of the iterator, combined with the completer of
-   *          the future for the object
+   * @param func
+   *          the function that should be executed for each object of the iterator
    * @param handler
    *          returns all futures created during the execution. WILL ALWAYS RETURN SUCCESS! Check each future to
    *          determine if the operation really was successful
    */
   public static <T, U, F extends Future<U>> void executeChunked(final Iterator<T> iterator, final int chunkSize,
       final long waitDuration, final Vertx vertx,
-      final Function<T, F> biConsumer, final Handler<AsyncResult<List<F>>> handler) {
+      final Function<T, F> func, final Handler<AsyncResult<List<F>>> handler) {
     List<F> totalFutures = new ArrayList<>();
     if (chunkSize <= 0) {
       throw new IllegalArgumentException("'chunkSize' must be > 0");
@@ -107,7 +105,7 @@ public class CompositeUtil {
       // empty list, don't even start
       handler.handle(Future.succeededFuture(totalFutures));
     } else {
-      executeChunk(iterator, chunkSize, waitDuration, vertx, biConsumer, totalFutures, result -> {
+      executeChunk(iterator, chunkSize, waitDuration, vertx, func, totalFutures, result -> {
         handler.handle(Future.succeededFuture(totalFutures));
       });
     }
