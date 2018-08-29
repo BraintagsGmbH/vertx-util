@@ -55,13 +55,7 @@ public class CompositeUtil {
    *          returns all futures created during the execution. WILL ALWAYS RETURN SUCCESS! Check each future to
    *          determine if the operation really was successful
    */
-  @Deprecated
-  public static <T, U, F extends Future<U>> void executeChunked(final Iterator<T> iterator, final int chunkSize,
-      final Function<T, F> func, final Handler<AsyncResult<List<F>>> handler) {
-    executeChunked(iterator, chunkSize, 0, null, func, handler);
-  }
-
-  public static <T, U, F extends Future<U>> SharedFuture<List<F>> executeChunkedWithFuture(final Iterator<T> iterator,
+  public static <T, U, F extends Future<U>> SharedFuture<List<F>> executeChunked(final Iterator<T> iterator,
       final int chunkSize,
       final Function<T, F> func) {
     SharedFuture<List<F>> f = SharedFuture.future();

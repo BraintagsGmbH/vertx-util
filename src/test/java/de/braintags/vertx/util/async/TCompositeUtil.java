@@ -65,8 +65,8 @@ public class TCompositeUtil extends BtVertxTestBase {
     testList.add("Test1");
     testList.add("Test2");
 
-    CompositeUtil.executeChunked(testList.iterator(), 0, value -> Future.succeededFuture(),
-        context.asyncAssertSuccess());
+    CompositeUtil.executeChunked(testList.iterator(), 0, value -> Future.succeededFuture())
+        .setHandler(context.asyncAssertSuccess());
   }
 
   /**
@@ -83,7 +83,7 @@ public class TCompositeUtil extends BtVertxTestBase {
         return Future.failedFuture("Test fail");
       else
         return Future.succeededFuture((Void) null);
-    }, context.asyncAssertSuccess(result -> {
+    }).setHandler(context.asyncAssertSuccess(result -> {
       assertThat(result.size(), is(10));
       int failed = 0;
       int success = 0;
@@ -109,7 +109,7 @@ public class TCompositeUtil extends BtVertxTestBase {
     CompositeUtil.executeChunked(testList.iterator(), 2, value -> {
       Assert.fail("Should not have entered here with an empty list");
       return Future.succeededFuture();
-    }, context.asyncAssertSuccess());
+    }).setHandler(context.asyncAssertSuccess());
   }
 
   /**
@@ -135,7 +135,7 @@ public class TCompositeUtil extends BtVertxTestBase {
       }
       executionMap.put(value, true);
       return Future.succeededFuture();
-    }, context.asyncAssertSuccess());
+    }).setHandler(context.asyncAssertSuccess());
   }
 
 }
