@@ -90,7 +90,7 @@ public interface MultiThreadedFuture<T> extends CacheableFuture<T> {
   @Override
   MultiThreadedFuture<T> otherwiseEmpty();
 
-  MultiThreadedFuture<T> addHandler(Handler<AsyncResult<T>> handler);
+  MultiThreadedFuture<T> addHandler(Handler<? super MultiThreadedFuture<T>> handler);
 
 
   public static <T> MultiThreadedFuture<T> wrap(final long expires, final Future<T> future) {

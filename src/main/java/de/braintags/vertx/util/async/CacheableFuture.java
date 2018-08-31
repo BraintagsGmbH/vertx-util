@@ -87,6 +87,8 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
   @Override
   CacheableFuture<T> otherwiseEmpty();
 
+  CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler);
+
   public static <T> CacheableFuture<T> wrap(final long expires, final Future<T> future) {
     CacheableFuture<T> f = CacheableFuture.future();
     future.setHandler(res -> {

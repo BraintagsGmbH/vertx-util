@@ -217,4 +217,11 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     return otherwise(err -> null);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+    setHandler((Handler) handler);
+    return this;
+  }
+
 }

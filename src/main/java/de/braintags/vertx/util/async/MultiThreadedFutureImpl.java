@@ -14,7 +14,7 @@ import io.vertx.core.Vertx;
 
 public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements MultiThreadedFuture<T> {
 
-  private volatile List<Pair<Context, Handler<AsyncResult<T>>>> handlers;
+  private volatile List<Pair<Context, Handler<? super MultiThreadedFuture<T>>>> handlers;
   protected volatile FutureState state = FutureState.RUNNING;
   protected volatile T result;
   protected volatile Throwable throwable;
@@ -153,7 +153,7 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
 
   protected synchronized void callHandlers() {
     Context currentContext = Vertx.currentContext();
-    for (Pair<Context, Handler<AsyncResult<T>>> handler : handlers) {
+    for (Pair<Context, Handler<? super MultiThreadedFuture<T>>> handler : handlers) {
       if (handler.getKey() == null || currentContext == handler.getKey()) {
         handler.getValue().handle(this);
       } else {
@@ -166,7 +166,7 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   }
 
   @Override
-  public MultiThreadedFuture<T> addHandler(final Handler<AsyncResult<T>> handler) {
+  public MultiThreadedFuture<T> addHandler(final Handler<? super MultiThreadedFuture<T>> handler) {
     if (handler == null) {
       throw new NullPointerException("null handler not allowed");
     }
@@ -309,5 +309,11 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   @Override
   public MultiThreadedFuture<T> otherwiseEmpty() {
     return otherwise(err -> null);
+  }
+  
+  @Override
+  public MultiThreadedFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+    addHandler(handler);
+    return this;
   }
 }
