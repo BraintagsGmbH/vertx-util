@@ -13,7 +13,7 @@ public class SucceededMultiThreadedFuture<T> extends SucceededCacheableFuture<T>
   }
 
   @Override
-  public MultiThreadedFuture<T> addHandler(final Handler<AsyncResult<T>> handler) {
+  public MultiThreadedFuture<T> addHandler(final Handler<? super MultiThreadedFuture<T>> handler) {
     handler.handle(this);
     return this;
   }

@@ -105,4 +105,10 @@ public class SucceededCacheableFuture<T> extends SucceededSharedFuture<T> implem
     return this;
   }
 
+  @Override
+  public CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+    handler.handle(this);
+    return this;
+  }
+
 }
