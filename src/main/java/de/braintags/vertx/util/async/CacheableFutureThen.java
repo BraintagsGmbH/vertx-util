@@ -27,6 +27,7 @@ class CacheableFutureThen<U, T> extends CacheableFutureImpl<U> implements Cachea
   }
 
   private void chainFuture(final AsyncResult<T> res) {
+    reduceExpireFromResult(res);
     Future<U> result;
     try {
       result = mapper.apply(res);

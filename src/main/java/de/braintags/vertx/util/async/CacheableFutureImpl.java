@@ -49,6 +49,14 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
     this.expires = Math.min(this.expires, expires);
   }
 
+  protected void reduceExpireFromResult(final AsyncResult<?> res) {
+    if (res.succeeded() && res instanceof CacheableResult) {
+      reduceExpire(((CacheableResult<?>) res).expires());
+    } else {
+      reduceExpire(CacheableResult.EXPIRED);
+    }
+  }
+
   @Override
   public void complete(final long expires, final T result) {
     if (!tryComplete(expires, result))

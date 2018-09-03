@@ -27,6 +27,7 @@ class MultiThreadedFutureThen<U, T> extends MultiThreadedFutureImpl<U> implement
   }
 
   private void chainFuture(final AsyncResult<T> res) {
+    reduceExpireFromResult(res);
     Future<U> result;
     try {
       result = mapper.apply(res);

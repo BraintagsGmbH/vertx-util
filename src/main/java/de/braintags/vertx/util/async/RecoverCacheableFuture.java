@@ -28,8 +28,10 @@ class RecoverCacheableFuture<T> extends CacheableFutureImpl<T> {
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
+      reduceExpireFromResult(res);
       handle(res);
     } else {
+      reduceExpire(CacheableFuture.EXPIRED);
       Future<T> mapped;
       try {
         mapped = mapper.apply(res.cause());

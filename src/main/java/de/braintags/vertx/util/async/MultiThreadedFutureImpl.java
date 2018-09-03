@@ -41,6 +41,14 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
     this.expires = Math.min(this.expires, expires);
   }
 
+  protected void reduceExpireFromResult(final AsyncResult<?> res) {
+    if (res.succeeded() && res instanceof CacheableResult) {
+      reduceExpire(((CacheableResult<?>) res).expires());
+    } else {
+      reduceExpire(CacheableResult.EXPIRED);
+    }
+  }
+
   /**
    * The result of the operation. This will be null if the operation failed.
    */

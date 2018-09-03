@@ -27,6 +27,7 @@ class OtherwiseMultiThreadedFuture<T> extends MultiThreadedFutureImpl<T> impleme
   }
 
   private void chainFuture(final AsyncResult<T> res) {
+    reduceExpireFromResult(res);
     if (res.succeeded()) {
       handle(res);
     } else {

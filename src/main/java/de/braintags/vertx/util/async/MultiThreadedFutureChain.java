@@ -27,6 +27,7 @@ class MultiThreadedFutureChain<U> extends MultiThreadedFutureImpl<U> implements 
   }
 
   private void chainFuture(final AsyncResult<?> ar) {
+    reduceExpireFromResult(ar);
     Future<U> mapped;
     try {
       mapped = mapper.apply(null);
