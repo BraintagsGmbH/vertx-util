@@ -28,6 +28,7 @@ class ComposedMultiThreadedFuture<U, T> extends MultiThreadedFutureImpl<U> {
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
+      reduceExpireFromResult(res);
       Future<U> result;
       try {
         result = mapper.apply(res.result());

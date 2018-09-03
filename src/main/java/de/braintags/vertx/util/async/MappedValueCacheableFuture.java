@@ -26,6 +26,7 @@ class MappedValueCacheableFuture<U, T> extends CacheableFutureImpl<U> implements
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
+      reduceExpireFromResult(res);
       complete(value);
     } else {
       fail(res.cause());

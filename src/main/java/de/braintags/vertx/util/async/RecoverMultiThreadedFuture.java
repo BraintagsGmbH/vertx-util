@@ -27,6 +27,7 @@ class RecoverMultiThreadedFuture<T> extends MultiThreadedFutureImpl<T> {
   }
 
   private void chainFuture(final AsyncResult<T> res) {
+    reduceExpireFromResult(res);
     if (res.succeeded()) {
       handle(res);
     } else {

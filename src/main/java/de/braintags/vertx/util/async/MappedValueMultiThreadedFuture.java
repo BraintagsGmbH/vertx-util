@@ -26,6 +26,7 @@ class MappedValueMultiThreadedFuture<U, T> extends MultiThreadedFutureImpl<U> im
 
   private void chainFuture(final AsyncResult<T> res) {
     if (res.succeeded()) {
+      reduceExpireFromResult(res);
       complete(value);
     } else {
       fail(res.cause());
