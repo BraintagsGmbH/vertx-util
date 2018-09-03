@@ -26,9 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.braintags.vertx.BtVertxTestBase;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -43,18 +41,18 @@ public class TCompositeUtil extends BtVertxTestBase {
    * Ensure the second execution waits for the given amount of time before starting
    */
   @Test
-  public void testTimer(TestContext context) {
+  public void testTimer(final TestContext context) {
     List<String> testList = new ArrayList<>();
     testList.add("Test1");
     testList.add("Test2");
 
     long start = System.currentTimeMillis();
-    CompositeUtil.executeChunked(testList.iterator(), 1, 500, vertx, (value, subHandler) -> {
+    CompositeUtil.executeChunked(testList.iterator(), 1, 500, vertx, value -> {
       if ("Test2".equals(value)) {
         assertThat("Execution should have waited at least 500ms", System.currentTimeMillis() - start,
             greaterThanOrEqualTo(500l));
       }
-      subHandler.handle(Future.succeededFuture());
+      return Future.succeededFuture();
     }, context.asyncAssertSuccess());
   }
 
@@ -62,31 +60,30 @@ public class TCompositeUtil extends BtVertxTestBase {
    * Test that an invalid chunk size leads to an exception
    */
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidChunkSize(TestContext context) {
+  public void testInvalidChunkSize(final TestContext context) {
     List<String> testList = new ArrayList<>();
     testList.add("Test1");
     testList.add("Test2");
 
-    CompositeUtil.executeChunked(testList.iterator(), 0, (value, subHandler) -> {
-      subHandler.handle(Future.succeededFuture());
-    }, context.asyncAssertSuccess());
+    CompositeUtil.executeChunked(testList.iterator(), 0, value -> Future.succeededFuture())
+        .setHandler(context.asyncAssertSuccess());
   }
 
   /**
    * Ensure that all futures are executed, even if one fails in the middle of the execution
    */
   @Test
-  public void testCompleteResult(TestContext context) {
+  public void testCompleteResult(final TestContext context) {
     List<String> testList = new ArrayList<>();
     for (int i = 1; i <= 10; i++)
       testList.add("Test" + i);
 
-    CompositeUtil.executeChunked(testList.iterator(), 2, (String value, Handler<AsyncResult<Void>> subHandler) -> {
+    CompositeUtil.executeChunked(testList.iterator(), 2, value -> {
       if ("Test5".equals(value))
-        subHandler.handle(Future.failedFuture("Test fail"));
+        return Future.failedFuture("Test fail");
       else
-        subHandler.handle(Future.succeededFuture());
-    }, context.asyncAssertSuccess(result -> {
+        return Future.succeededFuture((Void) null);
+    }).setHandler(context.asyncAssertSuccess(result -> {
       assertThat(result.size(), is(10));
       int failed = 0;
       int success = 0;
@@ -106,19 +103,20 @@ public class TCompositeUtil extends BtVertxTestBase {
    * Ensure that no errors occur if the iterator is empty
    */
   @Test
-  public void testEmptyList(TestContext context) {
+  public void testEmptyList(final TestContext context) {
     List<String> testList = new ArrayList<>();
 
-    CompositeUtil.executeChunked(testList.iterator(), 2, (String value, Handler<AsyncResult<Void>> subHandler) -> {
+    CompositeUtil.executeChunked(testList.iterator(), 2, value -> {
       Assert.fail("Should not have entered here with an empty list");
-    }, context.asyncAssertSuccess());
+      return Future.succeededFuture();
+    }).setHandler(context.asyncAssertSuccess());
   }
 
   /**
    * Ensure that chunks are executed one after the other, and never in parallel
    */
   @Test
-  public void testSequentialExecution(TestContext context) {
+  public void testSequentialExecution(final TestContext context) {
     List<Integer> testList = new ArrayList<>();
     for (int i = 1; i <= 10; i++)
       testList.add(i);
@@ -128,7 +126,7 @@ public class TCompositeUtil extends BtVertxTestBase {
       executionMap.put(testValue, false);
     }
 
-    CompositeUtil.executeChunked(testList.iterator(), 1, (Integer value, Handler<AsyncResult<Void>> subHandler) -> {
+    CompositeUtil.executeChunked(testList.iterator(), 1, value -> {
       for (Entry<Integer, Boolean> entry : executionMap.entrySet()) {
         if (entry.getKey() < value)
           assertThat(entry.getKey() + " should have finished processing before " + value, entry.getValue(), is(true));
@@ -136,8 +134,8 @@ public class TCompositeUtil extends BtVertxTestBase {
           assertThat(entry.getKey() + " should not have been processed before " + value, entry.getValue(), is(false));
       }
       executionMap.put(value, true);
-      subHandler.handle(Future.succeededFuture());
-    }, context.asyncAssertSuccess());
+      return Future.succeededFuture();
+    }).setHandler(context.asyncAssertSuccess());
   }
 
 }
