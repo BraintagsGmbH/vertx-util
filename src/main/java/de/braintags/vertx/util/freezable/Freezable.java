@@ -45,6 +45,7 @@ public interface Freezable<F extends Freezable<?>> {
     }
   }
 
+
   public abstract static class Skeleton<F extends Freezable<?>> implements Freezable<F> {
 
     @JsonIgnore
@@ -73,17 +74,6 @@ public interface Freezable<F extends Freezable<?>> {
       checkFrozen();
     }
 
-    // important for ProxyCache checks
-    @Override
-    public int hashCode() {
-      return super.hashCode();
-    }
-
-    // important for ProxyCache checks
-    @Override
-    public boolean equals(final Object obj) {
-      return super.equals(obj);
-    }
   }
 
   public abstract static class Wrapper<F extends Freezable<?>> implements Freezable<F> {
