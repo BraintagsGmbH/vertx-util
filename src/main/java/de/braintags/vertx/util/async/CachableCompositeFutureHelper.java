@@ -12,6 +12,9 @@
  */
 package de.braintags.vertx.util.async;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.Comparator;
 import java.util.List;
 
 import io.vertx.core.AsyncResult;
@@ -89,10 +92,15 @@ public interface CachableCompositeFutureHelper {
    *
    * When the list is empty, the returned future will be already completed.
    */
-  static CacheableFuture<Void> join(final List<Future> futures) {
+  static CacheableFuture<Void> join(final List<? extends CacheableFuture<?>> futures) {
     CacheableFuture<Void> f = CacheableFuture.future();
     CacheableFuture<?>[] array = futures.toArray(new CacheableFuture[futures.size()]);
     CompositeFutureImpl.join(array).setHandler(handler(f, array));
     return f;
+  }
+  
+  static <T> CacheableFuture<List<T>> join2(final List<? extends CacheableFuture<T>> futures) {
+    return CacheableFuture.wrap(futures.stream().min(Comparator.comparing(CacheableFuture::expires)).get().expires(),
+        CompositeFuture.join((List) futures).map(v -> futures.stream().map(Future::result).collect(toList())));
   }
 }
