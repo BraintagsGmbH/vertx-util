@@ -320,8 +320,12 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   }
   
   @Override
-  public MultiThreadedFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
-    addHandler(handler);
+  public CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+    setHandler(res -> {
+      if (res.succeeded()) {
+        handler.handle((CacheableFuture<T>) res);
+      }
+    });
     return this;
   }
 }
