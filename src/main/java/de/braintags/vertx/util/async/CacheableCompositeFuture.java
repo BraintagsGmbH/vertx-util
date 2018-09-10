@@ -40,7 +40,7 @@ public interface CacheableCompositeFuture {
    *
    * When the list is empty, the returned future will be already completed.
    */
-  static CacheableFuture<Void> allVoid(final Collection<CacheableFuture<?>> futures) {
+  static CacheableFuture<Void> allVoid(final Collection<? extends CacheableFuture<?>> futures) {
     CacheableFuture<Void> f = CacheableFuture.future();
     SharedCompositeFuture.allVoid(futures).setHandler(handler(f, futures));
     return f;
