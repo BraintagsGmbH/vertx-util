@@ -27,7 +27,6 @@ class OtherwiseCacheableFuture<T> extends CacheableFutureImpl<T> implements Cach
   }
 
   private void chainFuture(final AsyncResult<T> res) {
-    reduceExpireFromResult(res);
     if (res.succeeded()) {
       handle(res);
     } else {

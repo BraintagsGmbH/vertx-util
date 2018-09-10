@@ -38,6 +38,24 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
     }
   }
 
+  public static <T> CacheableFuture<T> overrideExpires(final long expires, final Future<T> future) {
+    CacheableFuture<T> f = CacheableFuture.future();
+    future.setHandler(res -> {
+      if (res.succeeded())
+        f.complete(expires, res.result());
+      else
+        f.fail(res.cause());
+    });
+    return f;
+  }
+
+  public static <T> CacheableFuture<T> wrap(final long expires, final Future<T> future) {
+    CacheableFuture<T> f = CacheableFuture.future();
+    f.reduceExpire(expires);
+    future.setHandler(f);
+    return f;
+  }
+
   public static <U, T> CacheableFuture<U> computeExpires(final Future<T> future, final Function<T, U> valueMapper,
       final Function<AsyncResult<T>, Long> expiresMapper) {
     return new CacheableComputeExpires<>(future, valueMapper, expiresMapper);
@@ -94,15 +112,5 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
 
   CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler);
 
-  public static <T> CacheableFuture<T> wrap(final long expires, final Future<T> future) {
-    CacheableFuture<T> f = CacheableFuture.future();
-    future.setHandler(res -> {
-      if (res.succeeded())
-        f.complete(expires, res.result());
-      else
-        f.fail(res.cause());
-    });
-    return f;
-  }
 
 }
