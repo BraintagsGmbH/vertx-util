@@ -14,6 +14,8 @@ package de.braintags.vertx.util.async;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -38,23 +40,7 @@ public interface CachableCompositeFutureHelper {
    * @return the composite future
    */
   static CacheableFuture<Void> all(final CacheableFuture<?>... futures) {
-    CacheableFuture<Void> f = CacheableFuture.future();
-    CompositeFutureImpl.all(futures).setHandler(handler(f, futures));
-    return f;
-  }
-
-  static Handler<AsyncResult<CompositeFuture>> handler(final CacheableFuture<Void> f,
-      final CacheableFuture<?>... futures) {
-    return res -> {
-      for (CacheableFuture<?> resolvable : futures) {
-        f.reduceExpire(resolvable.expires());
-      }
-      if (res.succeeded()) {
-        f.complete(CacheableResult.INFINITE, null);
-      } else {
-        f.fail(res.cause());
-      }
-    };
+    return all(Arrays.asList(futures));
   }
 
   /**
@@ -63,12 +49,33 @@ public interface CachableCompositeFutureHelper {
    *
    * When the list is empty, the returned future will be already completed.
    */
-  static CacheableFuture<Void> all(final List<CacheableFuture<?>> futures) {
+  static CacheableFuture<Void> all(final Collection<CacheableFuture<?>> futures) {
     CacheableFuture<Void> f = CacheableFuture.future();
-    CacheableFuture<?>[] array = futures.toArray(new CacheableFuture[futures.size()]);
-    CompositeFutureImpl.all(array).setHandler(handler(f, array));
+    SharedCompositeFuture.allVoid(futures).setHandler(handler(f, futures));
     return f;
   }
+
+  static <T> CacheableFuture<List<T>> a(final List<CacheableFuture<T>> futures) {
+    CacheableFuture<List<T>> f = CacheableFuture.future();
+    SharedCompositeFuture.all(futures).setHandler(handler(f, futures));
+    return f;
+  }
+
+  static <T> Handler<AsyncResult<T>> handler(final CacheableFuture<T> f,
+      final Iterable<? extends CacheableFuture<?>> futures) {
+    return res -> {
+      for (CacheableFuture<?> resolvable : futures) {
+        f.reduceExpire(resolvable.expires());
+      }
+      if (res.succeeded()) {
+        f.complete(CacheableResult.INFINITE, res.result());
+      } else {
+        f.fail(res.cause());
+      }
+    };
+  }
+
+
 
   /**
    * Return a composite future, succeeded when all futures are succeeded, failed when any future is failed.
