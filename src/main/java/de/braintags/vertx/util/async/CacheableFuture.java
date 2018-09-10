@@ -38,6 +38,11 @@ public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> 
     }
   }
 
+  public static <U, T> CacheableFuture<U> computeExpires(final Future<T> future, final Function<T, U> valueMapper,
+      final Function<AsyncResult<T>, Long> expiresMapper) {
+    return new CacheableComputeExpires<>(future, valueMapper, expiresMapper);
+  }
+
   public static <T> CacheableFuture<T> future() {
     return new CacheableFutureImpl<>();
   }

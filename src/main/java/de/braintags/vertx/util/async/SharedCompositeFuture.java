@@ -24,6 +24,10 @@ public class SharedCompositeFuture {
     return SharedFuture.wrap(CompositeFuture.all(new ArrayList(futures))).mapEmpty();
   }
 
+  public static <T> SharedFuture<List<T>> all(final Future<? extends T>... futures) {
+    return all(Arrays.asList(futures));
+  }
+
   public static <T> SharedFuture<List<T>> all(final List<? extends Future<? extends T>> futures) {
     if (futures.isEmpty()) {
       return SharedFuture.succeededFuture(Collections.emptyList());
