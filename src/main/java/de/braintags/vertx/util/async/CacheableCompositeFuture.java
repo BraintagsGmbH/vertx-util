@@ -52,6 +52,10 @@ public interface CacheableCompositeFuture {
     return f;
   }
 
+  static <T> CacheableFuture<List<T>> all(final CacheableFuture<T>... futures) {
+    return all(Arrays.asList(futures));
+  }
+
   static <T> Handler<AsyncResult<T>> handler(final CacheableFuture<T> f,
       final Iterable<? extends CacheableFuture<?>> futures) {
     return res -> {
