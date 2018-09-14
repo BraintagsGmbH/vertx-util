@@ -14,6 +14,7 @@ package de.braintags.vertx.util.async;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import io.vertx.core.AsyncResult;
@@ -41,6 +42,9 @@ public interface CacheableCompositeFuture {
    * When the list is empty, the returned future will be already completed.
    */
   static CacheableFuture<Void> allVoid(final Collection<? extends CacheableFuture<?>> futures) {
+    if (futures.isEmpty()) {
+      return CacheableFuture.succeededFuture(CacheableFuture.INFINITE);
+    }
     CacheableFuture<Void> f = CacheableFuture.future();
     SharedCompositeFuture.allVoid(futures).setHandler(handler(f, futures));
     return f;
@@ -56,6 +60,9 @@ public interface CacheableCompositeFuture {
    * @return the composite future
    */
   static <T> CacheableFuture<List<T>> all(final List<CacheableFuture<T>> futures) {
+    if (futures.isEmpty()) {
+      return CacheableFuture.succeededFuture(CacheableFuture.INFINITE, Collections.emptyList());
+    }
     CacheableFuture<List<T>> f = CacheableFuture.future();
     SharedCompositeFuture.all(futures).setHandler(handler(f, futures));
     return f;
@@ -92,6 +99,9 @@ public interface CacheableCompositeFuture {
    * When the list is empty, the returned future will be already completed.
    */
   static CacheableFuture<Void> joinVoid(final List<? extends CacheableFuture<?>> futures) {
+    if (futures.isEmpty()) {
+      return CacheableFuture.succeededFuture(CacheableFuture.INFINITE);
+    }
     CacheableFuture<Void> f = CacheableFuture.future();
     SharedCompositeFuture.joinVoid(futures).setHandler(handler(f, futures));
     return f;
@@ -118,6 +128,9 @@ public interface CacheableCompositeFuture {
    * When the list is empty, the returned future will be already completed.
    */
   static <T> CacheableFuture<List<T>> join(final List<? extends CacheableFuture<T>> futures) {
+    if (futures.isEmpty()) {
+      return CacheableFuture.succeededFuture(CacheableFuture.INFINITE, Collections.emptyList());
+    }
     CacheableFuture<List<T>> f = CacheableFuture.future();
     SharedCompositeFuture.join(futures).setHandler(handler(f, futures));
     return f;
