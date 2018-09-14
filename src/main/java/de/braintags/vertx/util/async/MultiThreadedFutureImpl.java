@@ -133,6 +133,8 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
     // important: set throwable first
     this.throwable = cause;
     state = FutureState.FAILED;
+    reduceExpire(CacheableResult.EXPIRED);
+
     callHandlers();
     return true;
   }
@@ -320,7 +322,7 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   }
   
   @Override
-  public CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+  public CacheableFuture<T> addCacheHandler(final Handler<CacheableFuture<T>> handler) {
     setHandler(res -> {
       if (res.succeeded()) {
         handler.handle((CacheableFuture<T>) res);

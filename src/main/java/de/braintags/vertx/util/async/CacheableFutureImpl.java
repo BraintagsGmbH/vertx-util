@@ -85,8 +85,18 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
 
   @Override
   public synchronized boolean tryComplete(final T result) {
+    if (isComplete())
+      return false;
     reduceExpire(CacheableFuture.EXPIRED);
     return super.tryComplete(result);
+  }
+
+  @Override
+  public boolean tryFail(final Throwable cause) {
+    if (isComplete())
+      return false;
+    reduceExpire(CacheableFuture.EXPIRED);
+    return super.tryFail(cause);
   }
 
   @Override
@@ -226,7 +236,7 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
   }
 
   @Override
-  public CacheableFuture<T> addCacheHandler(Handler<CacheableFuture<T>> handler) {
+  public CacheableFuture<T> addCacheHandler(final Handler<CacheableFuture<T>> handler) {
     setHandler(res -> {
       if (res.succeeded()) {
         handler.handle((CacheableFuture<T>) res);
