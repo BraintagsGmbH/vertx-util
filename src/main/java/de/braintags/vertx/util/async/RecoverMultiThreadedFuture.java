@@ -27,10 +27,10 @@ class RecoverMultiThreadedFuture<T> extends MultiThreadedFutureImpl<T> {
   }
 
   private void chainFuture(final AsyncResult<T> res) {
-    reduceExpireFromResult(res);
     if (res.succeeded()) {
       handle(res);
     } else {
+      reduceExpireFromResult(res);
       Future<T> mapped;
       try {
         mapped = mapper.apply(res.cause());
