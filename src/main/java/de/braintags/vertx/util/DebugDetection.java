@@ -10,6 +10,7 @@ package de.braintags.vertx.util;
 public class DebugDetection {
 
   private static final boolean develop = detectDevelopMode();
+  private static final boolean profiling = detectProfilingMode();
   private static final boolean test = detectTestMode();
   private static final boolean fileCachingDisabled = detectFileCahcingDisabled();
 
@@ -21,6 +22,10 @@ public class DebugDetection {
     return test;
   }
 
+  public static boolean isProfiling() {
+    return profiling;
+  }
+
   public static boolean isFileCachingDisabled() {
     return fileCachingDisabled;
   }
@@ -30,11 +35,15 @@ public class DebugDetection {
     if (test != null)
       return "true".equals(test);
     else
-      return isLaunchedByEclipse();
+      return detectDevelopMode();
   }
 
   private static boolean detectFileCahcingDisabled() {
     return "true".equals(System.getProperties().getProperty("vertx.disableFileCaching"));
+  }
+
+  private static boolean detectProfilingMode() {
+    return "true".equals(System.getProperties().getProperty("profiling"));
   }
 
   private static boolean detectDevelopMode() {
