@@ -35,7 +35,7 @@ public interface CacheableCompositeFuture {
   }
 
   /**
-   * Like {@link #all(Future...))} but with a list of futures.
+   * Like {@link #allVoid(Future...))} but with a list of futures.
    * <p>
    *
    * When the list is empty, the returned future will be already completed.
@@ -46,31 +46,30 @@ public interface CacheableCompositeFuture {
     return f;
   }
 
+  /**
+   * Return a composite future, succeeded when all futures are succeeded, failed when any future is failed.
+   * <p/>
+   * The returned future fails as soon as one future fails.
+   *
+   * @param futures
+   *          the futures
+   * @return the composite future
+   */
   static <T> CacheableFuture<List<T>> all(final List<CacheableFuture<T>> futures) {
     CacheableFuture<List<T>> f = CacheableFuture.future();
     SharedCompositeFuture.all(futures).setHandler(handler(f, futures));
     return f;
   }
 
+  /**
+   * Like {@link #all(Future...))} but with a list of futures.
+   * <p>
+   *
+   * When the list is empty, the returned future will be already completed.
+   */
   static <T> CacheableFuture<List<T>> all(final CacheableFuture<T>... futures) {
     return all(Arrays.asList(futures));
   }
-
-  static <T> Handler<AsyncResult<T>> handler(final CacheableFuture<T> f,
-      final Iterable<? extends CacheableFuture<?>> futures) {
-    return res -> {
-      for (CacheableFuture<?> resolvable : futures) {
-        f.reduceExpire(resolvable.expires());
-      }
-      if (res.succeeded()) {
-        f.complete(CacheableResult.INFINITE, res.result());
-      } else {
-        f.fail(res.cause());
-      }
-    };
-  }
-
-
 
   /**
    * Return a composite future, succeeded when all futures are succeeded, failed when any future is failed.
@@ -122,5 +121,19 @@ public interface CacheableCompositeFuture {
     CacheableFuture<List<T>> f = CacheableFuture.future();
     SharedCompositeFuture.join(futures).setHandler(handler(f, futures));
     return f;
+  }
+
+  static <T> Handler<AsyncResult<T>> handler(final CacheableFuture<T> f,
+      final Iterable<? extends CacheableFuture<?>> futures) {
+    return res -> {
+      for (CacheableFuture<?> resolvable : futures) {
+        f.reduceExpire(resolvable.expires());
+      }
+      if (res.succeeded()) {
+        f.complete(CacheableResult.INFINITE, res.result());
+      } else {
+        f.fail(res.cause());
+      }
+    };
   }
 }
