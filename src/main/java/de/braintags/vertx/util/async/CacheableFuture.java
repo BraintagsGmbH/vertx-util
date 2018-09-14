@@ -28,6 +28,10 @@ import io.vertx.core.Handler;
  */
 public interface CacheableFuture<T> extends SharedFuture<T>, CacheableResult<T> {
 
+  public static <T> CacheableFuture<T> toCacheable(final CacheableFuture<T> future) {
+    return future;
+  }
+
   public static <T> CacheableFuture<T> toCacheable(final Future<T> future) {
     if (future instanceof CacheableFuture) {
       return (CacheableFuture<T>) future;
