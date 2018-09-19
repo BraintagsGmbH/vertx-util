@@ -12,7 +12,7 @@ public class DebugDetection {
   private static final boolean develop = detectDevelopMode();
   private static final boolean profiling = detectProfilingMode();
   private static final boolean test = detectTestMode();
-  private static final boolean fileCachingDisabled = detectFileCahcingDisabled();
+  private static final boolean fileCachingDisabled = detectFileCachingDisabled();
 
   public static boolean isLaunchedByEclipse() {
     return develop;
@@ -38,7 +38,7 @@ public class DebugDetection {
       return detectDevelopMode();
   }
 
-  private static boolean detectFileCahcingDisabled() {
+  private static boolean detectFileCachingDisabled() {
     return "true".equals(System.getProperties().getProperty("vertx.disableFileCaching"));
   }
 
