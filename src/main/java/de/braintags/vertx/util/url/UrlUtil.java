@@ -102,4 +102,12 @@ public class UrlUtil {
     }
   }
 
+  public static URI replaceHost(final URI uri, final String host, final int port) {
+    try {
+      return new URI(uri.getScheme(), uri.getUserInfo(), host, port, uri.getPath(), uri.getQuery(), uri.getFragment());
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 }
