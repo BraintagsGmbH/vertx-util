@@ -43,7 +43,7 @@ public class SharedCompositeFuture {
     return SharedFuture.wrap(CompositeFuture.join(new ArrayList(futures))).mapEmpty();
   }
 
-  public static <T> SharedFuture<List<T>> join(final List<? extends Future<T>> futures) {
+  public static <T, F extends Future<T>> SharedFuture<List<T>> join(final List<F> futures) {
     if (futures.isEmpty()) {
       return SharedFuture.succeededFuture(Collections.emptyList());
     }
