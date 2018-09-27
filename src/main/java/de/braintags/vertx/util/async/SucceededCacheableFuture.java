@@ -111,4 +111,26 @@ public class SucceededCacheableFuture<T> extends SucceededSharedFuture<T> implem
     return this;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + (int) (expires ^ (expires >>> 32));
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SucceededCacheableFuture other = (SucceededCacheableFuture) obj;
+    if (expires != other.expires)
+      return false;
+    return true;
+  }
+
 }
