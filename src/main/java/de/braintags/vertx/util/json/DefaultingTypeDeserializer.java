@@ -63,7 +63,7 @@ public class DefaultingTypeDeserializer extends AsPropertyTypeDeserializer {
 
     Class<?> raw = targetType.getRawClass();
     if (ClassUtil.isBogusClass(raw)) {
-      return NullifyingDeserializer.instance;
+      return NullifyingDeserializer.instance.deserialize(p, ctxt);
     }
 
     synchronized (this) {
