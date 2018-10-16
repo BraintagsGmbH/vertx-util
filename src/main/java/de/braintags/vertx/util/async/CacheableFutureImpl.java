@@ -36,7 +36,6 @@ public class CacheableFutureImpl<T> extends SharedFutureImpl<T> implements Cache
 
   CacheableFutureImpl(final Throwable cause) {
     super(cause);
-    this.expires = CacheableResult.EXPIRED;
   }
 
   @Override

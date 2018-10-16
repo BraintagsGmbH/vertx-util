@@ -25,8 +25,8 @@ public class MultiThreadedFutureImpl<T> extends AbstractFuture<T> implements Mul
   }
 
   MultiThreadedFutureImpl(final Throwable cause) {
-    handlers = new ArrayList<>();
-    this.expires = CacheableResult.EXPIRED;
+    this();
+    fail(cause);
   }
 
   private long expires = CacheableFuture.INFINITE;
