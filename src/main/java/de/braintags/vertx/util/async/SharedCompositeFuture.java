@@ -36,6 +36,10 @@ public class SharedCompositeFuture {
         .wrap(CompositeFuture.all((List) futures).map(v -> futures.stream().map(Future::result).collect(toList())));
   }
 
+  public static SharedFuture<Void> joinVoid(final Future<?>... futures) {
+    return joinVoid(Arrays.asList(futures));
+  }
+
   public static SharedFuture<Void> joinVoid(final Collection<? extends Future<?>> futures) {
     if (futures.isEmpty()) {
       return SharedFuture.succeededFuture();
